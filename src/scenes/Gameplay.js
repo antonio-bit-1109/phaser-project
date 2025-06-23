@@ -142,7 +142,7 @@ export class Gameplay extends Phaser.Scene {
         this.anims.create({
             key: 'boom',
             frames: this.anims.generateFrameNumbers('explosion', {start: 0, end: 24}),
-            frameRate: 15,
+            frameRate:30 ,
             repeat: 0
         })
     }
