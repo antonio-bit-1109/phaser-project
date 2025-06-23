@@ -14,6 +14,7 @@ export class Gameplay extends Phaser.Scene {
     maxHp = 100;
     hpBar = null;
     hpBackground = null;
+    punteggio = 0;
 
     // il constructor serve per dare un nome a questa classe, se la devo richiamare da qualche parte questo sarà il nome
     constructor() {
@@ -24,6 +25,7 @@ export class Gameplay extends Phaser.Scene {
     init(data) {
         this.canvasWidth = data.canvasWidth;
         this.canvasHeight = data.canvasHeight
+        this.hp = 100;
     }
 
     preload() {
@@ -47,7 +49,24 @@ export class Gameplay extends Phaser.Scene {
         this.load.audio('expl_sound', 'assets/sounds/expl_sound.mp3')
     }
 
+    showPunteggio() {
+        this.add.text(
+            this.canvasWidth / 1.3,
+            this.canvasHeight / 11,
+            'punteggio: ',
+            {
+                fontSize: '30px',
+                color: '#ff0000',
+                fontStyle: 'bold',
+            }).setOrigin(0.5, 0.5).setDepth(6)
+    }
+
     create() {
+
+        // visualizzo il punteggio della partita
+        this.showPunteggio()
+
+
         // inizializzo la variabile 'cursor' come variabile che recepisce gli eventi delle frecce direzionali
         // Dopo questa riga, cursors sarà un oggetto così:
         // {
@@ -95,10 +114,8 @@ export class Gameplay extends Phaser.Scene {
         this.createAnimationDude(this)
         this.createAnimationExplosion(this)
 
-        // creo lo sfondo della barra della vita (background)
-        this.hpBackground = this.add.graphics() // disegnare forme geometriche in phaser
-        this.hpBackground.fillStyle(0x555555, 1); // grigio
-        this.hpBackground.fillRect(20, 20, 200, 20); // x, y, width, height -- dimensioni del graphic
+        // crea background hp bar
+        this.createHpbackground()
 
         // crea vita vera e propria
         this.hpBar = this.add.graphics();
@@ -106,22 +123,53 @@ export class Gameplay extends Phaser.Scene {
     }
 
 
+    createHpbackground() {
+        // creo lo sfondo della barra della vita (background)
+        this.hpBackground = this.add.graphics() // disegnare forme geometriche in phaser
+        this.hpBackground.fillStyle(0xFF0000, 1); // grigio
+        this.hpBackground.fillRect(20, 20, 200, 20); // x, y, width, height -- dimensioni del graphic
+
+    }
+
     // eseguita ogni 16ms , accetta dei parametri
 // delta:tempo passato dall ultimavolta che la funzione è stata chiamata (ogni 16ms )
 // time: tempo totale in cui la func viene chiamata
     update(time, delta) {
 
-        console.log(this.dude.body.x)
+        // se la vita scende a zero avvio la scena di gameover
+        // interruzione della scena corrente
+        if (this.hp <= 0) {
+            this.scene.start('gameover', {
+                canvasWidth: this.canvasWidth,
+                canvasHeigth: this.canvasHeight
+            })
+        }
 
         if (this.bomb && Math.round(this.bomb.body.y) > Math.round(this.grassTerrain.body.y + 60)) {
-            this.explosion = this.add.sprite(this.bomb.x, this.bomb.y - 20, 'explosion');
-            this.explosion.setScale(0.5);
+            // sprite con interazioni fisiche
+            this.explosion = this.physics.add.sprite(this.bomb.x, this.bomb.y - 20, 'explosion');
+
+            // modifico visivamente l esplosione, non la hitbox del suo body
+            this.explosion.setScale(0.5)
+
+            // modifico la hitbox effettiva dello sprite di esplosione
+            // imposta la dimensione fisica in base alla dimensione visiva dopo lo scaling.
+            this.explosion.body.setSize(
+                this.explosion.displayWidth,
+                this.explosion.displayHeight
+            );
+
+            // centra il collider rispetto all'immagine.
+            this.explosion.body.setOffset(
+                (this.explosion.width - this.explosion.displayWidth) / 2,
+                (this.explosion.height - this.explosion.displayHeight) / 2
+            );
+
             this.explosion.anims.play('boom');
-            this.checkCollision()
-           // this.sound.play('expl_sound');
+            //  this.sound.play('expl_sound');
             this.bomb.destroy();
             this.bomb = null;
-
+            this.handle_Dude_Explosion_overlap()
             this.explosion.on('animationcomplete', () => {
                 this.explosion.destroy();
                 this.bomb = this.physics.add.sprite(Math.random() * this.canvasWidth, 0, 'bomb').setDepth(2);
@@ -153,15 +201,9 @@ export class Gameplay extends Phaser.Scene {
         this.updateHpBar()
     }
 
-    checkCollision(){
-        if (this.dude.body.y){
-
-        }
-    }
-
 
     // aggiornamento dello stato della vita
-    updateHpBar(){
+    updateHpBar() {
 
         this.hpBar.clear()
         const hpPercent = this.hp / this.maxHp
@@ -171,13 +213,21 @@ export class Gameplay extends Phaser.Scene {
         this.hpBar.fillRect(20, 20, 200 * hpPercent, 20);
     }
 
+    // controllare la collisione tra due elementi
+    handle_Dude_Explosion_overlap() {
+        if (this.dude && this.explosion && this.physics.overlap(this.dude, this.explosion)) {
+            this.hp -= 20
+            this.updateHpBar()
+        }
+    }
+
 
     // creazione dell animazione di esplosione
     createAnimationExplosion() {
         this.anims.create({
             key: 'boom',
             frames: this.anims.generateFrameNumbers('explosion', {start: 0, end: 24}),
-            frameRate:30 ,
+            frameRate: 30,
             repeat: 0
         })
     }
