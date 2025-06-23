@@ -10,6 +10,10 @@ export class Gameplay extends Phaser.Scene {
     explosion = null;
     canvasWidth = null;
     canvasHeight = null;
+    hp = 100;
+    maxHp = 100;
+    hpBar = null;
+    hpBackground = null;
 
     // il constructor serve per dare un nome a questa classe, se la devo richiamare da qualche parte questo sarà il nome
     constructor() {
@@ -90,19 +94,31 @@ export class Gameplay extends Phaser.Scene {
         this.dude.displayHeight = 60;
         this.createAnimationDude(this)
         this.createAnimationExplosion(this)
+
+        // creo lo sfondo della barra della vita (background)
+        this.hpBackground = this.add.graphics() // disegnare forme geometriche in phaser
+        this.hpBackground.fillStyle(0x555555, 1); // grigio
+        this.hpBackground.fillRect(20, 20, 200, 20); // x, y, width, height -- dimensioni del graphic
+
+        // crea vita vera e propria
+        this.hpBar = this.add.graphics();
+        this.updateHpBar()
     }
+
 
     // eseguita ogni 16ms , accetta dei parametri
 // delta:tempo passato dall ultimavolta che la funzione è stata chiamata (ogni 16ms )
 // time: tempo totale in cui la func viene chiamata
     update(time, delta) {
 
+        console.log(this.dude.body.x)
 
         if (this.bomb && Math.round(this.bomb.body.y) > Math.round(this.grassTerrain.body.y + 60)) {
             this.explosion = this.add.sprite(this.bomb.x, this.bomb.y - 20, 'explosion');
             this.explosion.setScale(0.5);
             this.explosion.anims.play('boom');
-            this.sound.play('expl_sound');
+            this.checkCollision()
+           // this.sound.play('expl_sound');
             this.bomb.destroy();
             this.bomb = null;
 
@@ -134,8 +150,27 @@ export class Gameplay extends Phaser.Scene {
             this.dude.anims.play('stand')
         }
 
-
+        this.updateHpBar()
     }
+
+    checkCollision(){
+        if (this.dude.body.y){
+
+        }
+    }
+
+
+    // aggiornamento dello stato della vita
+    updateHpBar(){
+
+        this.hpBar.clear()
+        const hpPercent = this.hp / this.maxHp
+
+        // Disegno la barra verde in base alla percentuale
+        this.hpBar.fillStyle(0x00ff00, 1); // verde
+        this.hpBar.fillRect(20, 20, 200 * hpPercent, 20);
+    }
+
 
     // creazione dell animazione di esplosione
     createAnimationExplosion() {
