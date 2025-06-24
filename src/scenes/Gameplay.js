@@ -26,6 +26,7 @@ export class Gameplay extends Phaser.Scene {
     DEFAULT_GENERATION_BOMB = 'default'
     DOUBLE_GENERATION_BOMB = 'double';
     TRIPLE_GENERATION_BOMB = 'triple';
+    QUADRUPLE_GENERATION_BOMB = 'quadruple'
     bombGenerationType = this.DEFAULT_GENERATION_BOMB;
     bullet = null;
     explosion_bullet_bomb = null;
@@ -113,6 +114,9 @@ export class Gameplay extends Phaser.Scene {
             case this.TRIPLE_GENERATION_BOMB:
                 this.multipleBombGen(3)
                 break;
+            case this.QUADRUPLE_GENERATION_BOMB:
+                this.multipleBombGen(4)
+                break
         }
     }
 
@@ -430,15 +434,19 @@ export class Gameplay extends Phaser.Scene {
                 console.log("timer spwan bomba diminuito", this.timerEventSpawnBomb.delay)
             }
 
-
             if (this.livello === 5) {
                 this.bombGenerationType = this.DOUBLE_GENERATION_BOMB
                 console.log("passato a modalità spawn bombe doppio")
             }
 
-            if (this.livello > 5) {
+            if (this.livello === 7) {
                 this.bombGenerationType = this.TRIPLE_GENERATION_BOMB
                 console.log("passato alla modalità spawn bombe triplo")
+            }
+
+            if (this.livello > 9) {
+                this.bombGenerationType = this.QUADRUPLE_GENERATION_BOMB
+                console.log("passato alla modalità spawn bombe quadruplo")
             }
         }
     }
