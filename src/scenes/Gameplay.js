@@ -26,6 +26,8 @@ export class Gameplay extends Phaser.Scene {
     DEFAULT_GENERATION_BOMB = 'default'
     DOUBLE_GENERATION_BOMB = 'double';
     bombGenerationType = this.DEFAULT_GENERATION_BOMB;
+    bullet = null;
+    explosion_bullet_bomb = null;
 
 
     // il constructor serve per dare un nome a questa classe, se la devo richiamare da qualche parte questo sarà il nome
@@ -70,9 +72,18 @@ export class Gameplay extends Phaser.Scene {
             frameWidth: 320
         })
 
+        // carico lo spritesheet dell esplosione causata dal contatto proiettile e bomba
+        this.load.spritesheet('bullet_bomb_explosion', "assets/explosion_sprite.png", {
+            frameHeight: 145,
+            frameWidth: 120
+        })
+
         // carico un suono di un esplosione
         this.load.audio('expl_sound', 'assets/sounds/expl_sound.mp3')
         this.load.audio("gameMusic", "assets/sounds/gameMusic.mp3")
+
+        //carico immagine proiettile
+        this.load.image('bullet', "assets/bullet.png")
     }
 
 
@@ -207,7 +218,7 @@ export class Gameplay extends Phaser.Scene {
 
         this.createAnimationDude(this)
         this.createAnimationExplosion(this)
-
+        this.createAnimationExplosionBulletBomb()
         // crea background hp bar
         this.createHpbackground()
 
@@ -237,6 +248,23 @@ export class Gameplay extends Phaser.Scene {
 
     }
 
+
+    // controlla se il bullet è uscito dalla canvas sull asse y
+    checkIfBulletOutOfCanvas() {
+        if (this.bullet && this.bullet.body.y <= 0) {
+            this.bullet = null
+            console.log("bullet uscita dall asse y ")
+        }
+    }
+
+    // controllo se le hitbox di bomba e bullet si toccano
+    checkIfCollide_bullet_bomb(bomb) {
+        if (bomb && this.bullet && this.physics.overlap(bomb, this.bullet)) {
+            return true;
+        }
+    }
+
+
     // eseguita ogni 16ms , accetta dei parametri
 // delta:tempo passato dall ultimavolta che la funzione è stata chiamata (ogni 16ms )
 // time: tempo totale in cui la func viene chiamata
@@ -263,6 +291,24 @@ export class Gameplay extends Phaser.Scene {
         this.bombsGroup && this.bombsGroup.children.iterate((bomb) => {
 
             if (!bomb) return
+
+            if (this.checkIfCollide_bullet_bomb(bomb)) {
+                // nel punto dove bullet e bomb si toccano inserisci l animazione di una esplosione
+                bomb.destroy()
+                this.explosion_bullet_bomb = this.physics.add.sprite(bomb.x, bomb.y, 'bullet_bomb_explosion')
+                    .setOrigin(0.5, 0.5)
+                this.explosion_bullet_bomb.setGravity(false)
+                this.explosion_bullet_bomb.anims.play('boom2')
+                this.bullet.destroy();
+                this.bullet = null;
+                this.explosion_bullet_bomb.on('animationcomplete', () => {
+                    this.explosion_bullet_bomb.destroy()
+                });
+                return;
+                //
+
+
+            }
 
             if (bomb && Math.round(bomb.body.y) > Math.round(this.grassTerrain.body.y + 60)) {
                 // sprite con interazioni fisiche
@@ -323,6 +369,27 @@ export class Gameplay extends Phaser.Scene {
             if (this.cursors.left.isDown) return;
 
             this.dude.setVisible(false)
+
+            if (this.bullet === null) {
+                this.bullet = this.physics.add.sprite(
+                    this.dude.x,
+                    this.dude.y - 30,
+                    'bullet'
+                )
+                    .setAngle(90)
+                    .setScale(0.3) // Riduce anche il render grafico
+                    .setOrigin(0.5);
+
+                // Calcola nuova dimensione hitbox in base alla scala e all’immagine originale
+                const width = this.bullet.displayWidth;
+                const height = this.bullet.displayHeight;
+
+                this.bullet.body.setSize(width, height);
+                this.bullet.body.setOffset((this.bullet.width - width) / 2, (this.bullet.height - height) / 2);
+                this.bullet.setVelocity(0, -250)
+            }
+
+
             this.shooting_dude.setVisible(true)
             this.shooting_dude.setPosition(this.dude.x, this.dude.y - 9);
             this.shooting_dude.anims.play('shoot', true);
@@ -336,6 +403,8 @@ export class Gameplay extends Phaser.Scene {
 
 
         this.updateHpBar()
+        this.checkIfBulletOutOfCanvas()
+
     }
 
     updateLivello() {
@@ -397,6 +466,15 @@ export class Gameplay extends Phaser.Scene {
         }
     }
 
+    // animazione di collisione tra bullet e bomb
+    createAnimationExplosionBulletBomb() {
+        this.anims.create({
+            key: 'boom2',
+            frames: this.anims.generateFrameNumbers('bullet_bomb_explosion', {start: 0, end: 7}),
+            frameRate: 15,
+            repeat: 0
+        })
+    }
 
     // creazione dell animazione di esplosione
     createAnimationExplosion() {
