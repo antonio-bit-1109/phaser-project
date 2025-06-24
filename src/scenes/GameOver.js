@@ -80,7 +80,7 @@ export class GameOver extends Phaser.Scene {
 
     pressKeyToRestart() {
         this.input.keyboard.once('keydown-SPACE', () => {
-            this.sound.get('gameOver').destroy()
+            this.sound.removeAll()
             this.scene.start('gameplay')
         })
     }
