@@ -435,17 +435,17 @@ export class Gameplay extends Phaser.Scene {
                 console.log("timer spwan bomba diminuito", this.timerEventSpawnBomb.delay)
             }
 
-            if (this.livello === 5) {
+            if (this.livello === 2) {
                 this.bombGenerationType = this.DOUBLE_GENERATION_BOMB
                 console.log("passato a modalità spawn bombe doppio")
             }
 
-            if (this.livello === 7) {
+            if (this.livello === 3) {
                 this.bombGenerationType = this.TRIPLE_GENERATION_BOMB
                 console.log("passato alla modalità spawn bombe triplo")
             }
 
-            if (this.livello >= 9) {
+            if (this.livello >= 5) {
                 this.bombGenerationType = this.QUADRUPLE_GENERATION_BOMB
                 console.log("passato alla modalità spawn bombe quadruplo")
             }
