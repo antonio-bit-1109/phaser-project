@@ -49,6 +49,7 @@ export class Gameplay extends Phaser.Scene {
         this.livello = 0;
         this.livelloChanged = false;
         this.bombGenerationType = this.DEFAULT_GENERATION_BOMB;
+        this.bullet = null
     }
 
     preload() {
@@ -444,7 +445,7 @@ export class Gameplay extends Phaser.Scene {
                 console.log("passato alla modalità spawn bombe triplo")
             }
 
-            if (this.livello > 9) {
+            if (this.livello >= 9) {
                 this.bombGenerationType = this.QUADRUPLE_GENERATION_BOMB
                 console.log("passato alla modalità spawn bombe quadruplo")
             }
