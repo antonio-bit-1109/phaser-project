@@ -25,6 +25,7 @@ export class Gameplay extends Phaser.Scene {
     timerEventSpawnBomb = null;
     DEFAULT_GENERATION_BOMB = 'default'
     DOUBLE_GENERATION_BOMB = 'double';
+    TRIPLE_GENERATION_BOMB = 'triple';
     bombGenerationType = this.DEFAULT_GENERATION_BOMB;
     bullet = null;
     explosion_bullet_bomb = null;
@@ -81,6 +82,7 @@ export class Gameplay extends Phaser.Scene {
         // carico un suono di un esplosione
         this.load.audio('expl_sound', 'assets/sounds/expl_sound.mp3')
         this.load.audio("gameMusic", "assets/sounds/gameMusic.mp3")
+        this.load.audio('expl_bomb_bullet', "assets/sounds/explosion_bullet_bomb.mp3")
 
         //carico immagine proiettile
         this.load.image('bullet', "assets/bullet.png")
@@ -107,6 +109,9 @@ export class Gameplay extends Phaser.Scene {
                 break;
             case this.DOUBLE_GENERATION_BOMB:
                 this.multipleBombGen(2)
+                break;
+            case this.TRIPLE_GENERATION_BOMB:
+                this.multipleBombGen(3)
                 break;
         }
     }
@@ -260,6 +265,9 @@ export class Gameplay extends Phaser.Scene {
     // controllo se le hitbox di bomba e bullet si toccano
     checkIfCollide_bullet_bomb(bomb) {
         if (bomb && this.bullet && this.physics.overlap(bomb, this.bullet)) {
+            this.sound.play('expl_bomb_bullet', {
+                volume: 5
+            });
             return true;
         }
     }
@@ -423,9 +431,14 @@ export class Gameplay extends Phaser.Scene {
             }
 
 
-            if (this.livello >= 5) {
+            if (this.livello === 5) {
                 this.bombGenerationType = this.DOUBLE_GENERATION_BOMB
                 console.log("passato a modalità spawn bombe doppio")
+            }
+
+            if (this.livello > 5) {
+                this.bombGenerationType = this.TRIPLE_GENERATION_BOMB
+                console.log("passato alla modalità spawn bombe triplo")
             }
         }
     }
