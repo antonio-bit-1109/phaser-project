@@ -3,7 +3,6 @@ export class Gameplay extends Phaser.Scene {
     VELOCITY = 200;
     BOMB_DEFAULT_WIDTH = 100;
     BOMB_DEFAULT_HEIGHT = 100;
-    // bomb = null;
     grassTerrain = null;
     dude = null;
     shooting_dude = null;
@@ -30,6 +29,9 @@ export class Gameplay extends Phaser.Scene {
     bombGenerationType = this.DEFAULT_GENERATION_BOMB;
     bullet = null;
     explosion_bullet_bomb = null;
+    boss = null;
+    movingRight = false
+    movingLeft = false
 
 
     // il constructor serve per dare un nome a questa classe, se la devo richiamare da qualche parte questo sarà il nome
@@ -54,7 +56,7 @@ export class Gameplay extends Phaser.Scene {
 
     preload() {
         // key dell immagine e source da dove prenderla
-        this.load.image('nature', 'assets/nature.jpg');
+        this.load.image('nature', 'assets/sky.png');
         this.load.image('bomb', "assets/bomb_gpt.png");
         this.load.image('grass', 'assets/grass_no_bg.png');
         // carico l immagine di frame come spritesheet in modo da poter utilizzare ogni singolo frame ad un determinato evento
@@ -88,6 +90,11 @@ export class Gameplay extends Phaser.Scene {
 
         //carico immagine proiettile
         this.load.image('bullet', "assets/bullet.png")
+
+        //caricamento boss nemico
+        this.load.spritesheet('bossSpriteSheet', "assets/boss.png", {
+            frameWidth: 87, frameHeight: 110
+        })
     }
 
 
@@ -152,6 +159,7 @@ export class Gameplay extends Phaser.Scene {
     }
 
     create() {
+
 
         //musica principale
         this.sound.play("gameMusic")
@@ -226,9 +234,14 @@ export class Gameplay extends Phaser.Scene {
         this.shooting_dude.displayHeight = 12;
         this.shooting_dude.setVisible(false); // nascosto di default
 
+        // inizializzo animazione del dude
         this.createAnimationDude(this)
+        // inizializzo animazione dell esplosione della bomba
         this.createAnimationExplosion(this)
+        // inizializzo animazione del contatto bullet e bomba
         this.createAnimationExplosionBulletBomb()
+        // inizializzo la funzione per creare l animazione che poi servirà a far muovere il boss
+        this.createAnimationBossMovements()
         // crea background hp bar
         this.createHpbackground()
 
@@ -278,6 +291,20 @@ export class Gameplay extends Phaser.Scene {
     }
 
 
+    moveBoss() {
+        //  this.movingRight = true
+        // this.movingRight && this.boss.setVelocityX(100)
+        //
+        //  if (this)
+        // } else {
+        //     this.boss.setVelocityX(100)
+        // }
+
+
+        // if (this.boss.body.x)
+    }
+
+
     // eseguita ogni 16ms , accetta dei parametri
 // delta:tempo passato dall ultimavolta che la funzione è stata chiamata (ogni 16ms )
 // time: tempo totale in cui la func viene chiamata
@@ -301,6 +328,11 @@ export class Gameplay extends Phaser.Scene {
             })
         }
 
+
+        // se il boss esiste, gestione dei movimenti
+        this.boss && this.moveBoss()
+
+
         this.bombsGroup && this.bombsGroup.children.iterate((bomb) => {
 
             if (!bomb) return
@@ -309,7 +341,7 @@ export class Gameplay extends Phaser.Scene {
                 // nel punto dove bullet e bomb si toccano inserisci l animazione di una esplosione
                 bomb.destroy()
                 this.explosion_bullet_bomb = this.physics.add.sprite(bomb.x, bomb.y, 'bullet_bomb_explosion')
-                  
+
                 this.explosion_bullet_bomb.setGravity(false)
                 this.explosion_bullet_bomb.anims.play('boom2')
                 this.bullet.destroy();
@@ -324,7 +356,6 @@ export class Gameplay extends Phaser.Scene {
             }
 
             if (bomb && Math.round(bomb.body.y) > Math.round(this.grassTerrain.body.y + 60)) {
-                debugger
                 // sprite con interazioni fisiche
                 this.explosion = this.physics.add.sprite(bomb.x, bomb.y - 20, 'explosion')
 
@@ -418,23 +449,33 @@ export class Gameplay extends Phaser.Scene {
                 console.log("timer spwan bomba diminuito", this.timerEventSpawnBomb.delay)
             }
 
-            if (this.livello === 2) {
+            if (this.livello === 3) {
                 this.bombGenerationType = this.DOUBLE_GENERATION_BOMB
                 console.log("passato a modalità spawn bombe doppio")
             }
 
-            if (this.livello === 3) {
+            if (this.livello === 5) {
                 this.bombGenerationType = this.TRIPLE_GENERATION_BOMB
                 console.log("passato alla modalità spawn bombe triplo")
             }
 
-            if (this.livello >= 5) {
+            if (this.livello === 9) {
                 this.bombGenerationType = this.QUADRUPLE_GENERATION_BOMB
                 console.log("passato alla modalità spawn bombe quadruplo")
+            }
+
+            if (this.livello === 1) {
+                this.generateBoss()
             }
         }
     }
 
+
+    // informazioni per generare il boss
+    generateBoss() {
+        this.boss = this.physics.add.sprite(this.canvasWidth / 5, this.canvasHeight / 6, 'bossSpriteSheet')
+        this.boss.anims.play('bossAnim')
+    }
 
     // aggiorno il valore del punteggio allo scorrere del tempo
     updatePunteggio(time) {
@@ -478,6 +519,15 @@ export class Gameplay extends Phaser.Scene {
             frames: this.anims.generateFrameNumbers('bullet_bomb_explosion', {start: 0, end: 7}),
             frameRate: 15,
             repeat: 0
+        })
+    }
+
+    createAnimationBossMovements() {
+        this.anims.create({
+            key: 'bossAnim',
+            frames: this.anims.generateFrameNumbers('bossSpriteSheet', {start: 0, end: 7}),
+            frameRate: 20,
+            repeat: -1
         })
     }
 
