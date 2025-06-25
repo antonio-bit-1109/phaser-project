@@ -31,6 +31,9 @@ export class Gameplay extends Phaser.Scene {
     explosion_bullet_bomb = null;
     boss = null;
     movingRight = false
+    hpBackground_boss = null;
+    hpBoss_bar = null
+    hpBoss_number = 100;
 
 
     // il constructor serve per dare un nome a questa classe, se la devo richiamare da qualche parte questo sarà il nome
@@ -337,7 +340,7 @@ export class Gameplay extends Phaser.Scene {
 
         // se il boss esiste, gestione dei movimenti
         this.boss && this.moveBoss()
-
+        this.boss && this.updateBossLife()
 
         this.bombsGroup && this.bombsGroup.children.iterate((bomb) => {
 
@@ -484,9 +487,28 @@ export class Gameplay extends Phaser.Scene {
     // informazioni per generare il boss
     generateBoss() {
         this.boss = this.physics.add.sprite(this.canvasWidth / 8, this.canvasHeight / 6, 'bossSpriteSheet')
+        this.createBossHp_Background()
         this.boss.anims.play('bossAnim')
         // variabile usate per lo spostamento iniziale del boss
         this.movingRight = true;
+        this.hpBoss_bar = this.add.graphics()
+    }
+
+    createBossHp_Background() {
+        // creo lo sfondo della barra della vita (background)
+        this.hpBackground_boss = this.add.graphics() // disegnare forme geometriche in phaser
+        this.hpBackground_boss.fillStyle(0x808080, 1); // grigio medio
+        this.hpBackground_boss.fillRect(this.canvasWidth - 250, 20, 200, 20); // x, y, width, height -- dimensioni del graphic
+
+    }
+
+    updateBossLife() {
+        this.hpBoss_bar.clear()
+        const hpPercent = this.hpBoss_number / this.maxHp
+
+        // Disegno la barra verde in base alla percentuale
+        this.hpBoss_bar.fillStyle(0x800080, 1); // viola
+        this.hpBoss_bar.fillRect(this.canvasWidth - 250, 20, 200 * hpPercent, 20);
     }
 
     // aggiorno il valore del punteggio allo scorrere del tempo
