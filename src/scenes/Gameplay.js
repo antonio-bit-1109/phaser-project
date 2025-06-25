@@ -71,8 +71,8 @@ export class Gameplay extends Phaser.Scene {
 
         // carico l'immagine di animazione dello scoppio della bomba
         this.load.spritesheet('explosion', "assets/explosion.png", {
-            frameHeight: 232,
-            frameWidth: 320
+            frameHeight: 115,
+            frameWidth: 160
         })
 
         // carico lo spritesheet dell esplosione causata dal contatto proiettile e bomba
@@ -309,7 +309,7 @@ export class Gameplay extends Phaser.Scene {
                 // nel punto dove bullet e bomb si toccano inserisci l animazione di una esplosione
                 bomb.destroy()
                 this.explosion_bullet_bomb = this.physics.add.sprite(bomb.x, bomb.y, 'bullet_bomb_explosion')
-                    .setOrigin(0.5, 0.5)
+                  
                 this.explosion_bullet_bomb.setGravity(false)
                 this.explosion_bullet_bomb.anims.play('boom2')
                 this.bullet.destroy();
@@ -324,30 +324,13 @@ export class Gameplay extends Phaser.Scene {
             }
 
             if (bomb && Math.round(bomb.body.y) > Math.round(this.grassTerrain.body.y + 60)) {
+                debugger
                 // sprite con interazioni fisiche
-                this.explosion = this.physics.add.sprite(bomb.x, bomb.y - 20, 'explosion');
-
-                // modifico visivamente l esplosione, non la hitbox del suo body
-                this.explosion.setScale(0.5)
-
-                // modifico la hitbox effettiva dello sprite di esplosione
-                // imposta la dimensione fisica in base alla dimensione visiva dopo lo scaling.
-                this.explosion.body.setSize(
-                    this.explosion.displayWidth,
-                    this.explosion.displayHeight
-                );
-
-                // centra il collider rispetto all'immagine.
-                this.explosion.body.setOffset(
-                    (this.explosion.width - this.explosion.displayWidth) / 2,
-                    (this.explosion.height - this.explosion.displayHeight) / 2
-                );
+                this.explosion = this.physics.add.sprite(bomb.x, bomb.y - 20, 'explosion')
 
                 this.explosion.anims.play('boom');
                 this.sound.play('expl_sound');
                 bomb.destroy()
-                // this.bomb.destroy();
-                // this.bomb = null;
                 this.handle_Dude_Explosion_overlap()
                 this.explosion.on('animationcomplete', () => {
                     this.explosion.destroy();
