@@ -161,7 +161,9 @@ export class Gameplay extends Phaser.Scene {
 
 
         //musica principale
-        this.sound.play("gameMusic")
+        this.sound.play("gameMusic", {
+            loop: true
+        })
 
 
         this.bombsGroup = this.physics.add.group()
