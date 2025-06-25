@@ -31,7 +31,6 @@ export class Gameplay extends Phaser.Scene {
     explosion_bullet_bomb = null;
     boss = null;
     movingRight = false
-    movingLeft = false
 
 
     // il constructor serve per dare un nome a questa classe, se la devo richiamare da qualche parte questo sarà il nome
@@ -291,17 +290,22 @@ export class Gameplay extends Phaser.Scene {
     }
 
 
+    // movimento oscillatorio del bbss dx - sn
     moveBoss() {
-        //  this.movingRight = true
-        // this.movingRight && this.boss.setVelocityX(100)
-        //
-        //  if (this)
-        // } else {
-        //     this.boss.setVelocityX(100)
-        // }
 
+        if (this.boss.x >= 0 && this.movingRight) {
+            this.boss.setVelocityX(150)
+        }
 
-        // if (this.boss.body.x)
+        if (this.boss.x >= this.canvasWidth - 100) {
+            this.boss.setVelocityX(-150);
+            this.movingRight = false;
+        }
+
+        if (this.boss.x === 100) {
+            this.movingRight = true;
+        }
+
     }
 
 
@@ -473,8 +477,10 @@ export class Gameplay extends Phaser.Scene {
 
     // informazioni per generare il boss
     generateBoss() {
-        this.boss = this.physics.add.sprite(this.canvasWidth / 5, this.canvasHeight / 6, 'bossSpriteSheet')
+        this.boss = this.physics.add.sprite(this.canvasWidth / 8, this.canvasHeight / 6, 'bossSpriteSheet')
         this.boss.anims.play('bossAnim')
+        // variabile usate per lo spostamento iniziale del boss
+        this.movingRight = true;
     }
 
     // aggiorno il valore del punteggio allo scorrere del tempo
