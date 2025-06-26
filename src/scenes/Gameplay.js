@@ -434,6 +434,15 @@ export class Gameplay extends Phaser.Scene {
 
         })
 
+
+        // controllo collisioni tra bullet e boss se questi esistono
+        if (this.bullet && this.boss && this.checkCollision_general(this.bullet, this.boss)) {
+            this.hpBoss_number -= 10;
+            this.bullet.destroy()
+            this.bullet = null;
+        }
+
+
         // gestione dell animazione del dude
         this.dude.setVelocity(0);
         // this.dude.setVisible(true)
