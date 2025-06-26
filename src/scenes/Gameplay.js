@@ -35,7 +35,10 @@ export class Gameplay extends Phaser.Scene {
     hpBoss_bar = null
     hpBoss_number = 100;
     shuriken_boss = null;
-    timerEventBossAttack = null;
+    boss_laserBeam_1 = null;
+    boss_laserBeam_2 = null
+    shuriken_count = 0;
+    random_x_position_boss = null;
 
     // il constructor serve per dare un nome a questa classe, se la devo richiamare da qualche parte questo sarà il nome
     constructor() {
@@ -90,6 +93,7 @@ export class Gameplay extends Phaser.Scene {
         this.load.audio('expl_sound', 'assets/sounds/expl_sound.mp3')
         this.load.audio("gameMusic", "assets/sounds/gameMusic.mp3")
         this.load.audio('expl_bomb_bullet', "assets/sounds/explosion_bullet_bomb.mp3")
+        this.load.audio('bossMusic', "assets/sounds/bossMusic.mp3")
 
         //carico immagine proiettile
         this.load.image('bullet', "assets/bullet.png")
@@ -104,6 +108,9 @@ export class Gameplay extends Phaser.Scene {
             frameWidth: 15.5,
             frameHeight: 17
         })
+
+        // carico immagine del raggio laser del boss
+        this.load.image('laserBeam', "assets/laserBeam.png");
     }
 
 
@@ -332,13 +339,71 @@ export class Gameplay extends Phaser.Scene {
         }
 
         // ogni volta che la posizione x è un multiplo di 100 il boss lancia un attacco
-        if (this.boss.x % 100 === 0) {
-            this.bossAttack()
+        if (this.boss.x % 100 === 0 && this.shuriken_count < 15) {
+            this.bossAttack1()
+            console.log("boss lancia shuriken")
+        }
+
+        if (this.shuriken_count >= 15) {
+            this.bossAttack2()
         }
 
     }
 
-    bossAttack() {
+    bossAttack2() {
+
+        if (this.random_x_position_boss === null) {
+            this.random_x_position_boss = Math.random() * this.canvasWidth
+        }
+
+        // sposto il boss ad una posizione x
+        // casuale in modo graduale evitaando il teletrasporto
+        this.tweens.add({
+            targets: this.boss,
+            x: this.random_x_position_boss,
+            duration: 1000,
+            ease: 'Power2',
+            onComplete: () => {
+                this.fireLaserBeam()
+            }
+        });
+
+
+    }
+
+    fireLaserBeam() {
+        // Qui puoi fare qualcosa quando il boss arriva alla posizione
+        console.log("Boss arrivato alla posizione!");
+        // Ad esempio sparare il laser
+        // Creo un rettangolo che rappresenta il laser dal boss fino a terra
+        const laserWidth = 10;
+        const laserHeight = this.canvasHeight - this.boss.y;
+
+        this.boss_laserBeam_1 = this.add.rectangle(
+            this.boss.x - 40,
+            this.boss.y + (laserHeight / 2), // centro del rettangolo
+            laserWidth,
+            laserHeight,
+            0xff0000, // colore rosso
+            0.8 // trasparenza
+        );
+
+        this.boss_laserBeam_2 = this.add.rectangle(
+            this.boss.x + 30,
+            this.boss.y + (laserHeight / 2), // centro del rettangolo
+            laserWidth,
+            laserHeight,
+            0xff0000, // colore rosso
+            0.8 // trasparenza
+        );
+
+        // Aggiungi fisica per collision detection
+        this.physics.add.existing(this.boss_laserBeam_1);
+        this.physics.add.existing(this.boss_laserBeam_2);
+
+    }
+
+    bossAttack1() {
         // Crea lo shuriken
         const shuriken = this.physics.add
             .sprite(this.boss.x, this.boss.y, 'shuriken_boss')
@@ -351,6 +416,7 @@ export class Gameplay extends Phaser.Scene {
         shuriken.setVelocityY(100);
         shuriken.body.allowGravity = false; // Evita che la gravità interferisca
         shuriken.anims.play('shuriken');
+        this.shuriken_count++
     }
 
 
@@ -542,9 +608,14 @@ export class Gameplay extends Phaser.Scene {
                 console.log("passato alla modalità spawn bombe quadruplo")
             }
 
-            if (this.livello === 10) {
+            if (this.livello === 1) {
                 // metto in pausa la generazione di bombe
                 this.timerEventSpawnBomb.paused = true;
+                // interrompo musica di base
+                this.sound.get('gameMusic').stop();
+
+                // inizializzo musica boss figth
+                this.sound.play('bossMusic')
 
                 // genero il boss
                 this.generateBoss()
