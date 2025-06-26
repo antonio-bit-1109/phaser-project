@@ -338,7 +338,8 @@ export class Gameplay extends Phaser.Scene {
             this.movingRight = true;
         }
 
-        // ogni volta che la posizione x è un multiplo di 100 il boss lancia un attacco
+        // ogni volta che la posizione x è un multiplo di 100 il boss lancia un attacco shuriken finche non ne lancia 15
+        // poi passa al laser beam e poi di nuovo agli shurikne in loop finche non stira le zampe
         if (this.boss.x % 100 === 0 && this.shuriken_count < 15) {
             this.bossAttack1()
             console.log("boss lancia shuriken")
