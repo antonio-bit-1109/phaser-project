@@ -34,7 +34,8 @@ export class Gameplay extends Phaser.Scene {
     hpBackground_boss = null;
     hpBoss_bar = null
     hpBoss_number = 100;
-
+    shuriken_boss = null;
+    timerEventBossAttack = null;
 
     // il constructor serve per dare un nome a questa classe, se la devo richiamare da qualche parte questo sarà il nome
     constructor() {
@@ -96,6 +97,12 @@ export class Gameplay extends Phaser.Scene {
         //caricamento boss nemico
         this.load.spritesheet('bossSpriteSheet', "assets/boss.png", {
             frameWidth: 87, frameHeight: 110
+        })
+
+        // caricamento shuriken - boss's attack
+        this.load.spritesheet('shuriken_boss', 'assets/shuriken_boss.png', {
+            frameWidth: 15.5,
+            frameHeight: 17
         })
     }
 
@@ -170,6 +177,9 @@ export class Gameplay extends Phaser.Scene {
 
 
         this.bombsGroup = this.physics.add.group()
+
+        // creo un gruppo nel quale inserire gli sprite che saranno attacchi del boss
+        this.shuriken_boss = this.physics.add.group();
 
         // creo un loop per popolare questa variabile 'gruppo' -- cioè una variabile array tipo
         this.timerEventSpawnBomb = this.time.addEvent({
@@ -246,6 +256,10 @@ export class Gameplay extends Phaser.Scene {
         this.createAnimationExplosionBulletBomb()
         // inizializzo la funzione per creare l animazione che poi servirà a far muovere il boss
         this.createAnimationBossMovements()
+
+        // inizilizz animazione rotazione shuriken boss
+        this.createAnimationRotationShuriken();
+
         // crea background hp bar
         this.createHpbackground()
 
@@ -294,6 +308,12 @@ export class Gameplay extends Phaser.Scene {
         }
     }
 
+    checkCollision_general(p1, p2) {
+        if (p1 && p2 && this.physics.overlap(p1, p2)) {
+            return true;
+        }
+    }
+
 
     // movimento oscillatorio del bbss dx - sn
     moveBoss() {
@@ -311,6 +331,26 @@ export class Gameplay extends Phaser.Scene {
             this.movingRight = true;
         }
 
+        // ogni volta che la posizione x è un multiplo di 100 il boss lancia un attacco
+        if (this.boss.x % 100 === 0) {
+            this.bossAttack()
+        }
+
+    }
+
+    bossAttack() {
+        // Crea lo shuriken
+        const shuriken = this.physics.add
+            .sprite(this.boss.x, this.boss.y, 'shuriken_boss')
+            .setScale(2);
+
+        // Aggiungi al gruppo
+        this.shuriken_boss.add(shuriken);
+
+        // Imposta velocità DOPO l'aggiunta al gruppo
+        shuriken.setVelocityY(100);
+        shuriken.body.allowGravity = false; // Evita che la gravità interferisca
+        shuriken.anims.play('shuriken');
     }
 
 
@@ -342,6 +382,8 @@ export class Gameplay extends Phaser.Scene {
         this.boss && this.moveBoss()
         this.boss && this.updateBossLife()
 
+
+        // controllo le collisioni tra dude e gruppo delle bombe
         this.bombsGroup && this.bombsGroup.children.iterate((bomb) => {
 
             if (!bomb) return
@@ -379,6 +421,18 @@ export class Gameplay extends Phaser.Scene {
 
         })
 
+
+        // controllo collisioni tra dude e gruppo degli shuriken
+        this.shuriken_boss && this.shuriken_boss.children.iterate((shur) => {
+
+            // per ogni shuriken controllo collisione con dude
+            // se avviene sottraggo vita
+            if (this.checkCollision_general(shur, this.dude)) {
+                this.hp -= 10
+                shur.destroy()
+            }
+
+        })
 
         // gestione dell animazione del dude
         this.dude.setVelocity(0);
@@ -473,7 +527,7 @@ export class Gameplay extends Phaser.Scene {
                 console.log("passato alla modalità spawn bombe quadruplo")
             }
 
-            if (this.livello === 10) {
+            if (this.livello === 1) {
                 // metto in pausa la generazione di bombe
                 this.timerEventSpawnBomb.paused = true;
 
@@ -606,5 +660,12 @@ export class Gameplay extends Phaser.Scene {
         })
     }
 
-
+    createAnimationRotationShuriken() {
+        this.anims.create({
+            key: 'shuriken',
+            frames: this.anims.generateFrameNumbers('shuriken_boss', {start: 0, end: 1}),
+            frameRate: 8,
+            repeat: -1 // infinito
+        })
+    }
 }
