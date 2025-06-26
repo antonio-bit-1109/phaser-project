@@ -391,6 +391,7 @@ export class Gameplay extends Phaser.Scene {
             if (this.checkIfCollide_bullet_bomb(bomb)) {
                 // nel punto dove bullet e bomb si toccano inserisci l animazione di una esplosione
                 bomb.destroy()
+                this.punteggio += 10;
                 this.explosion_bullet_bomb = this.physics.add.sprite(bomb.x, bomb.y, 'bullet_bomb_explosion')
 
                 this.explosion_bullet_bomb.setGravity(false)
