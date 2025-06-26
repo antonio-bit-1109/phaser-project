@@ -442,6 +442,11 @@ export class Gameplay extends Phaser.Scene {
             this.bullet = null;
         }
 
+        if (this.boss && this.hpBoss_number === 0) {
+            this.boss.destroy()
+            this.boss = null
+        }
+
 
         // gestione dell animazione del dude
         this.dude.setVelocity(0);
