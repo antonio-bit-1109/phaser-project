@@ -98,8 +98,10 @@ export class Gameplay extends Phaser.Scene {
         this.load.audio('expl_bomb_bullet', "assets/sounds/explosion_bullet_bomb.mp3")
         this.load.audio('bossMusic', "assets/sounds/bossMusic.mp3")
 
-        //carico immagine proiettile
-        this.load.image('bullet', "assets/bullet.png")
+        //carico spritesheet proiettile
+        this.load.spritesheet('bullet', "assets/bullet_2.png", {
+            frameHeight: 151, frameWidth: 93
+        })
 
         //caricamento boss nemico
         this.load.spritesheet('bossSpriteSheet', "assets/boss.png", {
@@ -114,6 +116,9 @@ export class Gameplay extends Phaser.Scene {
 
         // carico immagine del raggio laser del boss
         this.load.image('laserBeam', "assets/laserBeam.png");
+
+        // carico suono bullet
+        this.load.audio('bulletSound', "assets/sounds/fireBall.mp3");
     }
 
     create() {
@@ -206,6 +211,9 @@ export class Gameplay extends Phaser.Scene {
         // inizializzo la funzione per creare l animazione che poi servirà a far muovere il boss
         this.createAnimationBossMovements()
 
+        // creo animazione del bullet fiammeggiante
+        this.createAnimationBulletFiring()
+
         // inizilizz animazione rotazione shuriken boss
         this.createAnimationRotationShuriken();
 
@@ -216,6 +224,7 @@ export class Gameplay extends Phaser.Scene {
         this.hpBar = this.add.graphics();
         this.updateHpBar()
     }
+
 
     // eseguita ogni 16ms , accetta dei parametri
 // delta:tempo passato dall ultimavolta che la funzione è stata chiamata (ogni 16ms )
@@ -387,7 +396,7 @@ export class Gameplay extends Phaser.Scene {
                     this.dude.y - 30,
                     'bullet'
                 )
-                    .setAngle(90)
+                    .setAngle(180)
                     .setScale(0.3) // Riduce anche il render grafico
                     .setOrigin(0.5);
 
@@ -398,6 +407,8 @@ export class Gameplay extends Phaser.Scene {
                 this.bullet.body.setSize(width, height);
                 this.bullet.body.setOffset((this.bullet.width - width) / 2, (this.bullet.height - height) / 2);
                 this.bullet.setVelocity(0, -250)
+                this.sound.play('bulletSound')
+                this.bullet.anims.play('flameBullet');
             }
 
 
@@ -837,6 +848,15 @@ export class Gameplay extends Phaser.Scene {
             frames: this.anims.generateFrameNumbers('shuriken_boss', {start: 0, end: 1}),
             frameRate: 8,
             repeat: -1 // infinito
+        })
+    }
+
+    createAnimationBulletFiring() {
+        this.anims.create({
+            key: 'flameBullet',
+            frames: this.anims.generateFrameNumbers('bullet', {start: 0, end: 4}),
+            frameRate: 15,
+            repeat: -1
         })
     }
 }
