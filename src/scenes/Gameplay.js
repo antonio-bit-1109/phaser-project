@@ -116,67 +116,6 @@ export class Gameplay extends Phaser.Scene {
         this.load.image('laserBeam', "assets/laserBeam.png");
     }
 
-
-    // mostro il punteggio nella canvas la priam volta
-    showPunteggio() {
-        this.punteggioRef = this.add.text(
-            this.canvasWidth / 1.3,
-            this.canvasHeight / 11,
-            `punteggio: ${this.punteggio} `,
-            {
-                fontSize: '30px',
-                color: '#ff0000',
-                fontStyle: 'bold',
-            }).setOrigin(0.5, 0.5).setDepth(6)
-    }
-
-    handleBombGeneration() {
-        switch (this.bombGenerationType) {
-            case this.DEFAULT_GENERATION_BOMB:
-                this.singleBombGen()
-                break;
-            case this.DOUBLE_GENERATION_BOMB:
-                this.multipleBombGen(2)
-                break;
-            case this.TRIPLE_GENERATION_BOMB:
-                this.multipleBombGen(3)
-                break;
-            case this.QUADRUPLE_GENERATION_BOMB:
-                this.multipleBombGen(4)
-                break
-        }
-    }
-
-    singleBombGen() {
-        const bomb = this.bombsGroup.create(
-            Math.random() * this.canvasWidth,
-            0,
-            'bomb'
-        );
-
-
-        bomb.setDisplaySize(this.BOMB_DEFAULT_WIDTH, this.BOMB_DEFAULT_HEIGHT);
-        bomb.setVelocityY(this.VELOCITY);        // imposta la velocità iniziale sull'asse Y
-        bomb.setGravityY(10);                    // applichi una gravità costante
-        bomb.setBounce(0);
-    }
-
-    multipleBombGen(count) {
-        for (let i = 0; i < count; i++) {
-            const bomb = this.bombsGroup.create(
-                Math.random() * this.canvasWidth,
-                0,
-                'bomb'
-            );
-
-
-            bomb.setDisplaySize(this.BOMB_DEFAULT_WIDTH, this.BOMB_DEFAULT_HEIGHT);
-            bomb.setVelocityY(this.VELOCITY);        // imposta la velocità iniziale sull'asse Y
-            bomb.setGravityY(10);                    // applichi una gravità costante
-            bomb.setBounce(0);
-        }
-    }
-
     create() {
 
 
@@ -276,182 +215,6 @@ export class Gameplay extends Phaser.Scene {
         // crea vita vera e propria
         this.hpBar = this.add.graphics();
         this.updateHpBar()
-    }
-
-
-    showLivello() {
-        this.livelloRef = this.add.text(
-            this.canvasWidth / 2,
-            this.canvasHeight / 11,
-            `Livello: ${this.livello} `,
-            {
-                fontSize: '20px',
-                color: '#ff0000',
-                fontStyle: 'bold',
-            }).setOrigin(0.5, 0.5).setDepth(6)
-    }
-
-    createHpbackground() {
-        // creo lo sfondo della barra della vita (background)
-        this.hpBackground = this.add.graphics() // disegnare forme geometriche in phaser
-        this.hpBackground.fillStyle(0xFF0000, 1); // red
-        this.hpBackground.fillRect(20, 20, 200, 20); // x, y, width, height -- dimensioni del graphic
-
-    }
-
-
-    // controlla se il bullet è uscito dalla canvas sull asse y
-    checkIfBulletOutOfCanvas() {
-        if (this.bullet && this.bullet.body.y <= 0) {
-            this.bullet = null
-            console.log("bullet uscita dall asse y ")
-        }
-    }
-
-
-    // check collision between 2 objects
-    checkCollision_general(p1, p2) {
-        if (p1 && p2 && this.physics.overlap(p1, p2)) {
-            return true;
-        }
-    }
-
-
-    // movimento oscillatorio del bbss dx - sn
-    moveBoss() {
-
-        if (this.boss_atk_2_done) {
-            this.boss_atk_2_done = false;
-            this.boss.setVelocityX(0);
-
-            if (this.boss.x > this.canvasWidth / 2) {
-                this.movingRight = false;
-                this.boss.setVelocityX(-150);
-            } else {
-                this.boss.setVelocityX(150)
-                this.movingRight = true;
-            }
-        }
-
-        if (this.boss.x >= 0 && this.movingRight) {
-            this.boss.setVelocityX(150)
-        }
-
-        if (this.boss.x >= this.canvasWidth - 100) {
-            this.boss.setVelocityX(-150);
-            this.movingRight = false;
-        }
-
-        if (this.boss.x <= 100) {
-            this.movingRight = true;
-        }
-
-    }
-
-    bossAttack2() {
-
-
-        // IMPORTANTE PORTARE SEMPRE IL BOSS AD UNA POSIZIONE X % 100 === 0
-        // perche gli shuriken vengono lanciati solo quando il boss si trova in posizione x % 100 === 0
-        // ( quindi quando il valore di x è intero e divisibile per 100 senza resto.)
-        if (this.random_x_position_boss === null) {
-            const randomPositions = [200, 300, 400, 500, 600, 700, 800, 900]
-            const shuffledArr = Phaser.Actions.Shuffle(randomPositions)
-            this.random_x_position_boss = shuffledArr[0];
-        }
-
-
-        if (!this.boss_tweens) {
-            // sposto il boss ad una posizione x
-            // casuale in modo graduale evitaando il teletrasporto
-            this.boss_tweens = this.tweens.add({
-                targets: this.boss,
-                x: this.random_x_position_boss,
-                duration: 1000,
-                ease: 'Power2',
-                onComplete: () => {
-                    this.fireLaserBeam()
-
-                    this.boss_laserBeam_1 &&
-                    this.boss_laserBeam_2 &&
-                    this.time.delayedCall(1000, () => {
-                        this.boss_laserBeam_1.destroy();
-                        this.boss_laserBeam_2.destroy();
-
-                        console.log("Laser beam disattivato!");
-                    })
-
-                    this.shuriken_count = 0;
-                    this.random_x_position_boss = null;
-                    this.boss_atk_2_done = true;
-                }
-            });
-        }
-
-
-    }
-
-    fireLaserBeam() {
-        // Qui puoi fare qualcosa quando il boss arriva alla posizione
-        console.log("Boss arrivato alla posizione!");
-        // Ad esempio sparare il laser
-        // Creo un rettangolo che rappresenta il laser dal boss fino a terra
-        const laserWidth = 10;
-        const laserHeight = this.canvasHeight - this.boss.y;
-
-        this.boss_laserBeam_1 = this.add.rectangle(
-            this.boss.x - 40,
-            this.boss.y + (laserHeight / 2), // centro del rettangolo
-            laserWidth,
-            laserHeight,
-            0xff0000, // colore rosso
-            0.8 // trasparenza
-        );
-
-        this.boss_laserBeam_2 = this.add.rectangle(
-            this.boss.x + 30,
-            this.boss.y + (laserHeight / 2), // centro del rettangolo
-            laserWidth,
-            laserHeight,
-            0xff0000, // colore rosso
-            0.8 // trasparenza
-        );
-
-        // Aggiungi fisica per collision detection
-        this.physics.add.existing(this.boss_laserBeam_1);
-        this.physics.add.existing(this.boss_laserBeam_2);
-
-    }
-
-    bossAttack1() {
-        // Crea lo shuriken
-        const shuriken = this.physics.add
-            .sprite(this.boss.x, this.boss.y, 'shuriken_boss')
-            .setScale(2);
-
-        // Aggiungi al gruppo
-        this.shuriken_boss.add(shuriken);
-
-        // Imposta velocità DOPO l'aggiunta al gruppo
-        shuriken.setVelocityY(100);
-        shuriken.body.allowGravity = false; // Evita che la gravità interferisca
-        shuriken.anims.play('shuriken');
-        this.shuriken_count++
-
-    }
-
-
-    stopGameAndGameOver() {
-        this.scene.stop('gameplay');
-        this.bombsGroup = null;
-        this.timerEventSpawnBomb = null
-        this.sound.stopAll();
-        this.scene.start('gameover', {
-            canvasWidth: this.canvasWidth,
-            canvasHeigth: this.canvasHeight,
-            punteggioFinale: this.punteggio,
-            livello: this.livello
-        })
     }
 
     // eseguita ogni 16ms , accetta dei parametri
@@ -653,6 +416,243 @@ export class Gameplay extends Phaser.Scene {
         this.updateHpBar()
         this.checkIfBulletOutOfCanvas()
 
+    }
+
+
+    showLivello() {
+        this.livelloRef = this.add.text(
+            this.canvasWidth / 2,
+            this.canvasHeight / 11,
+            `Livello: ${this.livello} `,
+            {
+                fontSize: '20px',
+                color: '#ff0000',
+                fontStyle: 'bold',
+            }).setOrigin(0.5, 0.5).setDepth(6)
+    }
+
+    createHpbackground() {
+        // creo lo sfondo della barra della vita (background)
+        this.hpBackground = this.add.graphics() // disegnare forme geometriche in phaser
+        this.hpBackground.fillStyle(0xFF0000, 1); // red
+        this.hpBackground.fillRect(20, 20, 200, 20); // x, y, width, height -- dimensioni del graphic
+
+    }
+
+
+    // controlla se il bullet è uscito dalla canvas sull asse y
+    checkIfBulletOutOfCanvas() {
+        if (this.bullet && this.bullet.body.y <= 0) {
+            this.bullet = null
+            console.log("bullet uscita dall asse y ")
+        }
+    }
+
+
+    // check collision between 2 objects
+    checkCollision_general(p1, p2) {
+        if (p1 && p2 && this.physics.overlap(p1, p2)) {
+            return true;
+        }
+    }
+
+
+    // movimento oscillatorio del bbss dx - sn
+    moveBoss() {
+
+        if (this.boss_atk_2_done) {
+            this.boss_atk_2_done = false;
+            this.boss.setVelocityX(0);
+
+            if (this.boss.x > this.canvasWidth / 2) {
+                this.movingRight = false;
+                this.boss.setVelocityX(-150);
+            } else {
+                this.boss.setVelocityX(150)
+                this.movingRight = true;
+            }
+        }
+
+        if (this.boss.x >= 0 && this.movingRight) {
+            this.boss.setVelocityX(150)
+        }
+
+        if (this.boss.x >= this.canvasWidth - 100) {
+            this.boss.setVelocityX(-150);
+            this.movingRight = false;
+        }
+
+        if (this.boss.x <= 100) {
+            this.movingRight = true;
+        }
+
+    }
+
+    bossAttack2() {
+
+
+        // IMPORTANTE PORTARE SEMPRE IL BOSS AD UNA POSIZIONE X % 100 === 0
+        // perche gli shuriken vengono lanciati solo quando il boss si trova in posizione x % 100 === 0
+        // ( quindi quando il valore di x è intero e divisibile per 100 senza resto.)
+        if (this.random_x_position_boss === null) {
+            const randomPositions = [200, 300, 400, 500, 600, 700, 800, 900]
+            const shuffledArr = Phaser.Actions.Shuffle(randomPositions)
+            this.random_x_position_boss = shuffledArr[0];
+        }
+
+
+        if (!this.boss_tweens) {
+            // sposto il boss ad una posizione x
+            // casuale in modo graduale evitaando il teletrasporto
+            this.boss_tweens = this.tweens.add({
+                targets: this.boss,
+                x: this.random_x_position_boss,
+                duration: 1000,
+                ease: 'Power2',
+                onComplete: () => {
+                    this.fireLaserBeam()
+
+                    this.boss_laserBeam_1 &&
+                    this.boss_laserBeam_2 &&
+                    this.time.delayedCall(1000, () => {
+                        this.boss_laserBeam_1.destroy();
+                        this.boss_laserBeam_2.destroy();
+
+                        console.log("Laser beam disattivato!");
+                    })
+
+                    this.shuriken_count = 0;
+                    this.random_x_position_boss = null;
+                    this.boss_atk_2_done = true;
+                }
+            });
+        }
+
+
+    }
+
+    fireLaserBeam() {
+        // Qui puoi fare qualcosa quando il boss arriva alla posizione
+        console.log("Boss arrivato alla posizione!");
+        // Ad esempio sparare il laser
+        // Creo un rettangolo che rappresenta il laser dal boss fino a terra
+        const laserWidth = 10;
+        const laserHeight = this.canvasHeight - this.boss.y;
+
+        this.boss_laserBeam_1 = this.add.rectangle(
+            this.boss.x - 40,
+            this.boss.y + (laserHeight / 2), // centro del rettangolo
+            laserWidth,
+            laserHeight,
+            0xff0000, // colore rosso
+            0.8 // trasparenza
+        );
+
+        this.boss_laserBeam_2 = this.add.rectangle(
+            this.boss.x + 30,
+            this.boss.y + (laserHeight / 2), // centro del rettangolo
+            laserWidth,
+            laserHeight,
+            0xff0000, // colore rosso
+            0.8 // trasparenza
+        );
+
+        // Aggiungi fisica per collision detection
+        this.physics.add.existing(this.boss_laserBeam_1);
+        this.physics.add.existing(this.boss_laserBeam_2);
+
+    }
+
+    bossAttack1() {
+        // Crea lo shuriken
+        const shuriken = this.physics.add
+            .sprite(this.boss.x, this.boss.y, 'shuriken_boss')
+            .setScale(2);
+
+        // Aggiungi al gruppo
+        this.shuriken_boss.add(shuriken);
+
+        // Imposta velocità DOPO l'aggiunta al gruppo
+        shuriken.setVelocityY(100);
+        shuriken.body.allowGravity = false; // Evita che la gravità interferisca
+        shuriken.anims.play('shuriken');
+        this.shuriken_count++
+
+    }
+
+
+    stopGameAndGameOver() {
+        this.scene.stop('gameplay');
+        this.bombsGroup = null;
+        this.timerEventSpawnBomb = null
+        this.sound.stopAll();
+        this.scene.start('gameover', {
+            canvasWidth: this.canvasWidth,
+            canvasHeigth: this.canvasHeight,
+            punteggioFinale: this.punteggio,
+            livello: this.livello
+        })
+    }
+
+
+    // mostro il punteggio nella canvas la priam volta
+    showPunteggio() {
+        this.punteggioRef = this.add.text(
+            this.canvasWidth / 1.3,
+            this.canvasHeight / 11,
+            `punteggio: ${this.punteggio} `,
+            {
+                fontSize: '30px',
+                color: '#ff0000',
+                fontStyle: 'bold',
+            }).setOrigin(0.5, 0.5).setDepth(6)
+    }
+
+    handleBombGeneration() {
+        switch (this.bombGenerationType) {
+            case this.DEFAULT_GENERATION_BOMB:
+                this.singleBombGen()
+                break;
+            case this.DOUBLE_GENERATION_BOMB:
+                this.multipleBombGen(2)
+                break;
+            case this.TRIPLE_GENERATION_BOMB:
+                this.multipleBombGen(3)
+                break;
+            case this.QUADRUPLE_GENERATION_BOMB:
+                this.multipleBombGen(4)
+                break
+        }
+    }
+
+    singleBombGen() {
+        const bomb = this.bombsGroup.create(
+            Math.random() * this.canvasWidth,
+            0,
+            'bomb'
+        );
+
+
+        bomb.setDisplaySize(this.BOMB_DEFAULT_WIDTH, this.BOMB_DEFAULT_HEIGHT);
+        bomb.setVelocityY(this.VELOCITY);        // imposta la velocità iniziale sull'asse Y
+        bomb.setGravityY(10);                    // applichi una gravità costante
+        bomb.setBounce(0);
+    }
+
+    multipleBombGen(count) {
+        for (let i = 0; i < count; i++) {
+            const bomb = this.bombsGroup.create(
+                Math.random() * this.canvasWidth,
+                0,
+                'bomb'
+            );
+
+
+            bomb.setDisplaySize(this.BOMB_DEFAULT_WIDTH, this.BOMB_DEFAULT_HEIGHT);
+            bomb.setVelocityY(this.VELOCITY);        // imposta la velocità iniziale sull'asse Y
+            bomb.setGravityY(10);                    // applichi una gravità costante
+            bomb.setBounce(0);
+        }
     }
 
     // controllo se c'è collisione tra p1 ed il terreno,
