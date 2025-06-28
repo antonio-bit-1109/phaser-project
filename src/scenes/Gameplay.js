@@ -39,6 +39,9 @@ export class Gameplay extends Phaser.Scene {
     boss_laserBeam_2 = null
     shuriken_count = 0;
     random_x_position_boss = null;
+    boss_tweens = null;
+    boss_atk_2_done = false;
+    hittedByLaserBeam = false;
 
     // il constructor serve per dare un nome a questa classe, se la devo richiamare da qualche parte questo sarà il nome
     constructor() {
@@ -67,7 +70,7 @@ export class Gameplay extends Phaser.Scene {
         this.load.image('grass', 'assets/grass_no_bg.png');
         // carico l immagine di frame come spritesheet in modo da poter utilizzare ogni singolo frame ad un determinato evento
         this.load.spritesheet('dude', 'assets/dude.png', {
-            frameHeight: 48,
+            frameHeight: 45,
             frameWidth: 32
         })
 
@@ -325,6 +328,19 @@ export class Gameplay extends Phaser.Scene {
     // movimento oscillatorio del bbss dx - sn
     moveBoss() {
 
+        if (this.boss_atk_2_done) {
+            this.boss_atk_2_done = false;
+            this.boss.setVelocityX(0);
+
+            if (this.boss.x > this.canvasWidth / 2) {
+                this.movingRight = false;
+                this.boss.setVelocityX(-150);
+            } else {
+                this.boss.setVelocityX(150)
+                this.movingRight = true;
+            }
+        }
+
         if (this.boss.x >= 0 && this.movingRight) {
             this.boss.setVelocityX(150)
         }
@@ -334,40 +350,51 @@ export class Gameplay extends Phaser.Scene {
             this.movingRight = false;
         }
 
-        if (this.boss.x === 100) {
+        if (this.boss.x <= 100) {
             this.movingRight = true;
-        }
-
-        // ogni volta che la posizione x è un multiplo di 100 il boss lancia un attacco shuriken finche non ne lancia 15
-        // poi passa al laser beam e poi di nuovo agli shurikne in loop finche non stira le zampe
-        if (this.boss.x % 100 === 0 && this.shuriken_count < 15) {
-            this.bossAttack1()
-            console.log("boss lancia shuriken")
-        }
-
-        if (this.shuriken_count >= 15) {
-            this.bossAttack2()
         }
 
     }
 
     bossAttack2() {
 
+
+        // IMPORTANTE PORTARE SEMPRE IL BOSS AD UNA POSIZIONE X % 100 === 0
+        // perche gli shuriken vengono lanciati solo quando il boss si trova in posizione x % 100 === 0
+        // ( quindi quando il valore di x è intero e divisibile per 100 senza resto.)
         if (this.random_x_position_boss === null) {
-            this.random_x_position_boss = Math.random() * this.canvasWidth
+            const randomPositions = [200, 300, 400, 500, 600, 700, 800, 900]
+            const shuffledArr = Phaser.Actions.Shuffle(randomPositions)
+            this.random_x_position_boss = shuffledArr[0];
         }
 
-        // sposto il boss ad una posizione x
-        // casuale in modo graduale evitaando il teletrasporto
-        this.tweens.add({
-            targets: this.boss,
-            x: this.random_x_position_boss,
-            duration: 1000,
-            ease: 'Power2',
-            onComplete: () => {
-                this.fireLaserBeam()
-            }
-        });
+
+        if (!this.boss_tweens) {
+            // sposto il boss ad una posizione x
+            // casuale in modo graduale evitaando il teletrasporto
+            this.boss_tweens = this.tweens.add({
+                targets: this.boss,
+                x: this.random_x_position_boss,
+                duration: 1000,
+                ease: 'Power2',
+                onComplete: () => {
+                    this.fireLaserBeam()
+
+                    this.boss_laserBeam_1 &&
+                    this.boss_laserBeam_2 &&
+                    this.time.delayedCall(1000, () => {
+                        this.boss_laserBeam_1.destroy();
+                        this.boss_laserBeam_2.destroy();
+
+                        console.log("Laser beam disattivato!");
+                    })
+
+                    this.shuriken_count = 0;
+                    this.random_x_position_boss = null;
+                    this.boss_atk_2_done = true;
+                }
+            });
+        }
 
 
     }
@@ -418,6 +445,7 @@ export class Gameplay extends Phaser.Scene {
         shuriken.body.allowGravity = false; // Evita che la gravità interferisca
         shuriken.anims.play('shuriken');
         this.shuriken_count++
+
     }
 
 
@@ -449,6 +477,23 @@ export class Gameplay extends Phaser.Scene {
         this.boss && this.moveBoss()
         this.boss && this.updateBossLife()
 
+        // ogni volta che la posizione x è un multiplo di 100 il boss lancia un attacco shuriken finche non ne lancia 15
+        // poi passa al laser beam e poi di nuovo agli shurikne in loop finche non stira le zampe
+
+        if (this.boss) {
+            if (Math.floor(this.boss.x) % 100 === 0 && this.shuriken_count < 15) {
+                console.log(this.shuriken_count)
+                this.bossAttack1()
+                this.boss_tweens = null;
+                console.log("boss lancia shuriken")
+            }
+
+            if (this.shuriken_count >= 15) {
+                this.bossAttack2()
+            }
+        }
+
+        this.boss && console.log("Boss X:", this.boss.x, "X % 100:", this.boss.x % 100)
 
         // controllo le collisioni tra dude e gruppo delle bombe
         this.bombsGroup && this.bombsGroup.children.iterate((bomb) => {
@@ -501,6 +546,34 @@ export class Gameplay extends Phaser.Scene {
             }
 
         })
+
+        // se lo shuriken tocca terra lo elimino dal gruppo
+        this.shuriken_boss && this.shuriken_boss.children.iterate(shuriken => {
+            if (shuriken && Math.round(shuriken.body.y) >= Math.round(this.grassTerrain.body.y + 100)) {
+                console.log("shuriken tocca terra brasato.")
+                shuriken.destroy()
+            }
+        })
+
+
+        //controllo se uno dei laserBeam colpisce dude
+        if (this.dude && this.boss_laserBeam_1 && this.boss_laserBeam_2 && !this.hittedByLaserBeam) {
+            if (this.checkCollision_general(this.dude, this.boss_laserBeam_1) ||
+                this.checkCollision_general(this.dude, this.boss_laserBeam_2)) {
+                this.hp -= 30;
+                this.hittedByLaserBeam = true;
+                console.log("dude preso da uno dei laser beam del boss")
+            }
+        }
+
+        // se dude è stato colpito dal laser aspetto due secondi e poi resetto la variabile
+        // che se impostata su false gli consente di riprendere danno dal laser,
+        // (quindi dopo un danno dal laserbeam del boss ne è immune per 2 secondi
+        if (this.hittedByLaserBeam) {
+            this.time.delayedCall(2000, () => {
+                this.hittedByLaserBeam = false;
+            })
+        }
 
 
         // controllo collisioni tra bullet e boss se questi esistono
@@ -609,11 +682,11 @@ export class Gameplay extends Phaser.Scene {
                 console.log("passato alla modalità spawn bombe quadruplo")
             }
 
-            if (this.livello === 1) {
+            if (this.livello === 10) {
                 // metto in pausa la generazione di bombe
                 this.timerEventSpawnBomb.paused = true;
                 // interrompo musica di base
-                this.sound.get('gameMusic').stop();
+                this.sound.get('gameMusic')
 
                 // inizializzo musica boss figth
                 this.sound.play('bossMusic')
