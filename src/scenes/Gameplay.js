@@ -308,16 +308,8 @@ export class Gameplay extends Phaser.Scene {
         }
     }
 
-    // controllo se le hitbox di bomba e bullet si toccano
-    checkIfCollide_bullet_bomb(bomb) {
-        if (bomb && this.bullet && this.physics.overlap(bomb, this.bullet)) {
-            this.sound.play('expl_bomb_bullet', {
-                volume: 5
-            });
-            return true;
-        }
-    }
 
+    // check collision between 2 objects
     checkCollision_general(p1, p2) {
         if (p1 && p2 && this.physics.overlap(p1, p2)) {
             return true;
@@ -449,6 +441,19 @@ export class Gameplay extends Phaser.Scene {
     }
 
 
+    stopGameAndGameOver() {
+        this.scene.stop('gameplay');
+        this.bombsGroup = null;
+        this.timerEventSpawnBomb = null
+        this.sound.stopAll();
+        this.scene.start('gameover', {
+            canvasWidth: this.canvasWidth,
+            canvasHeigth: this.canvasHeight,
+            punteggioFinale: this.punteggio,
+            livello: this.livello
+        })
+    }
+
     // eseguita ogni 16ms , accetta dei parametri
 // delta:tempo passato dall ultimavolta che la funzione è stata chiamata (ogni 16ms )
 // time: tempo totale in cui la func viene chiamata
@@ -460,16 +465,7 @@ export class Gameplay extends Phaser.Scene {
         // se la vita scende a zero avvio la scena di gameover
         // interruzione della scena corrente
         if (this.hp <= 0) {
-            this.scene.stop('gameplay');
-            this.bombsGroup = null;
-            this.timerEventSpawnBomb = null
-            this.sound.stopAll();
-            this.scene.start('gameover', {
-                canvasWidth: this.canvasWidth,
-                canvasHeigth: this.canvasHeight,
-                punteggioFinale: this.punteggio,
-                livello: this.livello
-            })
+            this.stopGameAndGameOver()
         }
 
 
@@ -500,9 +496,13 @@ export class Gameplay extends Phaser.Scene {
 
             if (!bomb) return
 
-            if (this.checkIfCollide_bullet_bomb(bomb)) {
+            if (this.bullet && this.checkCollision_general(bomb, this.bullet)) {
                 // nel punto dove bullet e bomb si toccano inserisci l animazione di una esplosione
                 bomb.destroy()
+                this.sound.play('expl_bomb_bullet', {
+                    volume: 5
+                });
+
                 this.punteggio += 10;
                 this.explosion_bullet_bomb = this.physics.add.sprite(bomb.x, bomb.y, 'bullet_bomb_explosion')
 
@@ -519,7 +519,8 @@ export class Gameplay extends Phaser.Scene {
 
             }
 
-            if (bomb && Math.round(bomb.body.y) > Math.round(this.grassTerrain.body.y + 60)) {
+            if (this.checkCollisionWithGround(bomb, 60)) {
+
                 // sprite con interazioni fisiche
                 this.explosion = this.physics.add.sprite(bomb.x, bomb.y - 20, 'explosion')
 
@@ -549,10 +550,12 @@ export class Gameplay extends Phaser.Scene {
 
         // se lo shuriken tocca terra lo elimino dal gruppo
         this.shuriken_boss && this.shuriken_boss.children.iterate(shuriken => {
-            if (shuriken && Math.round(shuriken.body.y) >= Math.round(this.grassTerrain.body.y + 100)) {
+
+            if (this.checkCollisionWithGround(shuriken, 100)) {
                 console.log("shuriken tocca terra brasato.")
                 shuriken.destroy()
             }
+
         })
 
 
@@ -650,6 +653,14 @@ export class Gameplay extends Phaser.Scene {
         this.updateHpBar()
         this.checkIfBulletOutOfCanvas()
 
+    }
+
+    // controllo se c'è collisione tra p1 ed il terreno,
+    // aggiustando la distanza a cui voglio che l'oggetto sparisca una volta in prossimita dell terreno (offsetFromTerrain)
+    checkCollisionWithGround(p1, offsetFromTerrain) {
+        if (p1 && Math.round(p1.body.y) > Math.round(this.grassTerrain.body.y + offsetFromTerrain)) {
+            return true;
+        }
     }
 
     updateLivello() {
