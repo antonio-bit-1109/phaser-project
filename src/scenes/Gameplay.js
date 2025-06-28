@@ -63,10 +63,16 @@ export class Gameplay extends Phaser.Scene {
         this.bullet = null
     }
 
+
     preload() {
         // key dell immagine e source da dove prenderla
         this.load.image('nature', 'assets/sky.png');
-        this.load.image('bomb', "assets/bomb_gpt.png");
+
+        // spritesheet della bomba con rapida animazione
+        this.load.spritesheet('bomb', "assets/bomb_spritesheet.png", {
+            frameWidth: 32, frameHeight: 32
+        });
+
         this.load.image('grass', 'assets/grass_no_bg.png');
         // carico l immagine di frame come spritesheet in modo da poter utilizzare ogni singolo frame ad un determinato evento
         this.load.spritesheet('dude', 'assets/dude.png', {
@@ -202,6 +208,8 @@ export class Gameplay extends Phaser.Scene {
         this.shooting_dude.displayHeight = 12;
         this.shooting_dude.setVisible(false); // nascosto di default
 
+        //inizializzo l animazione della bomba mentre cade
+        this.loadBombAnimation()
         // inizializzo animazione del dude
         this.createAnimationDude(this)
         // inizializzo animazione dell esplosione della bomba
@@ -648,6 +656,7 @@ export class Gameplay extends Phaser.Scene {
         bomb.setVelocityY(this.VELOCITY);        // imposta la velocità iniziale sull'asse Y
         bomb.setGravityY(10);                    // applichi una gravità costante
         bomb.setBounce(0);
+        bomb.anims.play('bombAnim')
     }
 
     multipleBombGen(count) {
@@ -663,6 +672,7 @@ export class Gameplay extends Phaser.Scene {
             bomb.setVelocityY(this.VELOCITY);        // imposta la velocità iniziale sull'asse Y
             bomb.setGravityY(10);                    // applichi una gravità costante
             bomb.setBounce(0);
+            bomb.anims.play('bombAnim')
         }
     }
 
@@ -707,8 +717,17 @@ export class Gameplay extends Phaser.Scene {
             if (this.livello === 10) {
                 // metto in pausa la generazione di bombe
                 this.timerEventSpawnBomb.paused = true;
-                // interrompo musica di base
-                this.sound.get('gameMusic')
+                // interrompo musica di base facendo un fade out
+
+                this.tweens.add({
+                    targets: this.sound.get('gameMusic'),
+                    volume: 0,
+                    duration: 2000, // durata in millisecondi
+                    ease: 'Linear',
+                    onComplete: () => {
+                        this.sound.get('gameMusic').stop(); // opzionale: ferma la musica quando il volume è 0
+                    }
+                });
 
                 // inizializzo musica boss figth
                 this.sound.play('bossMusic')
@@ -859,4 +878,15 @@ export class Gameplay extends Phaser.Scene {
             repeat: -1
         })
     }
+
+
+    loadBombAnimation() {
+        this.anims.create({
+            key: 'bombAnim',
+            frames: this.anims.generateFrameNumbers('bomb', {start: 0, end: 2}),
+            frameRate: 15,
+            repeat: -1
+        })
+    }
+
 }
