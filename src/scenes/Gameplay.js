@@ -42,7 +42,7 @@ export class Gameplay extends Phaser.Scene {
     boss_tweens = null;
     boss_atk_2_done = false;
     hittedByLaserBeam = false;
-    generatorBombHp= 0;
+    generatorBombHp = 0;
     hpBomb_sprite = null;
 
     // il constructor serve per dare un nome a questa classe, se la devo richiamare da qualche parte questo sarà il nome
@@ -83,8 +83,8 @@ export class Gameplay extends Phaser.Scene {
         })
 
         //carico immagine della bomba gainHp
-        this.load.spritesheet("hpBomb" , "assets/lifeBomb.png" , {
-            frameWidth:261 , frameHeight:264.5
+        this.load.spritesheet("hpBomb", "assets/lifeBomb.png", {
+            frameWidth: 261, frameHeight: 264.5
         })
 
         //carico spritesheet da cui prendo animazione dello sparo
@@ -112,7 +112,7 @@ export class Gameplay extends Phaser.Scene {
         this.load.audio('bossMusic', "assets/sounds/bossMusic.mp3")
 
         // caricamento suono danno subito dal dude
-        this.load.audio("dude_damage" , "assets/sounds/hurt.mp3")
+        this.load.audio("dude_damage", "assets/sounds/hurt.mp3")
 
         //carico spritesheet proiettile
         this.load.spritesheet('bullet', "assets/bullet_2.png", {
@@ -256,9 +256,9 @@ export class Gameplay extends Phaser.Scene {
 
         // spawn random della hpBomb, solo una alla volta,
         // se gia ce ne sta una generata non è possibile generarne altre
-        if (!this.hpBomb_sprite && this.generatorBombHp === 0){
+        if (!this.hpBomb_sprite && this.generatorBombHp === 0) {
 
-            if (this.generatorBombHp === 0){
+            if (this.generatorBombHp === 0) {
                 this.generateHpBomb()
                 this.generatorBombHp = 1
             }
@@ -268,8 +268,7 @@ export class Gameplay extends Phaser.Scene {
 
         if (this.hpBomb_sprite &&
             this.dude &&
-            this.checkCollision_general(this.hpBomb_sprite , this.dude))
-        {
+            this.checkCollision_general(this.hpBomb_sprite, this.dude)) {
             this.hpBomb_sprite.setVelocityY(0);               // azzera velocità
             this.hpBomb_sprite.body.setAllowGravity(false);
             this.hpBomb_sprite.anims.play('hpBombTaken')
@@ -486,9 +485,9 @@ export class Gameplay extends Phaser.Scene {
 
 
     // funzione per la generazione della hp bomb a schermo
-    generateHpBomb(){
-        this.hpBomb_sprite = this.physics.add.sprite(Math.random() * this.canvasWidth ,
-            0 ,
+    generateHpBomb() {
+        this.hpBomb_sprite = this.physics.add.sprite(Math.random() * this.canvasWidth,
+            0,
             "hpBomb")
         this.hpBomb_sprite.anims.play("hpBombFall")
         this.hpBomb_sprite.setVelocityY(150)
@@ -702,13 +701,16 @@ export class Gameplay extends Phaser.Scene {
         }
     }
 
-    singleBombGen() {
-        const bomb = this.bombsGroup.create(
+    createBomb() {
+        return this.bombsGroup.create(
             Math.random() * this.canvasWidth,
             0,
             'bomb'
         );
+    }
 
+    singleBombGen() {
+        const bomb = this.createBomb()
 
         bomb.setDisplaySize(this.BOMB_DEFAULT_WIDTH, this.BOMB_DEFAULT_HEIGHT);
         bomb.setVelocityY(this.VELOCITY);        // imposta la velocità iniziale sull'asse Y
@@ -719,13 +721,8 @@ export class Gameplay extends Phaser.Scene {
 
     multipleBombGen(count) {
         for (let i = 0; i < count; i++) {
-            const bomb = this.bombsGroup.create(
-                Math.random() * this.canvasWidth,
-                0,
-                'bomb'
-            );
-
-
+            const bomb = this.createBomb()
+            
             bomb.setDisplaySize(this.BOMB_DEFAULT_WIDTH, this.BOMB_DEFAULT_HEIGHT);
             bomb.setVelocityY(this.VELOCITY);        // imposta la velocità iniziale sull'asse Y
             bomb.setGravityY(10);                    // applichi una gravità costante
@@ -949,25 +946,25 @@ export class Gameplay extends Phaser.Scene {
     }
 
 
-    animateBombHpGain(){
+    animateBombHpGain() {
         this.anims.create({
-            key:'hpBombFall' ,
-            frames: this.anims.generateFrameNumbers('hpBomb' , {start: 0 , end:0}),
-            frameRate: 15 ,
+            key: 'hpBombFall',
+            frames: this.anims.generateFrameNumbers('hpBomb', {start: 0, end: 0}),
+            frameRate: 15,
             repeat: -1
         })
 
         this.anims.create({
-            key:'hpBombTaken',
-            frames: this.anims.generateFrameNumbers('hpBomb' , {start: 4 , end:11}),
-            frameRate: 10 ,
+            key: 'hpBombTaken',
+            frames: this.anims.generateFrameNumbers('hpBomb', {start: 4, end: 11}),
+            frameRate: 10,
             repeat: 0
         })
 
         this.anims.create({
-            key:'hpBombFallenGround',
-            frames: this.anims.generateFrameNumbers('hpBomb' , {start: 7 , end:11}),
-            frameRate: 15 ,
+            key: 'hpBombFallenGround',
+            frames: this.anims.generateFrameNumbers('hpBomb', {start: 7, end: 11}),
+            frameRate: 15,
             repeat: -1
         })
     }
