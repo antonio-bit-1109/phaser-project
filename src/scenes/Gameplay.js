@@ -42,6 +42,8 @@ export class Gameplay extends Phaser.Scene {
     boss_tweens = null;
     boss_atk_2_done = false;
     hittedByLaserBeam = false;
+    generatorBombHp= 0;
+    hpBomb_sprite = null;
 
     // il constructor serve per dare un nome a questa classe, se la devo richiamare da qualche parte questo sarà il nome
     constructor() {
@@ -78,6 +80,11 @@ export class Gameplay extends Phaser.Scene {
         this.load.spritesheet('dude', 'assets/dude.png', {
             frameHeight: 45,
             frameWidth: 32
+        })
+
+        //carico immagine della bomba gainHp
+        this.load.spritesheet("hpBomb" , "assets/lifeBomb.png" , {
+            frameWidth:261 , frameHeight:264.5
         })
 
         //carico spritesheet da cui prendo animazione dello sparo
@@ -222,6 +229,9 @@ export class Gameplay extends Phaser.Scene {
         // inizializzo la funzione per creare l animazione che poi servirà a far muovere il boss
         this.createAnimationBossMovements()
 
+        // inizializzo animazioni per la gestione della bomba hpGain
+        this.animateBombHpGain()
+
         // creo animazione del bullet fiammeggiante
         this.createAnimationBulletFiring()
 
@@ -236,7 +246,6 @@ export class Gameplay extends Phaser.Scene {
         this.updateHpBar()
     }
 
-
     // eseguita ogni 16ms , accetta dei parametri
 // delta:tempo passato dall ultimavolta che la funzione è stata chiamata (ogni 16ms )
 // time: tempo totale in cui la func viene chiamata
@@ -244,6 +253,39 @@ export class Gameplay extends Phaser.Scene {
 
         this.updatePunteggio(time)
         this.updateLivello()
+
+        // spawn random della hpBomb, solo una alla volta,
+        // se gia ce ne sta una generata non è possibile generarne altre
+        if (!this.hpBomb_sprite && this.generatorBombHp === 0){
+
+            if (this.generatorBombHp === 0){
+                this.generateHpBomb()
+                this.generatorBombHp = 1
+            }
+
+        }
+
+
+        if (this.hpBomb_sprite &&
+            this.dude &&
+            this.checkCollision_general(this.hpBomb_sprite , this.dude))
+        {
+            this.hpBomb_sprite.setVelocityY(0);               // azzera velocità
+            this.hpBomb_sprite.body.setAllowGravity(false);
+            this.hpBomb_sprite.anims.play('hpBombTaken')
+
+            this.hpBomb_sprite.on('animationcomplete-hpBombTaken', () => {
+                this.hpBomb_sprite.destroy();    // rimuovi lo sprite
+                this.hpBomb_sprite = null;       // resetti il riferimento
+
+                if (this.hp <= 80) {
+                    this.hp += 20;
+                } else {
+                    console.log("la vita è troppo alta per essere ricaricata: hp dude --> ", this.hp);
+                }
+            });
+        }
+
 
         // se la vita scende a zero avvio la scena di gameover
         // interruzione della scena corrente
@@ -440,6 +482,17 @@ export class Gameplay extends Phaser.Scene {
         this.updateHpBar()
         this.checkIfBulletOutOfCanvas()
 
+    }
+
+
+    // funzione per la generazione della hp bomb a schermo
+    generateHpBomb(){
+        this.hpBomb_sprite = this.physics.add.sprite(Math.random() * this.canvasWidth ,
+            0 ,
+            "hpBomb")
+        this.hpBomb_sprite.anims.play("hpBombFall")
+        this.hpBomb_sprite.setVelocityY(150)
+        this.hpBomb_sprite.setScale(0.3)
     }
 
 
@@ -895,4 +948,27 @@ export class Gameplay extends Phaser.Scene {
         })
     }
 
+
+    animateBombHpGain(){
+        this.anims.create({
+            key:'hpBombFall' ,
+            frames: this.anims.generateFrameNumbers('hpBomb' , {start: 0 , end:0}),
+            frameRate: 15 ,
+            repeat: -1
+        })
+
+        this.anims.create({
+            key:'hpBombTaken',
+            frames: this.anims.generateFrameNumbers('hpBomb' , {start: 4 , end:11}),
+            frameRate: 10 ,
+            repeat: 0
+        })
+
+        this.anims.create({
+            key:'hpBombFallenGround',
+            frames: this.anims.generateFrameNumbers('hpBomb' , {start: 7 , end:11}),
+            frameRate: 15 ,
+            repeat: -1
+        })
+    }
 }
