@@ -104,6 +104,9 @@ export class Gameplay extends Phaser.Scene {
         this.load.audio('expl_bomb_bullet', "assets/sounds/explosion_bullet_bomb.mp3")
         this.load.audio('bossMusic', "assets/sounds/bossMusic.mp3")
 
+        // caricamento suono danno subito dal dude
+        this.load.audio("dude_damage" , "assets/sounds/hurt.mp3")
+
         //carico spritesheet proiettile
         this.load.spritesheet('bullet', "assets/bullet_2.png", {
             frameHeight: 151, frameWidth: 93
@@ -324,6 +327,7 @@ export class Gameplay extends Phaser.Scene {
             if (this.checkCollision_general(shur, this.dude)) {
                 this.hp -= 10
                 shur.destroy()
+                this.sound.play('dude_damage');
             }
 
         })
@@ -345,6 +349,7 @@ export class Gameplay extends Phaser.Scene {
                 this.checkCollision_general(this.dude, this.boss_laserBeam_2)) {
                 this.hp -= 30;
                 this.hittedByLaserBeam = true;
+                this.sound.play('dude_damage');
                 console.log("dude preso da uno dei laser beam del boss")
             }
         }
@@ -797,6 +802,7 @@ export class Gameplay extends Phaser.Scene {
     handle_Dude_Explosion_overlap() {
         if (this.dude && this.explosion && this.physics.overlap(this.dude, this.explosion)) {
             this.hp -= 20
+            this.sound.play("dude_damage");
             this.updateHpBar()
         }
     }
