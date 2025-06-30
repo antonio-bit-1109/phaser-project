@@ -44,6 +44,7 @@ export class Gameplay extends Phaser.Scene {
     hittedByLaserBeam = false;
     generatorBombHp = 0;
     hpBomb_sprite = null;
+    alreadyAccessed = false;
 
     // il constructor serve per dare un nome a questa classe, se la devo richiamare da qualche parte questo sarà il nome
     constructor() {
@@ -110,6 +111,7 @@ export class Gameplay extends Phaser.Scene {
         this.load.audio("gameMusic", "assets/sounds/gameMusic.mp3")
         this.load.audio('expl_bomb_bullet', "assets/sounds/explosion_bullet_bomb.mp3")
         this.load.audio('bossMusic', "assets/sounds/bossMusic.mp3")
+        this.load.audio('hpUp', "assets/sounds/hpUp.mp3")
 
         // caricamento suono danno subito dal dude
         this.load.audio("dude_damage", "assets/sounds/hurt.mp3")
@@ -265,24 +267,32 @@ export class Gameplay extends Phaser.Scene {
 
         }
 
-
+// ho dovuto impostare il boolena this.alreadyAccessed boolean
+        // perche altrimenti nel loop successivo rientrava nel if ma poi 'animationcomplete'
+        // scattava e il riferimento a hpBomb_sprite diventata null e rompeva tutto
         if (this.hpBomb_sprite &&
+            !this.alreadyAccessed &&
             this.dude &&
             this.checkCollision_general(this.hpBomb_sprite, this.dude)) {
+            this.alreadyAccessed = true;
             this.hpBomb_sprite.setVelocityY(0);               // azzera velocità
+            this.sound.play('hpUp'); // suono hpBomb
             this.hpBomb_sprite.body.setAllowGravity(false);
-            this.hpBomb_sprite.anims.play('hpBombTaken')
 
-            this.hpBomb_sprite.on('animationcomplete-hpBombTaken', () => {
-                this.hpBomb_sprite.destroy();    // rimuovi lo sprite
-                this.hpBomb_sprite = null;       // resetti il riferimento
+            this.hpBomb_sprite && this.hpBomb_sprite.anims.play('hpBombTaken')
+                .on('animationcomplete', () => {
+                    this.hpBomb_sprite.destroy();
+                    this.hpBomb_sprite = null;
+                    this.alreadyAccessed = false;
+                })
 
-                if (this.hp <= 80) {
-                    this.hp += 20;
-                } else {
-                    console.log("la vita è troppo alta per essere ricaricata: hp dude --> ", this.hp);
-                }
-            });
+            if (this.hp <= 80) {
+                this.hp += 20;
+            } else {
+                console.log("la vita è troppo alta per essere ricaricata: hp dude --> ", this.hp);
+            }
+
+
         }
 
 
@@ -722,7 +732,7 @@ export class Gameplay extends Phaser.Scene {
     multipleBombGen(count) {
         for (let i = 0; i < count; i++) {
             const bomb = this.createBomb()
-            
+
             bomb.setDisplaySize(this.BOMB_DEFAULT_WIDTH, this.BOMB_DEFAULT_HEIGHT);
             bomb.setVelocityY(this.VELOCITY);        // imposta la velocità iniziale sull'asse Y
             bomb.setGravityY(10);                    // applichi una gravità costante
