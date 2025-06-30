@@ -115,7 +115,10 @@ export class Gameplay extends Phaser.Scene {
         this.load.audio('hpUp', "assets/sounds/hpUp.mp3")
 
         // caricamento suono danno subito dal dude
-        this.load.audio("dude_damage", "assets/sounds/hurt.mp3")
+        this.load.audio("dude_damage_1", "assets/sounds/hurt_1.mp3")
+        this.load.audio("dude_damage_2", "assets/sounds/hurt_2.mp3")
+        this.load.audio("dude_damage_3", "assets/sounds/hurt_3.mp3")
+        this.load.audio("dude_damage_4", "assets/sounds/hurt_4.mp3")
 
         //carico spritesheet proiettile
         this.load.spritesheet('bullet', "assets/bullet_2.png", {
@@ -316,7 +319,7 @@ export class Gameplay extends Phaser.Scene {
 
         // se il boss esiste, gestione dei movimenti
         this.boss && this.moveBoss()
-        this.updateBossLife()
+        this.boss && this.updateBossLife()
 
         // ogni volta che la posizione x è un multiplo di 100 il boss lancia un attacco shuriken finche non ne lancia 15
         // poi passa al laser beam e poi di nuovo agli shurikne in loop finche non stira le zampe
@@ -389,7 +392,7 @@ export class Gameplay extends Phaser.Scene {
             if (this.checkCollision_general(shur, this.dude)) {
                 this.hp -= 10
                 shur.destroy()
-                this.sound.play('dude_damage');
+                this.sound.play(this.chooseRandomDudeDamageSound(), {volume: 2});
             }
 
         })
@@ -411,7 +414,7 @@ export class Gameplay extends Phaser.Scene {
                 this.checkCollision_general(this.dude, this.boss_laserBeam_2)) {
                 this.hp -= 30;
                 this.hittedByLaserBeam = true;
-                this.sound.play('dude_damage');
+                this.sound.play(this.chooseRandomDudeDamageSound(), {volume: 2});
                 console.log("dude preso da uno dei laser beam del boss")
             }
         }
@@ -435,10 +438,10 @@ export class Gameplay extends Phaser.Scene {
         }
 
         if (this.boss && this.hpBoss_number === 0) {
-            this.hpBoss_number = 0;
             this.sound.play('bossDeath', {
                 volume: 3
             })
+            this.updateBossLife()
             this.boss.destroy()
             this.boss = null
         }
@@ -550,6 +553,10 @@ export class Gameplay extends Phaser.Scene {
         }
     }
 
+    chooseRandomDudeDamageSound() {
+        const arrDamage = ['dude_damage_1', "dude_damage_2", "dude_damage_3", "dude_damage_4"]
+        return arrDamage[Math.floor(Math.random() * arrDamage.length)];
+    }
 
     // check collision between 2 objects
     checkCollision_general(p1, p2) {
@@ -878,7 +885,7 @@ export class Gameplay extends Phaser.Scene {
     handle_Dude_Explosion_overlap() {
         if (this.dude && this.explosion && this.physics.overlap(this.dude, this.explosion)) {
             this.hp -= 20
-            this.sound.play("dude_damage");
+            this.sound.play(this.chooseRandomDudeDamageSound(), {volume: 2});
             this.updateHpBar()
         }
     }
