@@ -42,9 +42,10 @@ export class Gameplay extends Phaser.Scene {
     boss_tweens = null;
     boss_atk_2_done = false;
     hittedByLaserBeam = false;
-    generatorBombHp = 0;
+    generatingHpBomb = false;
     hpBomb_sprite = null;
     alreadyAccessed = false;
+
 
     // il constructor serve per dare un nome a questa classe, se la devo richiamare da qualche parte questo sarà il nome
     constructor() {
@@ -137,6 +138,9 @@ export class Gameplay extends Phaser.Scene {
 
         // carico suono bullet
         this.load.audio('bulletSound', "assets/sounds/fireBall.mp3");
+
+        this.load.audio('bossHitted', "assets/sounds/bossDefeated.mp3")
+        this.load.audio('bossDeath', "assets/sounds/bossIsDeath.mp3")
     }
 
     create() {
@@ -256,15 +260,14 @@ export class Gameplay extends Phaser.Scene {
         this.updatePunteggio(time)
         this.updateLivello()
 
-        // spawn random della hpBomb, solo una alla volta,
-        // se gia ce ne sta una generata non è possibile generarne altre
-        if (!this.hpBomb_sprite && this.generatorBombHp === 0) {
 
-            if (this.generatorBombHp === 0) {
-                this.generateHpBomb()
-                this.generatorBombHp = 1
-            }
-
+        // ogni mille punti spawn della bomba hp
+        if (this.punteggio % 900 === 0 &&
+            !this.generatingHpBomb &&
+            this.punteggio !== 0) {
+            console.log("generazione hp bomb ")
+            this.generatingHpBomb = true;
+            this.generateHpBomb()
         }
 
 // ho dovuto impostare il boolena this.alreadyAccessed boolean
@@ -284,6 +287,7 @@ export class Gameplay extends Phaser.Scene {
                     this.hpBomb_sprite.destroy();
                     this.hpBomb_sprite = null;
                     this.alreadyAccessed = false;
+                    this.generatingHpBomb = false;
                 })
 
             if (this.hp <= 80) {
@@ -293,6 +297,13 @@ export class Gameplay extends Phaser.Scene {
             }
 
 
+        }
+
+        // se la Hpbomb collide col terreno sparisce e resetto timer per spawn hpbomb
+        if (this.checkCollisionWithGround(this.hpBomb_sprite, 90)) {
+            this.hpBomb_sprite.destroy();
+            this.hpBomb_sprite = null;
+            this.generatingHpBomb = false;
         }
 
 
@@ -305,7 +316,7 @@ export class Gameplay extends Phaser.Scene {
 
         // se il boss esiste, gestione dei movimenti
         this.boss && this.moveBoss()
-        this.boss && this.updateBossLife()
+        this.updateBossLife()
 
         // ogni volta che la posizione x è un multiplo di 100 il boss lancia un attacco shuriken finche non ne lancia 15
         // poi passa al laser beam e poi di nuovo agli shurikne in loop finche non stira le zampe
@@ -418,11 +429,16 @@ export class Gameplay extends Phaser.Scene {
         // controllo collisioni tra bullet e boss se questi esistono
         if (this.bullet && this.boss && this.checkCollision_general(this.bullet, this.boss)) {
             this.hpBoss_number -= 10;
+            this.hpBoss_number > 0 && this.sound.play('bossHitted')
             this.bullet.destroy()
             this.bullet = null;
         }
 
         if (this.boss && this.hpBoss_number === 0) {
+            this.hpBoss_number = 0;
+            this.sound.play('bossDeath', {
+                volume: 3
+            })
             this.boss.destroy()
             this.boss = null
         }
@@ -500,7 +516,7 @@ export class Gameplay extends Phaser.Scene {
             0,
             "hpBomb")
         this.hpBomb_sprite.anims.play("hpBombFall")
-        this.hpBomb_sprite.setVelocityY(150)
+        this.hpBomb_sprite.setVelocityY(350)
         this.hpBomb_sprite.setScale(0.3)
     }
 
@@ -779,7 +795,7 @@ export class Gameplay extends Phaser.Scene {
                 console.log("passato alla modalità spawn bombe quadruplo")
             }
 
-            if (this.livello === 10) {
+            if (this.livello === 1) {
                 // metto in pausa la generazione di bombe
                 this.timerEventSpawnBomb.paused = true;
                 // interrompo musica di base facendo un fade out
