@@ -371,11 +371,6 @@ export class Gameplay extends Phaser.Scene {
         // BOSS'S ATTACKS
         if (this.boss) {
 
-            // check if dude is hitted by layers attack
-            if (this.checkCollision_general(this.layer, this.dude)) {
-                this.hp -= 1;
-            }
-
             !this.bossExecutingAnAttack && this.chooseAttackRandomly()
 
             // se arrAtks[0] è true allora vado con il primo attacco
@@ -503,6 +498,13 @@ export class Gameplay extends Phaser.Scene {
             }
 
         })
+
+        // check if dude is hitted by layers attack
+        if (this.layer && this.dude) {
+            if (this.checkCollision_general(this.layer, this.dude)) {
+                this.hp -= 1;
+            }
+        }
 
 
         //controllo se uno dei laserBeam colpisce dude
