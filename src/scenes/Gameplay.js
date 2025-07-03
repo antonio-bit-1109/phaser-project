@@ -45,6 +45,11 @@ export class Gameplay extends Phaser.Scene {
     generatingHpBomb = false;
     hpBomb_sprite = null;
     alreadyAccessed = false;
+    bossDoingAtk1 = false;
+    bossDoingAtk2 = false;
+    bossDoingAtk3 = false;
+    arrAtks = [this.bossDoingAtk1, this.bossDoingAtk2, this.bossDoingAtk3]
+    bossExecutingAnAttack = false;
 
 
     // il constructor serve per dare un nome a questa classe, se la devo richiamare da qualche parte questo sarà il nome
@@ -255,6 +260,34 @@ export class Gameplay extends Phaser.Scene {
         this.updateHpBar()
     }
 
+    layersAttackBoss() {
+        console.log("attacco 3 del boss!")
+
+        // attacco a layers
+        
+
+        this.bossDoingAtk3 = false;
+        this.bossExecutingAnAttack = false;
+    }
+
+
+    // impostare una delle variabili contenenti i booleani per scegliere quale attacco fare su true
+    // lil metodo deve essere skippato se in esecuzione un attacco,
+    // finchè non finisce non dovrà entrare in questa funzione
+    chooseAttackRandomly() {
+
+        let n = Math.floor(Math.random() * this.arrAtks.length);
+        this.arrAtks[n] = true;
+        console.log(this.arrAtks)
+        this.bossExecutingAnAttack = true;
+    }
+
+    // reset boolean array with all falses
+    resetArrAttacks() {
+        this.arrAtks = this.arrAtks.map(val => false);
+        console.log(this.arrAtks, "array attacchi post reset");
+    }
+
     // eseguita ogni 16ms , accetta dei parametri
 // delta:tempo passato dall ultimavolta che la funzione è stata chiamata (ogni 16ms )
 // time: tempo totale in cui la func viene chiamata
@@ -324,20 +357,67 @@ export class Gameplay extends Phaser.Scene {
         // ogni volta che la posizione x è un multiplo di 100 il boss lancia un attacco shuriken finche non ne lancia 15
         // poi passa al laser beam e poi di nuovo agli shurikne in loop finche non stira le zampe
 
+        // BOSS'S ATTACKS
         if (this.boss) {
-            if (Math.floor(this.boss.x) % 100 === 0 && this.shuriken_count < 15) {
-                console.log(this.shuriken_count)
-                this.bossAttack1()
-                this.boss_tweens = null;
-                console.log("boss lancia shuriken")
+
+            !this.bossExecutingAnAttack && this.chooseAttackRandomly()
+
+            // se arrAtks[0] è true allora vado con il primo attacco
+            // completato l attacco resetto tutti i valori e reimposto anche arrAtks con tutti false
+            if (this.arrAtks[0] && !this.bossDoingAtk2 && !this.bossDoingAtk3) {
+
+                this.bossDoingAtk1 = true;
+                this.bossExecutingAnAttack = true;
+                Math.floor(this.boss.x) % 100 === 0 &&
+                this.shuriken_count < 15 &&
+                this.shurikenAttackBOss()
+
+                if (this.shuriken_count >= 15) {
+                    this.resetArrAttacks()
+                    this.bossDoingAtk1 = false;
+                    this.shuriken_count = 0;
+                    this.bossExecutingAnAttack = false;
+                }
+
             }
 
-            if (this.shuriken_count >= 15) {
-                this.bossAttack2()
+            // se arrAtks[1] è true allora vado con il secondo attacco
+            // completato l attacco resetto tutti i valori e reimposto anche arrAtks con tutti false
+            if (this.arrAtks[1] && !this.bossDoingAtk1 && !this.bossDoingAtk3) {
+                this.bossDoingAtk2 = true;
+                this.laserBeamAttackBoss()
             }
+
+            if (this.arrAtks[2] && !this.bossDoingAtk1 && !this.bossDoingAtk2) {
+                this.bossDoingAtk3 = true;
+                this.layersAttackBoss()
+            }
+
+            //
+            // if (this.arrAtks[0] &&
+            //     this.bossExecutingAnAttack &&
+            //     Math.floor(this.boss.x) % 100 === 0 &&
+            //     this.shuriken_count < 15
+            // ) {
+            //     this.bossDoingAtk1 = true;
+            //     console.log(this.shuriken_count)
+            //     this.shurikenAttackBOss()
+            //     this.boss_tweens = null;
+            //     console.log("boss lancia shuriken")
+            // }
+            //
+            // // attacco laser beam boss
+            // if (this.shuriken_count >= 15 && !this.bossDoingAtk1 || !this.bossDoingAtk3) {
+            //     this.laserBeamAttackBoss()
+            // }
+
+            // attacco layers boss
+
+            // reset attacchi
+            // if (!this.bossExecutingAnAttack &&)
         }
 
-        this.boss && console.log("Boss X:", this.boss.x, "X % 100:", this.boss.x % 100)
+        // this.boss && console.log("Boss X:", this.boss.x, "X % 100:", this.boss.x % 100)
 
         // controllo le collisioni tra dude e gruppo delle bombe
         this.bombsGroup && this.bombsGroup.children.iterate((bomb) => {
@@ -597,7 +677,7 @@ export class Gameplay extends Phaser.Scene {
 
     }
 
-    bossAttack2() {
+    laserBeamAttackBoss() {
 
 
         // IMPORTANTE PORTARE SEMPRE IL BOSS AD UNA POSIZIONE X % 100 === 0
@@ -626,13 +706,15 @@ export class Gameplay extends Phaser.Scene {
                     this.time.delayedCall(1000, () => {
                         this.boss_laserBeam_1.destroy();
                         this.boss_laserBeam_2.destroy();
-
+                        this.boss_tweens = null;
+                        this.bossDoingAtk2 = false;
                         console.log("Laser beam disattivato!");
                     })
 
-                    this.shuriken_count = 0;
+                    // this.shuriken_count = 0;
                     this.random_x_position_boss = null;
-                    this.boss_atk_2_done = true;
+                    this.bossExecutingAnAttack = false;
+                    this.resetArrAttacks()
                 }
             });
         }
@@ -672,7 +754,7 @@ export class Gameplay extends Phaser.Scene {
 
     }
 
-    bossAttack1() {
+    shurikenAttackBOss() {
         // Crea lo shuriken
         const shuriken = this.physics.add
             .sprite(this.boss.x, this.boss.y, 'shuriken_boss')
@@ -802,7 +884,7 @@ export class Gameplay extends Phaser.Scene {
                 console.log("passato alla modalità spawn bombe quadruplo")
             }
 
-            if (this.livello === 10) {
+            if (this.livello === 1) {
                 // metto in pausa la generazione di bombe
                 this.timerEventSpawnBomb.paused = true;
                 // interrompo musica di base facendo un fade out
