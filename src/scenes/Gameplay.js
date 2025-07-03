@@ -273,12 +273,14 @@ export class Gameplay extends Phaser.Scene {
         console.log("attacco 3 del boss!")
 
         // attacco a layers
-        this.layer = this.physics.add.sprite(Math.floor(Math.random() * this.canvasWidth), 0, 'layer')
-        this.layer.setVelocityY(300)
-        this.layer.anims.play('thunderLayer')
-
-        this.bossDoingAtk3 = false;
-        this.bossExecutingAnAttack = false;
+        if (!this.layer) {
+            this.layer = this.physics.add.sprite(Math.floor(Math.random() * this.canvasWidth), 0, 'layer')
+            this.layer.setVelocityY(300)
+            this.layer.anims.play('thunderLayer')
+            this.bossDoingAtk3 = false;
+            this.bossExecutingAnAttack = false;
+        }
+        
     }
 
 
@@ -401,35 +403,11 @@ export class Gameplay extends Phaser.Scene {
 
             if (this.arrAtks[2] && !this.bossDoingAtk1 && !this.bossDoingAtk2) {
                 this.bossDoingAtk3 = true;
+                this.bossExecutingAnAttack = true
                 this.layersAttackBoss()
             }
 
-
-            //
-            // if (this.arrAtks[0] &&
-            //     this.bossExecutingAnAttack &&
-            //     Math.floor(this.boss.x) % 100 === 0 &&
-            //     this.shuriken_count < 15
-            // ) {
-            //     this.bossDoingAtk1 = true;
-            //     console.log(this.shuriken_count)
-            //     this.shurikenAttackBOss()
-            //     this.boss_tweens = null;
-            //     console.log("boss lancia shuriken")
-            // }
-            //
-            // // attacco laser beam boss
-            // if (this.shuriken_count >= 15 && !this.bossDoingAtk1 || !this.bossDoingAtk3) {
-            //     this.laserBeamAttackBoss()
-            // }
-
-            // attacco layers boss
-
-            // reset attacchi
-            // if (!this.bossExecutingAnAttack &&)
         }
-
-        // this.boss && console.log("Boss X:", this.boss.x, "X % 100:", this.boss.x % 100)
 
         // controllo le collisioni tra dude e gruppo delle bombe
         this.bombsGroup && this.bombsGroup.children.iterate((bomb) => {
@@ -504,6 +482,13 @@ export class Gameplay extends Phaser.Scene {
             if (this.checkCollision_general(this.layer, this.dude)) {
                 this.hp -= 1;
             }
+        }
+
+        // check if layer thunder has passed the canvas heigth
+        if (this.layer && this.layer.y > this.canvasHeight) {
+            console.log("il layer è uscito dalla canvas")
+            this.layer.destroy();
+            this.layer = null;
         }
 
 
