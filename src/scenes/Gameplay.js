@@ -50,6 +50,7 @@ export class Gameplay extends Phaser.Scene {
     bossDoingAtk3 = false;
     arrAtks = [this.bossDoingAtk1, this.bossDoingAtk2, this.bossDoingAtk3]
     bossExecutingAnAttack = false;
+    layer = null;
 
 
     // il constructor serve per dare un nome a questa classe, se la devo richiamare da qualche parte questo sarà il nome
@@ -139,6 +140,11 @@ export class Gameplay extends Phaser.Scene {
         this.load.spritesheet('shuriken_boss', 'assets/shuriken_boss.png', {
             frameWidth: 15.5,
             frameHeight: 17
+        })
+
+        // add texture laser layer boss's attack
+        this.load.spritesheet('layer', "assets/texture_laser.png", {
+            frameWidth: 68, frameHeight: 422
         })
 
         // carico immagine del raggio laser del boss
@@ -246,6 +252,9 @@ export class Gameplay extends Phaser.Scene {
         // inizializzo animazioni per la gestione della bomba hpGain
         this.animateBombHpGain()
 
+        // animazione per attacco layer del boss
+        this.animateThunderLayer()
+
         // creo animazione del bullet fiammeggiante
         this.createAnimationBulletFiring()
 
@@ -264,7 +273,9 @@ export class Gameplay extends Phaser.Scene {
         console.log("attacco 3 del boss!")
 
         // attacco a layers
-        
+        this.layer = this.physics.add.sprite(Math.floor(Math.random() * this.canvasWidth), 0, 'layer')
+        this.layer.setVelocityY(300)
+        this.layer.anims.play('thunderLayer')
 
         this.bossDoingAtk3 = false;
         this.bossExecutingAnAttack = false;
@@ -360,6 +371,11 @@ export class Gameplay extends Phaser.Scene {
         // BOSS'S ATTACKS
         if (this.boss) {
 
+            // check if dude is hitted by layers attack
+            if (this.checkCollision_general(this.layer, this.dude)) {
+                this.hp -= 1;
+            }
+
             !this.bossExecutingAnAttack && this.chooseAttackRandomly()
 
             // se arrAtks[0] è true allora vado con il primo attacco
@@ -392,6 +408,7 @@ export class Gameplay extends Phaser.Scene {
                 this.bossDoingAtk3 = true;
                 this.layersAttackBoss()
             }
+
 
             //
             // if (this.arrAtks[0] &&
@@ -1079,6 +1096,15 @@ export class Gameplay extends Phaser.Scene {
         this.anims.create({
             key: 'hpBombFallenGround',
             frames: this.anims.generateFrameNumbers('hpBomb', {start: 7, end: 11}),
+            frameRate: 15,
+            repeat: -1
+        })
+    }
+
+    animateThunderLayer() {
+        this.anims.create({
+            key: 'thunderLayer',
+            frames: this.anims.generateFrameNumbers('layer', {start: 0, end: 3}),
             frameRate: 15,
             repeat: -1
         })
