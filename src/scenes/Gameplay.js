@@ -51,7 +51,7 @@ export class Gameplay extends Phaser.Scene {
     arrAtks = [this.bossDoingAtk1, this.bossDoingAtk2, this.bossDoingAtk3]
     bossExecutingAnAttack = false;
     layer = null;
-
+    shurikenVelocity = 100
 
     // il constructor serve per dare un nome a questa classe, se la devo richiamare da qualche parte questo sarà il nome
     constructor() {
@@ -280,7 +280,7 @@ export class Gameplay extends Phaser.Scene {
             this.bossDoingAtk3 = false;
             this.bossExecutingAnAttack = false;
         }
-        
+
     }
 
 
@@ -768,11 +768,12 @@ export class Gameplay extends Phaser.Scene {
         this.shuriken_boss.add(shuriken);
 
         // Imposta velocità DOPO l'aggiunta al gruppo
-        shuriken.setVelocityY(100);
+
+        shuriken.setVelocityY(this.shurikenVelocity++);
         shuriken.body.allowGravity = false; // Evita che la gravità interferisca
         shuriken.anims.play('shuriken');
         this.shuriken_count++
-
+        console.log(shuriken.body.velocity)
     }
 
 
