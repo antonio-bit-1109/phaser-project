@@ -71,6 +71,7 @@ export class Gameplay extends Phaser.Scene {
         this.livelloChanged = false;
         this.bombGenerationType = this.DEFAULT_GENERATION_BOMB;
         this.bullet = null
+        this.hpBoss_number = 100
     }
 
 
@@ -297,7 +298,7 @@ export class Gameplay extends Phaser.Scene {
 
     // reset boolean array with all falses
     resetArrAttacks() {
-        this.arrAtks = this.arrAtks.map(val => false);
+        this.arrAtks = this.arrAtks.map(() => false);
         console.log(this.arrAtks, "array attacchi post reset");
     }
 
@@ -382,10 +383,10 @@ export class Gameplay extends Phaser.Scene {
                 this.bossDoingAtk1 = true;
                 this.bossExecutingAnAttack = true;
                 Math.floor(this.boss.x) % 100 === 0 &&
-                this.shuriken_count < 15 &&
+                this.shuriken_count < 5 &&
                 this.shurikenAttackBOss()
 
-                if (this.shuriken_count >= 15) {
+                if (this.shuriken_count >= 5) {
                     this.resetArrAttacks()
                     this.bossDoingAtk1 = false;
                     this.shuriken_count = 0;
@@ -783,7 +784,7 @@ export class Gameplay extends Phaser.Scene {
 
         // Imposta velocità DOPO l'aggiunta al gruppo
 
-        shuriken.setVelocityY(this.shurikenVelocity++);
+        shuriken.setVelocityY(this.VELOCITY += 10);
         shuriken.body.allowGravity = false; // Evita che la gravità interferisca
         shuriken.anims.play('shuriken');
         this.shuriken_count++
@@ -907,7 +908,7 @@ export class Gameplay extends Phaser.Scene {
                 console.log("passato alla modalità spawn bombe quadruplo")
             }
 
-            if (this.livello === 5) {
+            if (this.livello === 6) {
                 // metto in pausa la generazione di bombe
                 this.timerEventSpawnBomb.paused = true;
                 // interrompo musica di base facendo un fade out
