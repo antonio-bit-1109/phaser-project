@@ -912,8 +912,7 @@ export class Gameplay extends Phaser.Scene {
             }
         }
     }
-
-
+    
     // informazioni per generare il boss
     generateBoss() {
         this.boss = this.physics.add.sprite(this.canvasWidth / 8, this.canvasHeight / 6, 'bossSpriteSheet')
