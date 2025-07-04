@@ -311,7 +311,7 @@ export class Gameplay extends Phaser.Scene {
 
 
         // ogni mille punti spawn della bomba hp
-        if (this.punteggio % 900 === 0 &&
+        if (this.punteggio % 300 === 0 &&
             !this.generatingHpBomb &&
             this.punteggio !== 0) {
             console.log("generazione hp bomb ")
@@ -528,6 +528,20 @@ export class Gameplay extends Phaser.Scene {
             this.updateBossLife()
             this.boss.destroy()
             this.boss = null
+
+
+            this.time.delayedCall(3000, () => {
+                this.scene.stop('gameplay')
+                this.sound.stopAll();
+                this.scene.start('gameover', {
+                    canvasWidth: this.canvasWidth,
+                    canvasHeigth: this.canvasHeight,
+                    punteggioFinale: this.punteggio,
+                    livello: this.livello,
+                    isGameVictory: true
+                })
+            })
+
         }
 
 
@@ -786,7 +800,11 @@ export class Gameplay extends Phaser.Scene {
             canvasWidth: this.canvasWidth,
             canvasHeigth: this.canvasHeight,
             punteggioFinale: this.punteggio,
-            livello: this.livello
+            livello: this.livello,
+            // sadDude: "assets/sad_dude_no_bg.png",
+            // happyDude: null,
+            // music: "assets/sounds/gameOver.mp3",
+            isGameVictory: false
         })
     }
 
@@ -874,22 +892,22 @@ export class Gameplay extends Phaser.Scene {
                 console.log("timer spwan bomba diminuito", this.timerEventSpawnBomb.delay)
             }
 
-            if (this.livello === 3) {
+            if (this.livello === 2) {
                 this.bombGenerationType = this.DOUBLE_GENERATION_BOMB
                 console.log("passato a modalità spawn bombe doppio")
             }
 
-            if (this.livello === 5) {
+            if (this.livello === 3) {
                 this.bombGenerationType = this.TRIPLE_GENERATION_BOMB
                 console.log("passato alla modalità spawn bombe triplo")
             }
 
-            if (this.livello === 9) {
+            if (this.livello === 4) {
                 this.bombGenerationType = this.QUADRUPLE_GENERATION_BOMB
                 console.log("passato alla modalità spawn bombe quadruplo")
             }
 
-            if (this.livello === 10) {
+            if (this.livello === 5) {
                 // metto in pausa la generazione di bombe
                 this.timerEventSpawnBomb.paused = true;
                 // interrompo musica di base facendo un fade out
@@ -912,7 +930,7 @@ export class Gameplay extends Phaser.Scene {
             }
         }
     }
-    
+
     // informazioni per generare il boss
     generateBoss() {
         this.boss = this.physics.add.sprite(this.canvasWidth / 8, this.canvasHeight / 6, 'bossSpriteSheet')

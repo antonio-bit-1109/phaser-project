@@ -4,6 +4,10 @@ export class GameOver extends Phaser.Scene {
     canvasHeight = null
     punteggioFinale = null;
     livello = null;
+    happyDude = null;
+    sadDude = null;
+    music = null;
+    isGameVictory = null;
 
 
     constructor() {
@@ -15,24 +19,30 @@ export class GameOver extends Phaser.Scene {
         this.canvasHeight = data.canvasHeigth;
         this.punteggioFinale = data.punteggioFinale;
         this.livello = data.livello;
+        this.isGameVictory = data.isGameVictory
     }
 
     preload() {
         this.load.image('nature', 'assets/nature.jpg');
         this.load.image('sadDude', "assets/sad_dude_no_bg.png")
-        this.load.audio('gameOver', "assets/sounds/gameOver.mp3")
+        this.load.image('happyDude', "assets/happyDude.png")
+
+        this.load.audio('gameOver_loser', "assets/sounds/gameOver.mp3")
+        this.load.audio('gameOver_winner', "assets/sounds/gameOver_victory.mp3")
+
     }
 
     create() {
         this.add.image(this.canvasWidth / 2, this.canvasHeight / 2, "nature").setOrigin(0.5, 0.5).setDepth(0)
-        this.sound.play('gameOver')
+        !this.isGameVictory && this.sound.play('gameOver_loser')
+        this.isGameVictory && this.sound.play('gameOver_winner')
         this.showGameOver()
         this.pressKeyToRestart()
     }
 
     showGameOver() {
 
-        this.add.image(this.canvasWidth / 2, this.canvasHeight / 3, 'sadDude')
+        this.add.image(this.canvasWidth / 2, this.canvasHeight / 3, this.isGameVictory ? 'happyDude' : 'sadDude')
             .setOrigin(0.5, 0.5)
             .setDepth(0)
             .setScale(0.5)
