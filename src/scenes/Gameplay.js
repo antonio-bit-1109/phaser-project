@@ -1,6 +1,6 @@
 export class Gameplay extends Phaser.Scene {
 
-    VELOCITY = 200;
+    VELOCITY = 250;
     BOMB_DEFAULT_WIDTH = 100;
     BOMB_DEFAULT_HEIGHT = 100;
     grassTerrain = null;
@@ -51,7 +51,11 @@ export class Gameplay extends Phaser.Scene {
     arrAtks = [this.bossDoingAtk1, this.bossDoingAtk2, this.bossDoingAtk3]
     bossExecutingAnAttack = false;
     layer = null;
-    shurikenVelocity = 100
+    timeToBeatBoss = 60;  // time you have to kill the boss
+    textTimerBoss = null
+    timerDecrement = null;
+    clicking_clock_sound = null
+    thunderTempest = null
 
     // il constructor serve per dare un nome a questa classe, se la devo richiamare da qualche parte questo sarà il nome
     constructor() {
@@ -62,7 +66,7 @@ export class Gameplay extends Phaser.Scene {
     init(data) {
         this.canvasWidth = data.canvasWidth;
         this.canvasHeight = data.canvasHeight
-
+        this.VELOCITY = 250
         this.hp = 100;
         this.maxHp = 100;
         this.punteggio = 0;
@@ -72,6 +76,15 @@ export class Gameplay extends Phaser.Scene {
         this.bombGenerationType = this.DEFAULT_GENERATION_BOMB;
         this.bullet = null
         this.hpBoss_number = 100
+        this.boss = null;
+        this.thunderTempest = null;
+        this.bossExecutingAnAttack = false;
+        this.layer = null;
+        this.timeToBeatBoss = 60;  // time you have to kill the boss
+        this.textTimerBoss = null
+        this.timerDecrement = null;
+        this.clicking_clock_sound = null
+        this.thunderTempest = null
     }
 
 
@@ -126,6 +139,8 @@ export class Gameplay extends Phaser.Scene {
         this.load.audio("dude_damage_2", "assets/sounds/hurt_2.mp3")
         this.load.audio("dude_damage_3", "assets/sounds/hurt_3.mp3")
         this.load.audio("dude_damage_4", "assets/sounds/hurt_4.mp3")
+
+        this.load.audio("clicking-clock", "assets/sounds/clock-timer.mp3")
 
         //carico spritesheet proiettile
         this.load.spritesheet('bullet', "assets/bullet_2.png", {
@@ -265,6 +280,7 @@ export class Gameplay extends Phaser.Scene {
         // crea background hp bar
         this.createHpbackground()
 
+
         // crea vita vera e propria
         this.hpBar = this.add.graphics();
         this.updateHpBar()
@@ -300,6 +316,40 @@ export class Gameplay extends Phaser.Scene {
     resetArrAttacks() {
         this.arrAtks = this.arrAtks.map(() => false);
         console.log(this.arrAtks, "array attacchi post reset");
+    }
+
+
+    // show the title with remaining time to kill boss (only if boss is present)
+    showTimerBossDefeat() {
+        if (!this.textTimerBoss) {
+            console.log("renderizzo timer boss")
+            this.textTimerBoss = this.add.text(
+                this.canvasWidth / 7,
+                this.canvasHeight / 8,
+                `time before annihilation:
+             ${this.timeToBeatBoss}`,
+                {
+                    fontSize: '17px',
+                    color: '#ffcc00',
+                    fontStyle: 'bold'
+                }).setOrigin(0.5, 0.5)
+        }
+    }
+
+
+    startDecrementBossTimer() {
+        if (!this.timerDecrement) {
+            this.timerDecrement = this.time.addEvent({
+                delay: 1000,
+                callback: () => {
+                    this.timeToBeatBoss -= 1
+                    this.textTimerBoss.setText(`time before annihilation:
+             ${this.timeToBeatBoss}`)
+                },
+                callbackScope: this,
+                loop: true
+            });
+        }
     }
 
     // eseguita ogni 16ms , accetta dei parametri
@@ -374,6 +424,15 @@ export class Gameplay extends Phaser.Scene {
         // BOSS'S ATTACKS
         if (this.boss) {
 
+            // create and show the timer the user have to defeat boss
+            this.showTimerBossDefeat()
+
+            // when the boss appear y have a limit time to defeat it
+            this.startDecrementBossTimer()
+            if (!this.clicking_clock_sound) {
+                this.clicking_clock_sound = this.sound.play('clicking-clock')
+            }
+
             !this.bossExecutingAnAttack && this.chooseAttackRandomly()
 
             // se arrAtks[0] è true allora vado con il primo attacco
@@ -408,7 +467,27 @@ export class Gameplay extends Phaser.Scene {
                 this.layersAttackBoss()
             }
 
+            // if time to kill boss is finished than givesYou an inavoidable attack
+            if (this.timeToBeatBoss <= 0 && !this.thunderTempest) {
+                this.thunderTempest = this.add.group()
+                for (let i = 0; i < 100; i++) {
+                    const thunder = this.physics.add.sprite(Math.floor(Math.random() * this.canvasWidth), 0, 'layer')
+                    this.thunderTempest.add(thunder);
+                    thunder.setVelocityY(300)
+                    thunder.anims.play('thunderLayer')
+                }
+
+            }
+
         }
+
+        // check collision between the dude and a thunder in the main update method
+        this.thunderTempest && this.thunderTempest.children.iterate(thunder => {
+            if (this.checkCollision_general(this.dude, thunder)) {
+                this.hp -= 10
+            }
+        })
+
 
         // controllo le collisioni tra dude e gruppo delle bombe
         this.bombsGroup && this.bombsGroup.children.iterate((bomb) => {
