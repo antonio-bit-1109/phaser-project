@@ -48,7 +48,8 @@ export class Gameplay extends Phaser.Scene {
     bossDoingAtk1 = false;
     bossDoingAtk2 = false;
     bossDoingAtk3 = false;
-    arrAtks = [this.bossDoingAtk1, this.bossDoingAtk2, this.bossDoingAtk3]
+    bossDoingAtk4 = false;
+    arrAtks = [this.bossDoingAtk1, this.bossDoingAtk2, this.bossDoingAtk3, this.bossDoingAtk4]
     bossExecutingAnAttack = false;
     layer = null;
     timeToBeatBoss = 60;  // time you have to kill the boss
@@ -56,6 +57,7 @@ export class Gameplay extends Phaser.Scene {
     timerDecrement = null;
     clicking_clock_sound = null
     thunderTempest = null
+    bossShield = null;
 
     // il constructor serve per dare un nome a questa classe, se la devo richiamare da qualche parte questo sarà il nome
     constructor() {
@@ -92,13 +94,16 @@ export class Gameplay extends Phaser.Scene {
         // key dell immagine e source da dove prenderla
         this.load.image('nature', 'assets/sky.png');
 
+        this.load.image('shield', "assets/shield.png")
+
         // spritesheet della bomba con rapida animazione
         this.load.spritesheet('bomb', "assets/bomb_spritesheet.png", {
             frameWidth: 32, frameHeight: 32
         });
 
         this.load.image('grass', 'assets/grass_no_bg.png');
-        // carico l immagine di frame come spritesheet in modo da poter utilizzare ogni singolo frame ad un determinato evento
+
+        // carico l immagine di frame come spritesheet in modo da poter utilizzare ogni singolo frame a un determinato evento
         this.load.spritesheet('dude', 'assets/dude.png', {
             frameHeight: 45,
             frameWidth: 32
@@ -352,10 +357,20 @@ export class Gameplay extends Phaser.Scene {
         }
     }
 
+    activateBossShield() {
+        if (!this.bossShield) {
+            this.bossShield = this.physics.add.image(this.boss.x, this.boss.y, "shield")
+            this.bossShield.displayWidth = 200;
+            this.bossShield.displayHeight = 200;
+        }
+
+    }
+
     // eseguita ogni 16ms , accetta dei parametri
 // delta:tempo passato dall ultimavolta che la funzione è stata chiamata (ogni 16ms )
 // time: tempo totale in cui la func viene chiamata
     update(time, delta) {
+
 
         this.updatePunteggio(time)
         this.updateLivello()
@@ -437,7 +452,7 @@ export class Gameplay extends Phaser.Scene {
 
             // se arrAtks[0] è true allora vado con il primo attacco
             // completato l attacco resetto tutti i valori e reimposto anche arrAtks con tutti false
-            if (this.arrAtks[0] && !this.bossDoingAtk2 && !this.bossDoingAtk3) {
+            if (this.arrAtks[0] && !this.bossDoingAtk2 && !this.bossDoingAtk3 && !this.bossDoingAtk4) {
 
                 this.bossDoingAtk1 = true;
                 this.bossExecutingAnAttack = true;
@@ -456,15 +471,29 @@ export class Gameplay extends Phaser.Scene {
 
             // se arrAtks[1] è true allora vado con il secondo attacco
             // completato l attacco resetto tutti i valori e reimposto anche arrAtks con tutti false
-            if (this.arrAtks[1] && !this.bossDoingAtk1 && !this.bossDoingAtk3) {
+            if (this.arrAtks[1] && !this.bossDoingAtk1 && !this.bossDoingAtk3 && !this.bossDoingAtk4) {
                 this.bossDoingAtk2 = true;
                 this.laserBeamAttackBoss()
             }
 
-            if (this.arrAtks[2] && !this.bossDoingAtk1 && !this.bossDoingAtk2) {
+            if (this.arrAtks[2] && !this.bossDoingAtk1 && !this.bossDoingAtk2 && !this.bossDoingAtk4) {
                 this.bossDoingAtk3 = true;
                 this.bossExecutingAnAttack = true
                 this.layersAttackBoss()
+            }
+
+            if (this.arrAtks[3] && !this.bossDoingAtk1 && !this.bossDoingAtk2 && !this.bossDoingAtk3) {
+                this.bossDoingAtk4 = true;
+                this.bossExecutingAnAttack = true;
+                this.activateBossShield()
+            }
+
+            this.activateBossShield()
+
+            if (this.bossShield) {
+
+                this.bossShield.x = this.boss.x
+                this.bossShield.y = this.boss.y
             }
 
             // if time to kill boss is finished than givesYou an inavoidable attack
@@ -480,6 +509,10 @@ export class Gameplay extends Phaser.Scene {
             }
 
         }
+
+
+        //add collider
+
 
         // check collision between the dude and a thunder in the main update method
         this.thunderTempest && this.thunderTempest.children.iterate(thunder => {
@@ -659,7 +692,8 @@ export class Gameplay extends Phaser.Scene {
                 )
                     .setAngle(180)
                     .setScale(0.3) // Riduce anche il render grafico
-                    .setOrigin(0.5);
+                    .setOrigin(0.5)
+                    .setBounce(1)
 
                 // Calcola nuova dimensione hitbox in base alla scala e all’immagine originale
                 const width = this.bullet.displayWidth;
@@ -685,8 +719,16 @@ export class Gameplay extends Phaser.Scene {
         }
 
 
+        //check if bullet has collided with shield,
+        // if that happen his velocity on y axe is inverted, than bullet exit from canvas and became null
+        if (this.bullet && this.bossShield && this.checkCollision_general(this.bullet, this.bossShield)) {
+            {
+                this.bullet.setVelocityY(200)
+            }
+        }
+
         this.updateHpBar()
-        this.checkIfBulletOutOfCanvas()
+        this.bullet && this.checkIfBulletOutOfCanvas()
 
     }
 
@@ -725,7 +767,7 @@ export class Gameplay extends Phaser.Scene {
 
     // controlla se il bullet è uscito dalla canvas sull asse y
     checkIfBulletOutOfCanvas() {
-        if (this.bullet && this.bullet.body.y <= 0) {
+        if (this.bullet && this.bullet.body.y <= 0 || this.bullet.body.y >= this.canvasHeight) {
             this.bullet = null
             console.log("bullet uscita dall asse y ")
         }
@@ -987,7 +1029,7 @@ export class Gameplay extends Phaser.Scene {
                 console.log("passato alla modalità spawn bombe quadruplo")
             }
 
-            if (this.livello === 6) {
+            if (this.livello === 1) {
                 // metto in pausa la generazione di bombe
                 this.timerEventSpawnBomb.paused = true;
                 // interrompo musica di base facendo un fade out
@@ -1194,4 +1236,5 @@ export class Gameplay extends Phaser.Scene {
             repeat: -1
         })
     }
+
 }
