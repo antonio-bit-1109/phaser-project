@@ -902,7 +902,6 @@ export class Gameplay extends Phaser.Scene {
                     onComplete: () => {
                         this.sound.get('gameMusic').stop(); // opzionale: ferma la musica quando il volume è 0
                     }
-                    
                 });
 
                 // inizializzo musica boss figth
