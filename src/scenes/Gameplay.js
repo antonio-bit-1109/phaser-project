@@ -511,9 +511,6 @@ export class Gameplay extends Phaser.Scene {
         }
 
 
-        //add collider
-
-
         // check collision between the dude and a thunder in the main update method
         this.thunderTempest && this.thunderTempest.children.iterate(thunder => {
             if (this.checkCollision_general(this.dude, thunder)) {
@@ -724,6 +721,7 @@ export class Gameplay extends Phaser.Scene {
         if (this.bullet && this.bossShield && this.checkCollision_general(this.bullet, this.bossShield)) {
             {
                 this.bullet.setVelocityY(200)
+                this.bullet.setAngle(360);
             }
         }
 
