@@ -58,6 +58,7 @@ export class Gameplay extends Phaser.Scene {
     clicking_clock_sound = null
     thunderTempest = null
     bossShield = null;
+    timerBossShield = null;
 
     // il constructor serve per dare un nome a questa classe, se la devo richiamare da qualche parte questo sarà il nome
     constructor() {
@@ -488,12 +489,28 @@ export class Gameplay extends Phaser.Scene {
                 this.activateBossShield()
             }
 
-            this.activateBossShield()
 
+            // if the shield has been activated handle it to last 3 sec than reset arr attacks and loop
             if (this.bossShield) {
 
                 this.bossShield.x = this.boss.x
                 this.bossShield.y = this.boss.y
+                // the shield must last 3sec each time
+                // when 3 seconds are lasts reset variable to restar the loop of random weapon generation
+                this.timerBossShield++
+                // handle the duration of the shield using delta variable,
+                // each 1 sec are 62 iteration in the loop
+                // every time the loop enter in the if the variable is +1
+                // if it reached 62 1 sec is lasted do it * 3 to have 3 sec
+                if (this.timerBossShield >= 62 * 3) {
+                    this.bossShield.destroy();
+                    this.bossShield = null
+                    this.timerBossShield = 0;
+                    this.bossExecutingAnAttack = false;
+                    this.bossDoingAtk4 = false;
+                    this.resetArrAttacks()
+                }
+
             }
 
             // if time to kill boss is finished than givesYou an inavoidable attack
@@ -590,8 +607,17 @@ export class Gameplay extends Phaser.Scene {
         // check if dude is hitted by layers attack
         if (this.layer && this.dude) {
             if (this.checkCollision_general(this.layer, this.dude)) {
-                this.hp -= 1;
+                this.hp -= 10;
             }
+        }
+
+
+        // check if dude hitted by is own bullet
+        if (this.checkCollision_general(this.bullet, this.dude)) {
+            this.hp -= 10;
+            this.bullet.destroy()
+            this.bullet = null;
+            this.sound.play(this.chooseRandomDudeDamageSound(), {volume: 2});
         }
 
         // check if layer thunder has passed the canvas heigth
@@ -684,7 +710,7 @@ export class Gameplay extends Phaser.Scene {
             if (this.bullet === null) {
                 this.bullet = this.physics.add.sprite(
                     this.dude.x,
-                    this.dude.y - 30,
+                    this.dude.y - 40,
                     'bullet'
                 )
                     .setAngle(180)
