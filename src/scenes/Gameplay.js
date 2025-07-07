@@ -1018,7 +1018,7 @@ export class Gameplay extends Phaser.Scene {
     // controllo se c'è collisione tra p1 ed il terreno,
     // aggiustando la distanza a cui voglio che l'oggetto sparisca una volta in prossimita dell terreno (offsetFromTerrain)
     checkCollisionWithGround(p1, offsetFromTerrain) {
-        if (p1 && Math.round(p1.body.y) > Math.round(this.grassTerrain.body.y + offsetFromTerrain)) {
+        if (p1 && p1.body && Math.round(p1.body.y) > Math.round(this.grassTerrain.body.y + offsetFromTerrain)) {
             return true;
         }
     }
@@ -1053,7 +1053,7 @@ export class Gameplay extends Phaser.Scene {
                 console.log("passato alla modalità spawn bombe quadruplo")
             }
 
-            if (this.livello === 1) {
+            if (this.livello === 6) {
                 // metto in pausa la generazione di bombe
                 this.timerEventSpawnBomb.paused = true;
                 // interrompo musica di base facendo un fade out
