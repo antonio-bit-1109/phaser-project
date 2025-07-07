@@ -59,6 +59,7 @@ export class Gameplay extends Phaser.Scene {
     thunderTempest = null
     bossShield = null;
     timerBossShield = null;
+    playingThunderStorm = false
 
     // il constructor serve per dare un nome a questa classe, se la devo richiamare da qualche parte questo sarà il nome
     constructor() {
@@ -147,6 +148,7 @@ export class Gameplay extends Phaser.Scene {
         this.load.audio("dude_damage_4", "assets/sounds/hurt_4.mp3")
 
         this.load.audio("clicking-clock", "assets/sounds/clock-timer.mp3")
+        this.load.audio("thunderstorm", "assets/sounds/thunderstorm.mp3");
 
         //carico spritesheet proiettile
         this.load.spritesheet('bullet', "assets/bullet_2.png", {
@@ -495,14 +497,14 @@ export class Gameplay extends Phaser.Scene {
 
                 this.bossShield.x = this.boss.x
                 this.bossShield.y = this.boss.y
-                // the shield must last 3 sec each time
-                // when 3 seconds are lasts reset variable to restar the loop of random weapon generation
+                // the shield must last 1 sec each time
+                // when 1 second is lasts reset variable to restar the loop of random weapon generation
                 this.timerBossShield++
                 // to handle the duration of the shield using delta variable,
-                // each 1 sec are 62 iterations in the loop
+                // each 2 sec are 62 iterations in the loop
                 // every time the loop enters the if the variable is +1
                 // if it reached 62, 1 sec is lasted do it * 3 to have 3 sec
-                if (this.timerBossShield >= 62 * 3) {
+                if (this.timerBossShield >= 62 * 2) {
                     this.bossShield.destroy();
                     this.bossShield = null
                     this.timerBossShield = 0;
@@ -525,6 +527,12 @@ export class Gameplay extends Phaser.Scene {
 
             }
 
+        }
+
+        // if thundertempest has been released play sound
+        if (this.thunderTempest !== null && !this.playingThunderStorm) {
+            this.sound.play('thunderstorm')
+            this.playingThunderStorm = true;
         }
 
 
@@ -607,7 +615,7 @@ export class Gameplay extends Phaser.Scene {
         // check if dude is hitted by layers attack
         if (this.layer && this.dude) {
             if (this.checkCollision_general(this.layer, this.dude)) {
-                this.hp -= 10;
+                this.hp -= 1;
             }
         }
 
@@ -746,7 +754,7 @@ export class Gameplay extends Phaser.Scene {
         // if that happen his velocity on y axe is inverted, than bullet exit from canvas and became null
         if (this.bullet && this.bossShield && this.checkCollision_general(this.bullet, this.bossShield)) {
             {
-                this.bullet.setVelocityY(200)
+                this.bullet.setVelocityY(400)
                 this.bullet.setAngle(360);
             }
         }
@@ -1053,7 +1061,7 @@ export class Gameplay extends Phaser.Scene {
                 console.log("passato alla modalità spawn bombe quadruplo")
             }
 
-            if (this.livello === 6) {
+            if (this.livello === 1) {
                 // metto in pausa la generazione di bombe
                 this.timerEventSpawnBomb.paused = true;
                 // interrompo musica di base facendo un fade out
