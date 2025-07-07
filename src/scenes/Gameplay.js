@@ -217,7 +217,7 @@ export class Gameplay extends Phaser.Scene {
         this.cursors = this.input.keyboard.createCursorKeys();
 
 
-        // x
+        // X
         // y
         // chiave dell oggetto precaricato che si vuole mostrare
         // l'immagine inserita di DEFAULT fa riferimento al punto centrale dell immagine , le coordinate che vengono inserite
@@ -318,14 +318,14 @@ export class Gameplay extends Phaser.Scene {
         this.bossExecutingAnAttack = true;
     }
 
-    // reset boolean array with all falses
+    // reset a boolean array with all falses
     resetArrAttacks() {
         this.arrAtks = this.arrAtks.map(() => false);
         console.log(this.arrAtks, "array attacchi post reset");
     }
 
 
-    // show the title with remaining time to kill boss (only if boss is present)
+    // show the title with remaining time to kill boss (only if the boss is present)
     showTimerBossDefeat() {
         if (!this.textTimerBoss) {
             console.log("renderizzo timer boss")
@@ -440,7 +440,7 @@ export class Gameplay extends Phaser.Scene {
         // BOSS'S ATTACKS
         if (this.boss) {
 
-            // create and show the timer the user have to defeat boss
+            // create and show the timer the user has to defeat boss
             this.showTimerBossDefeat()
 
             // when the boss appear y have a limit time to defeat it
@@ -490,18 +490,18 @@ export class Gameplay extends Phaser.Scene {
             }
 
 
-            // if the shield has been activated handle it to last 3 sec than reset arr attacks and loop
+            // if the shield has been activated, handle it to last 3 sec than reset arr attacks and loop
             if (this.bossShield) {
 
                 this.bossShield.x = this.boss.x
                 this.bossShield.y = this.boss.y
-                // the shield must last 3sec each time
+                // the shield must last 3 sec each time
                 // when 3 seconds are lasts reset variable to restar the loop of random weapon generation
                 this.timerBossShield++
-                // handle the duration of the shield using delta variable,
-                // each 1 sec are 62 iteration in the loop
-                // every time the loop enter in the if the variable is +1
-                // if it reached 62 1 sec is lasted do it * 3 to have 3 sec
+                // to handle the duration of the shield using delta variable,
+                // each 1 sec are 62 iterations in the loop
+                // every time the loop enters the if the variable is +1
+                // if it reached 62, 1 sec is lasted do it * 3 to have 3 sec
                 if (this.timerBossShield >= 62 * 3) {
                     this.bossShield.destroy();
                     this.bossShield = null
@@ -846,7 +846,7 @@ export class Gameplay extends Phaser.Scene {
 
         // IMPORTANTE PORTARE SEMPRE IL BOSS AD UNA POSIZIONE X % 100 === 0
         // perche gli shuriken vengono lanciati solo quando il boss si trova in posizione x % 100 === 0
-        // ( quindi quando il valore di x è intero e divisibile per 100 senza resto.)
+        // (quindi quando il valore di x è intero e divisibile per 100 senza resto.)
         if (this.random_x_position_boss === null) {
             const randomPositions = [200, 300, 400, 500, 600, 700, 800, 900]
             const shuffledArr = Phaser.Actions.Shuffle(randomPositions)
@@ -1175,7 +1175,7 @@ export class Gameplay extends Phaser.Scene {
             key: 'left',
             frames: this.anims.generateFrameNumbers('dude', {start: 0, end: 3}),
             frameRate: 10,
-            repeat: -1 // quante volte ripetuta animazione: -1 inifinito , n : n volte , 0: una sola volta
+            repeat: -1 // quante volte ripetuta animazione: -1 inifinito, n: n volte, 0: una sola volta
         })
 
         this.anims.create({
