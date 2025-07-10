@@ -61,6 +61,16 @@ export class Gameplay extends Phaser.Scene {
     timerBossShield = null;
     playingThunderStorm = false
 
+    attackUp_sprite = null;
+    generatingAttackUpSprite = false
+    caricatoreBullets = null;
+    bulletsGroup = null
+    dudePompato = false;
+    removingBullet = false;
+    superBullet = null
+    textSuperBulletRemaining = null
+    dudePompato_sprite = null;
+
     // il constructor serve per dare un nome a questa classe, se la devo richiamare da qualche parte questo sarà il nome
     constructor() {
         super('gameplay');
@@ -149,10 +159,16 @@ export class Gameplay extends Phaser.Scene {
 
         this.load.audio("clicking-clock", "assets/sounds/clock-timer.mp3")
         this.load.audio("thunderstorm", "assets/sounds/thunderstorm.mp3");
+        this.load.audio("attackUpSound", "assets/sounds/attackUpSound.mp3")
 
         //carico spritesheet proiettile
         this.load.spritesheet('bullet', "assets/bullet_2.png", {
             frameHeight: 151, frameWidth: 93
+        })
+
+        //load dude pompato
+        this.load.spritesheet("dudePompato", "assets/dudePompato.png", {
+            frameHeight: 490.5, frameWidth: 230
         })
 
         //caricamento boss nemico
@@ -173,6 +189,8 @@ export class Gameplay extends Phaser.Scene {
 
         // carico immagine del raggio laser del boss
         this.load.image('laserBeam', "assets/laserBeam.png");
+
+        this.load.image("attackUp", "assets/attackUp.png")
 
         // carico suono bullet
         this.load.audio('bulletSound', "assets/sounds/fireBall.mp3");
@@ -256,6 +274,12 @@ export class Gameplay extends Phaser.Scene {
         this.dude.displayWidth = 40;
         this.dude.displayHeight = 60;
 
+
+        this.dudePompato_sprite = this.physics.add.sprite(this.dude.x, this.dude.y, 'dudePompato')
+        this.dudePompato_sprite.setVisible(false)
+        this.dudePompato_sprite.setSize(40, 60)
+        this.dudePompato_sprite.setDisplaySize(40, 60);
+
         // carica sprite contenente il dude che spara
         this.shooting_dude = this.physics.add.sprite(this.dude.body.x, this.dude.body.y, 'shooting-dude')
         this.shooting_dude.displayWidth = 12;
@@ -288,6 +312,8 @@ export class Gameplay extends Phaser.Scene {
         // crea background hp bar
         this.createHpbackground()
 
+        // create animation dude pompato
+        this.createAnimationDudePompato()
 
         // crea vita vera e propria
         this.hpBar = this.add.graphics();
@@ -369,6 +395,12 @@ export class Gameplay extends Phaser.Scene {
 
     }
 
+
+    generateAttackUpSprite() {
+        this.attackUp_sprite = this.physics.add.sprite(Math.random() * this.canvasWidth, 0, "attackUp");
+        this.attackUp_sprite.setVelocityY(150)
+    }
+
     // eseguita ogni 16ms , accetta dei parametri
 // delta:tempo passato dall ultimavolta che la funzione è stata chiamata (ogni 16ms )
 // time: tempo totale in cui la func viene chiamata
@@ -379,7 +411,7 @@ export class Gameplay extends Phaser.Scene {
         this.updateLivello()
 
 
-        // ogni mille punti spawn della bomba hp
+        // ogni 300 punti spawn della bomba hp
         if (this.punteggio % 300 === 0 &&
             !this.generatingHpBomb &&
             this.punteggio !== 0) {
@@ -387,6 +419,41 @@ export class Gameplay extends Phaser.Scene {
             this.generatingHpBomb = true;
             this.generateHpBomb()
         }
+
+        // every 400 points an attackup power up is spawned
+        if (this.punteggio % 400 === 0 &&
+            !this.generatingAttackUpSprite
+            //&& this.punteggio !== 0
+        ) {
+            this.generatingAttackUpSprite = true;
+            this.generateAttackUpSprite()
+        }
+
+        // check if AttackUp Sprite is colliding with terrain
+        if (this.attackUp_sprite && this.checkCollisionWithGround(this.attackUp_sprite, 100)) {
+            this.attackUp_sprite.destroy();
+            this.attackUp_sprite = null;
+            this.generatingAttackUpSprite = false;
+            console.log("attack up sprite ritornato a null")
+        }
+
+        //check if powerUp is colliding with dude
+        if (this.attackUp_sprite && !this.dudePompato && this.checkCollision_general(this.dude, this.attackUp_sprite)) {
+            this.sound.play("attackUpSound");
+            this.attackUp_sprite.destroy();
+            this.attackUp_sprite = null;
+            this.generatingAttackUpSprite = false;
+            this.dudePompato = true;
+            console.log("dude has taken power up")
+            // 1. sostituisci dude con dude muscoloso
+            // this.dude.setTexture('dudePompato')
+            // this.dude.setTexture('dudePompato');
+            // this.dude.anims.play('standPompato');
+            // 2. fornisci un array di 5 proiettili che possono essere sparati a piacimento,
+
+            // finiti i quali si torna allo shooting di default
+        }
+
 
 // ho dovuto impostare il boolena this.alreadyAccessed boolean
         // perche altrimenti nel loop successivo rientrava nel if ma poi 'animationcomplete'
@@ -544,7 +611,7 @@ export class Gameplay extends Phaser.Scene {
         })
 
 
-        // controllo le collisioni tra dude e gruppo delle bombe
+        // controllo le collisioni tra dude e gruppo delle bombe se dude non pompato
         this.bombsGroup && this.bombsGroup.children.iterate((bomb) => {
 
             if (!bomb) return
@@ -567,8 +634,65 @@ export class Gameplay extends Phaser.Scene {
                     this.explosion_bullet_bomb.destroy()
                 });
                 return;
-                //
 
+            }
+
+            if (this.superBullet && this.checkCollision_general(bomb, this.superBullet)) {
+                // nel punto dove bullet e bomb si toccano inserisci l animazione di una esplosione
+                bomb.destroy()
+                this.sound.play('expl_bomb_bullet', {
+                    volume: 5
+                });
+
+                this.punteggio += 10;
+                this.explosion_bullet_bomb = this.physics.add.sprite(bomb.x, bomb.y, 'bullet_bomb_explosion')
+
+                this.explosion_bullet_bomb.setGravity(false)
+                this.explosion_bullet_bomb.anims.play('boom2')
+                this.explosion_bullet_bomb.on('animationcomplete', () => {
+                    this.explosion_bullet_bomb.destroy()
+                });
+                this.removingBullet = false;
+                return;
+
+            }
+
+
+            //if dude is pompato handle caricatore bullets
+            if (
+                this.dudePompato &&
+                (
+                    !this.caricatoreBullets ||
+                    this.caricatoreBullets.getLength() === 0
+                )
+            ) {
+
+                if (!this.caricatoreBullets) {
+                    this.caricatoreBullets = this.physics.add.group();
+                }
+
+
+                for (let i = 0; i < 5; i++) {
+                    const bullet = this.physics.add.sprite(
+                        this.dude.x,
+                        this.dude.y - 40,
+                        'bullet'
+                    )
+                        .setAngle(180)
+                        .setScale(0.5) // Riduce anche il render grafico
+                        .setOrigin(0.5)
+                        .setBounce(1)
+                        .setVisible(false)
+                    this.caricatoreBullets.add(bullet)
+                }
+                console.log("caricatore bullet dude pompato:", this.caricatoreBullets)
+                // create a visual text for residual super bullet remaining
+
+                this.textSuperBulletRemaining ?
+                    this.textSuperBulletRemaining.setText(`Superbullets: ${this.caricatoreBullets.getLength()} `) :
+                    this.textSuperBulletRemaining = this.add.text(this.canvasWidth / 17,
+                        this.canvasHeight / 7,
+                        `Superbullets: ${this.caricatoreBullets.getLength()} `)
 
             }
 
@@ -691,22 +815,51 @@ export class Gameplay extends Phaser.Scene {
 
         // gestione dell animazione del dude
         this.dude.setVelocity(0);
-        // this.dude.setVisible(true)
+
 
         if (this.cursors.left.isDown) {
             // il tasto FRECCIA SINISTRA è premuto
-            this.dude.setVisible(true)
-            this.shooting_dude.setVisible(false)
-            this.dude.anims.play('left', true)
-            this.dude.setVelocityX(-300);
+
+
+            if (!this.dudePompato) {
+                this.dude.setVisible(true)
+                this.dudePompato_sprite && this.dudePompato_sprite.setVisible(false)
+                this.shooting_dude.setVisible(false)
+                this.dude.anims.play('left', true)
+                this.dude.setVelocityX(-300);
+            }
+
+
+            if (this.dudePompato && this.dudePompato_sprite) {
+                this.dude.setVisible(false)
+                this.shooting_dude.setVisible(false)
+                this.dudePompato_sprite.setVisible(true);
+                this.dudePompato_sprite.setVelocityX(-300)
+                this.dudePompato_sprite.anims.play('goLeft')
+                // this.dude.displayWidth = 60;
+                // this.dude.displayHeight = 80;
+            }
         }
 
         if (this.cursors.right.isDown) {
             // il tasto FRECCIA DESTRA è premuto
-            this.dude.setVisible(true)
-            this.shooting_dude.setVisible(false)
-            this.dude.setVelocityX(300);
-            this.dude.anims.play('right', true)
+
+            if (!this.dudePompato) {
+                this.dude.setVisible(true)
+                this.shooting_dude.setVisible(false)
+                this.dude.setVelocityX(300);
+                this.dude.anims.play('right', true)
+            }
+
+            if (this.dudePompato) {
+                this.dude.setVisible(true)
+                this.shooting_dude.setVisible(false)
+                this.dude.setVelocityX(300);
+                // this.dude.setTexture('dudePompato')
+                // this.dude.anims.play('goRight');
+                // this.dude.displayWidth = 60;
+                // this.dude.displayHeight = 80;
+            }
         }
         if (this.cursors.up.isDown) {
 
@@ -715,38 +868,66 @@ export class Gameplay extends Phaser.Scene {
 
             this.dude.setVisible(false)
 
-            if (this.bullet === null) {
-                this.bullet = this.physics.add.sprite(
-                    this.dude.x,
-                    this.dude.y - 40,
-                    'bullet'
-                )
-                    .setAngle(180)
-                    .setScale(0.3) // Riduce anche il render grafico
-                    .setOrigin(0.5)
-                    .setBounce(1)
+            // if dude pompato handle throw of bigger bullet and caricatore bullet
+            if (this.dudePompato && this.caricatoreBullets.getLength() > 0 && !this.removingBullet) {
+                this.removingBullet = true;
+                const bullet = this.caricatoreBullets.getLast(true)
+                bullet.setVelocityY(-500);
+                bullet.setVisible(true)
+                bullet.anims.play('flameBullet')
+                bullet.body.x = this.dude.x - 30
+                bullet.body.y = this.dude.y - 50
+                this.caricatoreBullets.remove(bullet);
+                this.superBullet = bullet;
+                console.log("caricatore bullets rimasti dovrebbe essere x - 1 ", this.caricatoreBullets)
+                this.textSuperBulletRemaining.setText(`Superbullets: ${this.caricatoreBullets.getLength()}`)
+            } else {
 
-                // Calcola nuova dimensione hitbox in base alla scala e all’immagine originale
-                const width = this.bullet.displayWidth;
-                const height = this.bullet.displayHeight;
+                if (this.bullet === null && !this.dudePompato) {
+                    this.bullet = this.physics.add.sprite(
+                        this.dude.x,
+                        this.dude.y - 40,
+                        'bullet'
+                    )
+                        .setAngle(180)
+                        .setScale(0.3) // Riduce anche il render grafico
+                        .setOrigin(0.5)
+                        .setBounce(1)
 
-                this.bullet.body.setSize(width, height);
-                this.bullet.body.setOffset((this.bullet.width - width) / 2, (this.bullet.height - height) / 2);
-                this.bullet.setVelocity(0, -250)
-                this.sound.play('bulletSound')
-                this.bullet.anims.play('flameBullet');
+                    // Calcola nuova dimensione hitbox in base alla scala e all’immagine originale
+                    const width = this.bullet.displayWidth;
+                    const height = this.bullet.displayHeight;
+
+                    this.bullet.body.setSize(width, height);
+                    this.bullet.body.setOffset((this.bullet.width - width) / 2, (this.bullet.height - height) / 2);
+                    this.bullet.setVelocity(0, -250)
+                    this.sound.play('bulletSound')
+                    this.bullet.anims.play('flameBullet');
+                }
+
+
+                this.shooting_dude.setVisible(true)
+                this.shooting_dude.setPosition(this.dude.x, this.dude.y - 9);
+                this.shooting_dude.anims.play('shoot', true);
+
             }
 
-
-            this.shooting_dude.setVisible(true)
-            this.shooting_dude.setPosition(this.dude.x, this.dude.y - 9);
-            this.shooting_dude.anims.play('shoot', true);
-
         }
-        if (!this.cursors.right.isDown && !this.cursors.left.isDown && !this.cursors.up.isDown) {
+        if (!this.cursors.right.isDown && !this.cursors.left.isDown && !this.cursors.up.isDown && !this.dudePompato) {
             this.dude.setVisible(true)
+            this.dudePompato_sprite.setVisible(false)
             this.shooting_dude.setVisible(false)
             this.dude.anims.play('stand')
+
+        }
+
+        if (!this.cursors.right.isDown && !this.cursors.left.isDown && !this.cursors.up.isDown && this.dudePompato) {
+            this.dude.setVisible(false)
+            this.dudePompato_sprite.x = this.dude.x
+            this.dudePompato_sprite.setVisible(true)
+            this.shooting_dude.setVisible(false)
+            this.dude.anims.play('standPompato')
+
         }
 
 
@@ -762,6 +943,12 @@ export class Gameplay extends Phaser.Scene {
         this.updateHpBar()
         this.bullet && this.checkIfBulletOutOfCanvas()
 
+        this.superBullet && this.checkIfSuperBulletOutOfCanvas()
+
+        if (this.caricatoreBullets && this.caricatoreBullets.getLength() === 0 && this.dudePompato) {
+            console.log("dude non più pompato")
+            this.dudePompato = false;
+        }
     }
 
 
@@ -802,6 +989,15 @@ export class Gameplay extends Phaser.Scene {
         if (this.bullet && this.bullet.body.y <= 0 || this.bullet.body.y >= this.canvasHeight) {
             this.bullet = null
             console.log("bullet uscita dall asse y ")
+        }
+    }
+
+    checkIfSuperBulletOutOfCanvas() {
+        if (this.superBullet && this.superBullet.body.y <= 0 || this.superBullet.body.y >= this.canvasHeight) {
+            this.superBullet = null
+            console.log(" super bullet uscita dall asse y ")
+            this.removingBullet = false;
+            console.log("removing bullet false, posso sparare di nuovo: colpi superbullet residui: " + this.caricatoreBullets.getLength())
         }
     }
 
@@ -1032,7 +1228,9 @@ export class Gameplay extends Phaser.Scene {
     }
 
     updateLivello() {
-        if (!this.livelloChanged && this.punteggio % 200 === 0) {
+        if (!this.livelloChanged &&
+            this.punteggio % 200 === 0 &&
+            !this.boss) {
             this.livelloChanged = true;
             this.livello++
             this.livelloRef.setText(`Livello: ${this.livello}`)
@@ -1061,7 +1259,7 @@ export class Gameplay extends Phaser.Scene {
                 console.log("passato alla modalità spawn bombe quadruplo")
             }
 
-            if (this.livello === 1) {
+            if (this.livello === 6) {
                 // metto in pausa la generazione di bombe
                 this.timerEventSpawnBomb.paused = true;
                 // interrompo musica di base facendo un fade out
@@ -1264,6 +1462,29 @@ export class Gameplay extends Phaser.Scene {
         this.anims.create({
             key: 'thunderLayer',
             frames: this.anims.generateFrameNumbers('layer', {start: 0, end: 3}),
+            frameRate: 15,
+            repeat: -1
+        })
+    }
+
+    createAnimationDudePompato() {
+        this.anims.create({
+            key: 'standPompato',
+            frames: this.anims.generateFrameNumbers('dudePompato', {start: 4, end: 4}),
+            frameRate: 15,
+            repeat: -1
+        })
+
+        this.anims.create({
+            key: 'goRight',
+            frames: this.anims.generateFrameNumbers('dudePompato', {start: 0, end: 3}),
+            frameRate: 15,
+            repeat: -1
+        })
+
+        this.anims.create({
+            key: 'goLeft',
+            frames: this.anims.generateFrameNumbers('dudePompato', {start: 5, end: 8}),
             frameRate: 15,
             repeat: -1
         })
