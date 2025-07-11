@@ -69,7 +69,7 @@ export class Gameplay extends Phaser.Scene {
     removingBullet = false;
     superBullet = null
     textSuperBulletRemaining = null
-    dudePompato_sprite = null;
+    dudeCorazzato_sprite = null;
 
     // il constructor serve per dare un nome a questa classe, se la devo richiamare da qualche parte questo sarà il nome
     constructor() {
@@ -167,9 +167,15 @@ export class Gameplay extends Phaser.Scene {
         })
 
         //load dude pompato
-        this.load.spritesheet("dudePompato", "assets/dudePompato.png", {
-            frameHeight: 490.5, frameWidth: 230
-        })
+        // this.load.spritesheet('dudePompato', 'assets/dudePompato.png', {
+        //     frameWidth: 216,
+        //     frameHeight: 490.5
+        // });
+
+        this.load.spritesheet('dudeCorazzato', 'assets/dude_corazzato.png', {
+            frameWidth: 43,
+            frameHeight: 42
+        });
 
         //caricamento boss nemico
         this.load.spritesheet('bossSpriteSheet', "assets/boss.png", {
@@ -275,10 +281,10 @@ export class Gameplay extends Phaser.Scene {
         this.dude.displayHeight = 60;
 
 
-        this.dudePompato_sprite = this.physics.add.sprite(this.dude.x, this.dude.y, 'dudePompato')
-        this.dudePompato_sprite.setVisible(false)
-        this.dudePompato_sprite.setSize(40, 60)
-        this.dudePompato_sprite.setDisplaySize(40, 60);
+        this.dudeCorazzato_sprite = this.physics.add.sprite(this.dude.x, this.dude.y, 'dudeCorazzato')
+        this.dudeCorazzato_sprite.setVisible(false)
+        this.dudeCorazzato_sprite.setSize(40, 60)
+        this.dudeCorazzato_sprite.setDisplaySize(40, 60);
 
         // carica sprite contenente il dude che spara
         this.shooting_dude = this.physics.add.sprite(this.dude.body.x, this.dude.body.y, 'shooting-dude')
@@ -313,7 +319,7 @@ export class Gameplay extends Phaser.Scene {
         this.createHpbackground()
 
         // create animation dude pompato
-        this.createAnimationDudePompato()
+        this.createAnimationDudeCorazzato()
 
         // crea vita vera e propria
         this.hpBar = this.add.graphics();
@@ -445,13 +451,6 @@ export class Gameplay extends Phaser.Scene {
             this.generatingAttackUpSprite = false;
             this.dudePompato = true;
             console.log("dude has taken power up")
-            // 1. sostituisci dude con dude muscoloso
-            // this.dude.setTexture('dudePompato')
-            // this.dude.setTexture('dudePompato');
-            // this.dude.anims.play('standPompato');
-            // 2. fornisci un array di 5 proiettili che possono essere sparati a piacimento,
-
-            // finiti i quali si torna allo shooting di default
         }
 
 
@@ -823,19 +822,19 @@ export class Gameplay extends Phaser.Scene {
 
             if (!this.dudePompato) {
                 this.dude.setVisible(true)
-                this.dudePompato_sprite && this.dudePompato_sprite.setVisible(false)
+                this.dudeCorazzato_sprite && this.dudeCorazzato_sprite.setVisible(false)
                 this.shooting_dude.setVisible(false)
                 this.dude.anims.play('left', true)
                 this.dude.setVelocityX(-300);
             }
 
 
-            if (this.dudePompato && this.dudePompato_sprite) {
+            if (this.dudePompato && this.dudeCorazzato_sprite) {
                 this.dude.setVisible(false)
                 this.shooting_dude.setVisible(false)
-                this.dudePompato_sprite.setVisible(true);
-                this.dudePompato_sprite.setVelocityX(-300)
-                this.dudePompato_sprite.anims.play('goLeft')
+                this.dudeCorazzato_sprite.setVisible(true);
+                this.dudeCorazzato_sprite.setVelocityX(-300)
+                this.dudeCorazzato_sprite.anims.play('goLeft')
                 // this.dude.displayWidth = 60;
                 // this.dude.displayHeight = 80;
             }
@@ -913,9 +912,12 @@ export class Gameplay extends Phaser.Scene {
             }
 
         }
+
+        // static situation, no key pressed
+        // case dude pompato and not pompato
         if (!this.cursors.right.isDown && !this.cursors.left.isDown && !this.cursors.up.isDown && !this.dudePompato) {
             this.dude.setVisible(true)
-            this.dudePompato_sprite.setVisible(false)
+            this.dudeCorazzato_sprite.setVisible(false)
             this.shooting_dude.setVisible(false)
             this.dude.anims.play('stand')
 
@@ -923,10 +925,12 @@ export class Gameplay extends Phaser.Scene {
 
         if (!this.cursors.right.isDown && !this.cursors.left.isDown && !this.cursors.up.isDown && this.dudePompato) {
             this.dude.setVisible(false)
-            this.dudePompato_sprite.x = this.dude.x
-            this.dudePompato_sprite.setVisible(true)
+            this.dudeCorazzato_sprite.x = this.dude.x
+            this.dudeCorazzato_sprite.setVisible(true)
+            this.dudeCorazzato_sprite.displayWidth = 100;
+            this.dudeCorazzato_sprite.displayHeigth = 250;
             this.shooting_dude.setVisible(false)
-            this.dude.anims.play('standPompato')
+            this.dude.anims.play('standCorazzato')
 
         }
 
@@ -1467,24 +1471,24 @@ export class Gameplay extends Phaser.Scene {
         })
     }
 
-    createAnimationDudePompato() {
+    createAnimationDudeCorazzato() {
         this.anims.create({
-            key: 'standPompato',
-            frames: this.anims.generateFrameNumbers('dudePompato', {start: 4, end: 4}),
+            key: 'standCorazzato',
+            frames: this.anims.generateFrameNumbers('dudeCorazzato', {start: 0, end: 0}),
             frameRate: 15,
             repeat: -1
         })
 
         this.anims.create({
             key: 'goRight',
-            frames: this.anims.generateFrameNumbers('dudePompato', {start: 0, end: 3}),
+            frames: this.anims.generateFrameNumbers('dudeCorazzato', {start: 3, end: 8}),
             frameRate: 15,
             repeat: -1
         })
 
         this.anims.create({
             key: 'goLeft',
-            frames: this.anims.generateFrameNumbers('dudePompato', {start: 5, end: 8}),
+            frames: this.anims.generateFrameNumbers('dudeCorazzato', {start: 9, end: 14}),
             frameRate: 15,
             repeat: -1
         })
