@@ -70,6 +70,7 @@ export class Gameplay extends Phaser.Scene {
     superBullet = null
     textSuperBulletRemaining = null
     dudeCorazzato_sprite = null;
+    dudePositionX = null;
 
     // il constructor serve per dare un nome a questa classe, se la devo richiamare da qualche parte questo sarà il nome
     constructor() {
@@ -821,22 +822,22 @@ export class Gameplay extends Phaser.Scene {
 
 
             if (!this.dudePompato) {
-                this.dude.setVisible(true)
-                this.dudeCorazzato_sprite && this.dudeCorazzato_sprite.setVisible(false)
-                this.shooting_dude.setVisible(false)
+                this.showSprite(this.dude);
+                this.hideSprite(this.dudeCorazzato_sprite);
+                this.hideSprite(this.shooting_dude);
                 this.dude.anims.play('left', true)
                 this.dude.setVelocityX(-300);
             }
 
 
             if (this.dudePompato && this.dudeCorazzato_sprite) {
-                this.dude.setVisible(false)
-                this.shooting_dude.setVisible(false)
-                this.dudeCorazzato_sprite.setVisible(true);
+
+                this.hideSprite(this.dude);
+                this.hideSprite(this.shooting_dude);
+                this.showSprite(this.dudeCorazzato_sprite);
                 this.dudeCorazzato_sprite.setVelocityX(-300)
-                this.dudeCorazzato_sprite.anims.play('goLeft')
-                // this.dude.displayWidth = 60;
-                // this.dude.displayHeight = 80;
+                this.dudeCorazzato_sprite.anims.play('goLeft', true)
+
             }
         }
 
@@ -916,21 +917,21 @@ export class Gameplay extends Phaser.Scene {
         // static situation, no key pressed
         // case dude pompato and not pompato
         if (!this.cursors.right.isDown && !this.cursors.left.isDown && !this.cursors.up.isDown && !this.dudePompato) {
-            this.dude.setVisible(true)
-            this.dudeCorazzato_sprite.setVisible(false)
-            this.shooting_dude.setVisible(false)
+            this.showSprite(this.dude);
+            this.hideSprite(this.dudeCorazzato_sprite);
+            this.hideSprite(this.shooting_dude);
             this.dude.anims.play('stand')
-
         }
 
         if (!this.cursors.right.isDown && !this.cursors.left.isDown && !this.cursors.up.isDown && this.dudePompato) {
-            this.dude.setVisible(false)
-            this.dudeCorazzato_sprite.x = this.dude.x
-            this.dudeCorazzato_sprite.setVisible(true)
+
+            this.hideSprite(this.dude);
+            this.showSprite(this.dudeCorazzato_sprite);
+            this.hideSprite(this.shooting_dude);
             this.dudeCorazzato_sprite.displayWidth = 100;
             this.dudeCorazzato_sprite.displayHeigth = 250;
-            this.shooting_dude.setVisible(false)
             this.dude.anims.play('standCorazzato')
+            this.dudeCorazzato_sprite.x = this.dude.x;
 
         }
 
@@ -953,6 +954,19 @@ export class Gameplay extends Phaser.Scene {
             console.log("dude non più pompato")
             this.dudePompato = false;
         }
+    }
+
+
+    // method to hide a sprite from the canvas and also disable his body
+    hideSprite(sprite_ref) {
+        sprite_ref.setVisible(false)
+        sprite_ref.body.enable = false;
+    }
+
+    // method to show a sprite into the canvas and also enable his body physic
+    showSprite(sprite_ref) {
+        sprite_ref.setVisible(true)
+        sprite_ref.body.enable = true;
     }
 
 
