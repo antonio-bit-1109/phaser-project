@@ -100,6 +100,8 @@ export class Gameplay extends Phaser.Scene {
         this.timerDecrement = null;
         this.clicking_clock_sound = null
         this.thunderTempest = null
+        this.caricatoreBullets = null;
+        this.textSuperBulletRemaining = null;
     }
 
 
@@ -875,55 +877,66 @@ export class Gameplay extends Phaser.Scene {
             if (this.cursors.right.isDown) return;
             if (this.cursors.left.isDown) return;
 
-            this.shooting_dude.x = this.dudePositionX;
-            
+            // this.shooting_dude.x = this.dudePositionX;
+
             // this.dude.setVisible(false)
             // this.hideSprite(this.dude)
             // this.showSprite(this.shooting_dude)
 
             // if dude pompato handle throw of bigger bullet and caricatore bullet
-            if (this.dudePompato && this.caricatoreBullets.getLength() > 0 && !this.removingBullet) {
+            if (this.dudePompato && this.caricatoreBullets && this.caricatoreBullets.getLength() > 0 && !this.removingBullet) {
+
+                this.hideSprite(this.dude);
+                this.hideSprite(this.shooting_dude);
+                this.showSprite(this.dudeCorazzato_sprite)
+
+                this.dudeCorazzato_sprite.anims.play("spara_corazzato")
+                this.dudeCorazzato_sprite.setVelocityX(0);
                 this.removingBullet = true;
                 const bullet = this.caricatoreBullets.getLast(true)
                 bullet.setVelocityY(-500);
                 bullet.setVisible(true)
                 bullet.anims.play('flameBullet')
-                bullet.body.x = this.dude.x - 30
-                bullet.body.y = this.dude.y - 50
+                bullet.body.x = this.dudeCorazzato_sprite.x - 30
+                bullet.body.y = this.dudeCorazzato_sprite.y - 80
                 this.caricatoreBullets.remove(bullet);
                 this.superBullet = bullet;
                 console.log("caricatore bullets rimasti dovrebbe essere x - 1 ", this.caricatoreBullets)
                 this.textSuperBulletRemaining.setText(`Superbullets: ${this.caricatoreBullets.getLength()}`)
-            } else {
 
-                if (this.bullet === null && !this.dudePompato) {
-                    this.bullet = this.physics.add.sprite(
-                        this.dude.x,
-                        this.dude.y - 40,
-                        'bullet'
-                    )
-                        .setAngle(180)
-                        .setScale(0.3) // Riduce anche il render grafico
-                        .setOrigin(0.5)
-                        .setBounce(1)
-
-                    // Calcola nuova dimensione hitbox in base alla scala e all’immagine originale
-                    const width = this.bullet.displayWidth;
-                    const height = this.bullet.displayHeight;
-
-                    this.bullet.body.setSize(width, height);
-                    this.bullet.body.setOffset((this.bullet.width - width) / 2, (this.bullet.height - height) / 2);
-                    this.bullet.setVelocity(0, -250)
-                    this.sound.play('bulletSound')
-                    this.bullet.anims.play('flameBullet');
-                }
-
-
-                this.shooting_dude.setVisible(true)
-                this.shooting_dude.setPosition(this.dude.x, this.dude.y - 9);
-                this.shooting_dude.anims.play('shoot', true);
-
+                //
             }
+
+
+            if (this.bullet === null && !this.dudePompato) {
+                this.bullet = this.physics.add.sprite(
+                    this.dude.x,
+                    this.dude.y - 40,
+                    'bullet'
+                )
+                    .setAngle(180)
+                    .setScale(0.3) // Riduce anche il render grafico
+                    .setOrigin(0.5)
+                    .setBounce(1)
+
+                // Calcola nuova dimensione hitbox in base alla scala e all’immagine originale
+                const width = this.bullet.displayWidth;
+                const height = this.bullet.displayHeight;
+
+                this.bullet.body.setSize(width, height);
+                this.bullet.body.setOffset((this.bullet.width - width) / 2, (this.bullet.height - height) / 2);
+                this.bullet.setVelocity(0, -250)
+                this.sound.play('bulletSound')
+                this.bullet.anims.play('flameBullet');
+                // this.shooting_dude.setVisible(true)
+                this.hideSprite(this.dudeCorazzato_sprite)
+                this.hideSprite(this.dude);
+                this.showSprite(this.shooting_dude)
+                this.shooting_dude.x = this.dudePositionX;
+                this.shooting_dude.y = this.dude.y - 9
+                this.shooting_dude.anims.play('shoot', true);
+            }
+
 
         }
 
@@ -933,6 +946,7 @@ export class Gameplay extends Phaser.Scene {
             this.showSprite(this.dude);
             this.hideSprite(this.dudeCorazzato_sprite);
             this.hideSprite(this.shooting_dude);
+            this.dude.x = this.dudePositionX;
             this.dude.anims.play('stand')
         }
 
@@ -963,7 +977,7 @@ export class Gameplay extends Phaser.Scene {
 
         this.superBullet && this.checkIfSuperBulletOutOfCanvas()
 
-        if (this.caricatoreBullets && this.caricatoreBullets.getLength() === 0 && this.dudePompato) {
+        if (this.caricatoreBullets && this.caricatoreBullets.getLength() !== null && this.caricatoreBullets.getLength() === 0 && this.dudePompato) {
             console.log("dude non più pompato")
             this.dudePompato = false;
         }
@@ -1290,7 +1304,7 @@ export class Gameplay extends Phaser.Scene {
                 console.log("passato alla modalità spawn bombe quadruplo")
             }
 
-            if (this.livello === 6) {
+            if (this.livello === 2) {
                 // metto in pausa la generazione di bombe
                 this.timerEventSpawnBomb.paused = true;
                 // interrompo musica di base facendo un fade out
@@ -1516,6 +1530,13 @@ export class Gameplay extends Phaser.Scene {
         this.anims.create({
             key: 'goLeft',
             frames: this.anims.generateFrameNumbers('dudeCorazzato', {start: 9, end: 14}),
+            frameRate: 15,
+            repeat: -1
+        })
+
+        this.anims.create({
+            key: 'spara_corazzato',
+            frames: this.anims.generateFrameNumbers('dudeCorazzato', {start: 18, end: 18}),
             frameRate: 15,
             repeat: -1
         })
