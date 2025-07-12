@@ -280,7 +280,7 @@ export class Gameplay extends Phaser.Scene {
         this.dude = this.physics.add.sprite(this.canvasWidth / 2, this.canvasHeight - 80, 'dude')
         this.dude.displayWidth = 40;
         this.dude.displayHeight = 60;
-
+        this.dudePositionX = this.canvasWidth / 2;
 
         this.dudeCorazzato_sprite = this.physics.add.sprite(this.dude.x, this.dude.y, 'dudeCorazzato')
         this.dudeCorazzato_sprite.setVisible(false)
@@ -827,6 +827,7 @@ export class Gameplay extends Phaser.Scene {
                 this.hideSprite(this.shooting_dude);
                 this.dude.anims.play('left', true)
                 this.dude.setVelocityX(-300);
+                this.dudePositionX = this.dude.x;
             }
 
 
@@ -837,7 +838,8 @@ export class Gameplay extends Phaser.Scene {
                 this.showSprite(this.dudeCorazzato_sprite);
                 this.dudeCorazzato_sprite.setVelocityX(-300)
                 this.dudeCorazzato_sprite.anims.play('goLeft', true)
-
+                this.dudePositionX = this.dudeCorazzato_sprite.x;
+                // this.dudeCorazzato_sprite.x = this.dudePositionX;
             }
         }
 
@@ -845,28 +847,39 @@ export class Gameplay extends Phaser.Scene {
             // il tasto FRECCIA DESTRA è premuto
 
             if (!this.dudePompato) {
-                this.dude.setVisible(true)
-                this.shooting_dude.setVisible(false)
+
+                this.showSprite(this.dude);
+                this.hideSprite(this.shooting_dude);
+
+                // this.dude.setVisible(true)
+                // this.shooting_dude.setVisible(false)
                 this.dude.setVelocityX(300);
+                this.dudePositionX = this.dude.x;
                 this.dude.anims.play('right', true)
             }
 
             if (this.dudePompato) {
-                this.dude.setVisible(true)
-                this.shooting_dude.setVisible(false)
-                this.dude.setVelocityX(300);
-                // this.dude.setTexture('dudePompato')
-                // this.dude.anims.play('goRight');
-                // this.dude.displayWidth = 60;
-                // this.dude.displayHeight = 80;
+
+                this.hideSprite(this.dude);
+                this.hideSprite(this.shooting_dude);
+                this.showSprite(this.dudeCorazzato_sprite);
+
+                this.dudeCorazzato_sprite.setVelocityX(300);
+                this.dudePositionX = this.dudeCorazzato_sprite.x;
+                this.dudeCorazzato_sprite.anims.play("goRight", true)
             }
         }
+
         if (this.cursors.up.isDown) {
 
             if (this.cursors.right.isDown) return;
             if (this.cursors.left.isDown) return;
 
-            this.dude.setVisible(false)
+            this.shooting_dude.x = this.dudePositionX;
+            
+            // this.dude.setVisible(false)
+            // this.hideSprite(this.dude)
+            // this.showSprite(this.shooting_dude)
 
             // if dude pompato handle throw of bigger bullet and caricatore bullet
             if (this.dudePompato && this.caricatoreBullets.getLength() > 0 && !this.removingBullet) {
@@ -930,8 +943,8 @@ export class Gameplay extends Phaser.Scene {
             this.hideSprite(this.shooting_dude);
             this.dudeCorazzato_sprite.displayWidth = 100;
             this.dudeCorazzato_sprite.displayHeigth = 250;
-            this.dude.anims.play('standCorazzato')
-            this.dudeCorazzato_sprite.x = this.dude.x;
+            this.dudeCorazzato_sprite.anims.play('standCorazzato')
+            this.dudeCorazzato_sprite.x = this.dudePositionX;
 
         }
 
