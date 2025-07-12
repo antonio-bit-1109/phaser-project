@@ -462,8 +462,8 @@ export class Gameplay extends Phaser.Scene {
         // scattava e il riferimento a hpBomb_sprite diventata null e rompeva tutto
         if (this.hpBomb_sprite &&
             !this.alreadyAccessed &&
-            this.dude &&
-            this.checkCollision_general(this.hpBomb_sprite, this.dude)) {
+            (this.dude || this.dudeCorazzato_sprite) &&
+            (this.checkCollision_general(this.hpBomb_sprite, this.dude) || this.checkCollision_general(this.hpBomb_sprite, this.dudeCorazzato_sprite))) {
             this.alreadyAccessed = true;
             this.hpBomb_sprite.setVelocityY(0);               // azzera velocità
             this.sound.play('hpUp'); // suono hpBomb
@@ -685,6 +685,7 @@ export class Gameplay extends Phaser.Scene {
                         .setOrigin(0.5)
                         .setBounce(1)
                         .setVisible(false)
+                        .setTint(0xff00ff, 0xffff00, 0x0000ff, 0xff0000);
                     this.caricatoreBullets.add(bullet)
                 }
                 console.log("caricatore bullet dude pompato:", this.caricatoreBullets)
@@ -721,6 +722,12 @@ export class Gameplay extends Phaser.Scene {
             // per ogni shuriken controllo collisione con dude
             // se avviene sottraggo vita
             if (this.checkCollision_general(shur, this.dude)) {
+                this.hp -= 10
+                shur.destroy()
+                this.sound.play(this.chooseRandomDudeDamageSound(), {volume: 2});
+            }
+
+            if (this.dudeCorazzato_sprite && this.checkCollision_general(shur, this.dudeCorazzato_sprite)) {
                 this.hp -= 10
                 shur.destroy()
                 this.sound.play(this.chooseRandomDudeDamageSound(), {volume: 2});
@@ -1304,7 +1311,7 @@ export class Gameplay extends Phaser.Scene {
                 console.log("passato alla modalità spawn bombe quadruplo")
             }
 
-            if (this.livello === 2) {
+            if (this.livello === 6) {
                 // metto in pausa la generazione di bombe
                 this.timerEventSpawnBomb.paused = true;
                 // interrompo musica di base facendo un fade out
@@ -1385,6 +1392,12 @@ export class Gameplay extends Phaser.Scene {
     // controllare la collisione tra due elementi
     handle_Dude_Explosion_overlap() {
         if (this.dude && this.explosion && this.physics.overlap(this.dude, this.explosion)) {
+            this.hp -= 20
+            this.sound.play(this.chooseRandomDudeDamageSound(), {volume: 2});
+            this.updateHpBar()
+        }
+
+        if (this.dudeCorazzato_sprite && this.explosion && this.physics.overlap(this.dudeCorazzato_sprite, this.explosion)) {
             this.hp -= 20
             this.sound.play(this.chooseRandomDudeDamageSound(), {volume: 2});
             this.updateHpBar()
