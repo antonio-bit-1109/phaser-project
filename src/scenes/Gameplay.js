@@ -102,6 +102,9 @@ export class Gameplay extends Phaser.Scene {
         this.thunderTempest = null
         this.caricatoreBullets = null;
         this.textSuperBulletRemaining = null;
+        this.dudePompato = false;
+        this.removingBullet = false;
+        this.dudeCorazzato_sprite = null;
     }
 
 
@@ -606,9 +609,15 @@ export class Gameplay extends Phaser.Scene {
 
 
         // check collision between the dude and a thunder in the main update method
+        // or between dudeCorazzato and thunder
         this.thunderTempest && this.thunderTempest.children.iterate(thunder => {
             if (this.checkCollision_general(this.dude, thunder)) {
                 this.hp -= 10
+            }
+
+            if (this.dudeCorazzato_sprite &&
+                this.checkCollision_general(this.dudeCorazzato_sprite , thunder)){
+                this.hp -= 5;
             }
         })
 
@@ -659,46 +668,6 @@ export class Gameplay extends Phaser.Scene {
 
             }
 
-
-            //if dude is pompato handle caricatore bullets
-            if (
-                this.dudePompato &&
-                (
-                    !this.caricatoreBullets ||
-                    this.caricatoreBullets.getLength() === 0
-                )
-            ) {
-
-                if (!this.caricatoreBullets) {
-                    this.caricatoreBullets = this.physics.add.group();
-                }
-
-
-                for (let i = 0; i < 5; i++) {
-                    const bullet = this.physics.add.sprite(
-                        this.dude.x,
-                        this.dude.y - 40,
-                        'bullet'
-                    )
-                        .setAngle(180)
-                        .setScale(0.5) // Riduce anche il render grafico
-                        .setOrigin(0.5)
-                        .setBounce(1)
-                        .setVisible(false)
-                        .setTint(0xff00ff, 0xffff00, 0x0000ff, 0xff0000);
-                    this.caricatoreBullets.add(bullet)
-                }
-                console.log("caricatore bullet dude pompato:", this.caricatoreBullets)
-                // create a visual text for residual super bullet remaining
-
-                this.textSuperBulletRemaining ?
-                    this.textSuperBulletRemaining.setText(`Superbullets: ${this.caricatoreBullets.getLength()} `) :
-                    this.textSuperBulletRemaining = this.add.text(this.canvasWidth / 17,
-                        this.canvasHeight / 7,
-                        `Superbullets: ${this.caricatoreBullets.getLength()} `)
-
-            }
-
             if (this.checkCollisionWithGround(bomb, 60)) {
 
                 // sprite con interazioni fisiche
@@ -714,6 +683,46 @@ export class Gameplay extends Phaser.Scene {
             }
 
         })
+
+        //if dude is pompato handle caricatore bullets
+        if (
+            this.dudePompato &&
+            (
+                !this.caricatoreBullets ||
+                this.caricatoreBullets.getLength() === 0
+            )
+        ) {
+
+            if (!this.caricatoreBullets) {
+                this.caricatoreBullets = this.physics.add.group();
+            }
+
+
+            for (let i = 0; i < 5; i++) {
+                const bullet = this.physics.add.sprite(
+                    this.dude.x,
+                    this.dude.y - 40,
+                    'bullet'
+                )
+                    .setAngle(180)
+                    .setScale(0.5) // Riduce anche il render grafico
+                    .setOrigin(0.5)
+                    .setBounce(1)
+                    .setVisible(false)
+                    .setTint(0xff00ff, 0xffff00, 0x0000ff, 0xff0000);
+                this.caricatoreBullets.add(bullet)
+            }
+            console.log("caricatore bullet dude pompato:", this.caricatoreBullets)
+            // create a visual text for residual super bullet remaining
+
+            this.textSuperBulletRemaining ?
+                this.textSuperBulletRemaining.setText(`Superbullets: ${this.caricatoreBullets.getLength()} `) :
+                this.textSuperBulletRemaining = this.add.text(this.canvasWidth / 17,
+                    this.canvasHeight / 7,
+                    `Superbullets: ${this.caricatoreBullets.getLength()} `)
+
+        }
+
 
 
         // controllo collisioni tra dude e gruppo degli shuriken
@@ -748,17 +757,37 @@ export class Gameplay extends Phaser.Scene {
         // check if dude is hitted by layers attack
         if (this.layer && this.dude) {
             if (this.checkCollision_general(this.layer, this.dude)) {
+                this.hp -= 2;
+            }
+        }
+
+        // check if dudeCorazzato is hitted by layers attack
+        if (this.layer && this.dudeCorazzato_sprite) {
+            if (this.checkCollision_general(this.layer, this.dudeCorazzato_sprite)) {
                 this.hp -= 1;
             }
         }
 
 
         // check if dude hitted by is own bullet
-        if (this.checkCollision_general(this.bullet, this.dude)) {
+        if (this.bullet &&
+            (this.dude || this.dudeCorazzato_sprite) &&
+            (this.checkCollision_general(this.bullet, this.dude) || this.checkCollision_general(this.bullet, this.dudeCorazzato_sprite)  )) {
             this.hp -= 10;
             this.bullet.destroy()
             this.bullet = null;
             this.sound.play(this.chooseRandomDudeDamageSound(), {volume: 2});
+        }
+
+        // check if dude hitted by its own superbullet
+        if (this.superBullet &&
+            (this.dude || this.dudeCorazzato_sprite) &&
+            (this.checkCollision_general(this.superBullet, this.dudeCorazzato_sprite) || this.checkCollision_general(this.superBullet , this.dude) )) {
+            this.hp -= 18;
+            this.superBullet.destroy()
+            this.superBullet = null;
+            this.sound.play(this.chooseRandomDudeDamageSound(), {volume: 2});
+            this.removingBullet = false;
         }
 
         // check if layer thunder has passed the canvas heigth
@@ -774,6 +803,17 @@ export class Gameplay extends Phaser.Scene {
             if (this.checkCollision_general(this.dude, this.boss_laserBeam_1) ||
                 this.checkCollision_general(this.dude, this.boss_laserBeam_2)) {
                 this.hp -= 30;
+                this.hittedByLaserBeam = true;
+                this.sound.play(this.chooseRandomDudeDamageSound(), {volume: 2});
+                console.log("dude preso da uno dei laser beam del boss")
+            }
+        }
+
+        //controllo se uno dei laserBeam colpisce dudeCorazzato
+        if (this.dudeCorazzato_sprite && this.boss_laserBeam_1 && this.boss_laserBeam_2 && !this.hittedByLaserBeam) {
+            if (this.checkCollision_general(this.dudeCorazzato_sprite, this.boss_laserBeam_1) ||
+                this.checkCollision_general(this.dudeCorazzato_sprite, this.boss_laserBeam_2)) {
+                this.hp -= 20;
                 this.hittedByLaserBeam = true;
                 this.sound.play(this.chooseRandomDudeDamageSound(), {volume: 2});
                 console.log("dude preso da uno dei laser beam del boss")
@@ -798,7 +838,16 @@ export class Gameplay extends Phaser.Scene {
             this.bullet = null;
         }
 
-        if (this.boss && this.hpBoss_number === 0) {
+        // controllo collisioni tra superbullet e boss se questi esistono
+        if (this.superBullet && this.boss && this.checkCollision_general(this.superBullet, this.boss)) {
+            this.hpBoss_number -= 15;
+            this.hpBoss_number > 0 && this.sound.play('bossHitted')
+            this.superBullet.destroy()
+            this.superBullet = null;
+            this.removingBullet = false;
+        }
+
+        if (this.boss && this.hpBoss_number <= 0) {
             this.sound.play('bossDeath', {
                 volume: 3
             })
@@ -884,14 +933,11 @@ export class Gameplay extends Phaser.Scene {
             if (this.cursors.right.isDown) return;
             if (this.cursors.left.isDown) return;
 
-            // this.shooting_dude.x = this.dudePositionX;
-
-            // this.dude.setVisible(false)
-            // this.hideSprite(this.dude)
-            // this.showSprite(this.shooting_dude)
-
             // if dude pompato handle throw of bigger bullet and caricatore bullet
-            if (this.dudePompato && this.caricatoreBullets && this.caricatoreBullets.getLength() > 0 && !this.removingBullet) {
+            if (this.dudePompato &&
+                this.caricatoreBullets &&
+                this.caricatoreBullets.getLength() > 0 &&
+                !this.removingBullet) {
 
                 this.hideSprite(this.dude);
                 this.hideSprite(this.shooting_dude);
@@ -905,7 +951,7 @@ export class Gameplay extends Phaser.Scene {
                 bullet.setVisible(true)
                 bullet.anims.play('flameBullet')
                 bullet.body.x = this.dudeCorazzato_sprite.x - 30
-                bullet.body.y = this.dudeCorazzato_sprite.y - 80
+                bullet.body.y = this.dudeCorazzato_sprite.y - 120
                 this.caricatoreBullets.remove(bullet);
                 this.superBullet = bullet;
                 console.log("caricatore bullets rimasti dovrebbe essere x - 1 ", this.caricatoreBullets)
@@ -979,6 +1025,15 @@ export class Gameplay extends Phaser.Scene {
             }
         }
 
+        //check if superBullet has collided with shield,
+        // if that happen his velocity on y axe is inverted, than superBullet exit from canvas and became null
+        if (this.superBullet && this.bossShield && this.checkCollision_general(this.superBullet, this.bossShield)) {
+            {
+                this.superBullet.setVelocityY(600)
+                this.superBullet.setAngle(360);
+            }
+        }
+
         this.updateHpBar()
         this.bullet && this.checkIfBulletOutOfCanvas()
 
@@ -988,6 +1043,9 @@ export class Gameplay extends Phaser.Scene {
             console.log("dude non più pompato")
             this.dudePompato = false;
         }
+
+
+        console.log("dude è pompato??? ---> " , this.dudePompato)
     }
 
 
@@ -1311,7 +1369,7 @@ export class Gameplay extends Phaser.Scene {
                 console.log("passato alla modalità spawn bombe quadruplo")
             }
 
-            if (this.livello === 6) {
+            if (this.livello === 1) {
                 // metto in pausa la generazione di bombe
                 this.timerEventSpawnBomb.paused = true;
                 // interrompo musica di base facendo un fade out
