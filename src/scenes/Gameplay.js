@@ -717,7 +717,7 @@ export class Gameplay extends Phaser.Scene {
             this.textSuperBulletRemaining ?
                 this.textSuperBulletRemaining.setText(`Superbullets: ${this.caricatoreBullets.getLength()} `) :
                 this.textSuperBulletRemaining = this.add.text(this.canvasWidth / 17,
-                    this.canvasHeight / 7,
+                    this.canvasHeight / 6,
                     `Superbullets: ${this.caricatoreBullets.getLength()} `)
 
         }
