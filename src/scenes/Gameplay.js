@@ -607,7 +607,6 @@ export class Gameplay extends Phaser.Scene {
             this.playingThunderStorm = true;
         }
 
-
         // check collision between the dude and a thunder in the main update method
         // or between dudeCorazzato and thunder
         this.thunderTempest && this.thunderTempest.children.iterate(thunder => {
@@ -873,13 +872,18 @@ export class Gameplay extends Phaser.Scene {
 
         // gestione dell animazione del dude
         this.dude.setVelocity(0);
-
+        this.dudeCorazzato_sprite && this.dudeCorazzato_sprite.setVelocity(0);
 
         if (this.cursors.left.isDown) {
             // il tasto FRECCIA SINISTRA è premuto
 
 
             if (!this.dudePompato) {
+                // if dude is near the left corner of the canvas he must stop
+                if (this.dude && this.dude.x <= 20){
+                    return;
+                }
+
                 this.showSprite(this.dude);
                 this.hideSprite(this.dudeCorazzato_sprite);
                 this.hideSprite(this.shooting_dude);
@@ -890,6 +894,11 @@ export class Gameplay extends Phaser.Scene {
 
 
             if (this.dudePompato && this.dudeCorazzato_sprite) {
+
+                // if dude corazzato is near the left corner of the canvas he must stop
+                if (this.dudeCorazzato_sprite && this.dudeCorazzato_sprite.x <= 20){
+                    return;
+                }
 
                 this.hideSprite(this.dude);
                 this.hideSprite(this.shooting_dude);
@@ -906,6 +915,11 @@ export class Gameplay extends Phaser.Scene {
 
             if (!this.dudePompato) {
 
+                // if dude is near the right corner of the canvas he must stop
+                if (this.dude && this.dude.x >= this.canvasWidth - 30) {
+                    return;
+                }
+
                 this.showSprite(this.dude);
                 this.hideSprite(this.shooting_dude);
 
@@ -917,6 +931,12 @@ export class Gameplay extends Phaser.Scene {
             }
 
             if (this.dudePompato) {
+
+                // if dude is near the right corner of the canvas he must stop
+                if ( this.dudeCorazzato_sprite &&
+                    this.dudeCorazzato_sprite && this.dudeCorazzato_sprite.x >= this.canvasWidth - 30) {
+                    return;
+                }
 
                 this.hideSprite(this.dude);
                 this.hideSprite(this.shooting_dude);
@@ -1122,7 +1142,6 @@ export class Gameplay extends Phaser.Scene {
             return true;
         }
     }
-
 
     // movimento oscillatorio del bbss dx - sn
     moveBoss() {
