@@ -922,9 +922,6 @@ export class Gameplay extends Phaser.Scene {
 
                 this.showSprite(this.dude);
                 this.hideSprite(this.shooting_dude);
-
-                // this.dude.setVisible(true)
-                // this.shooting_dude.setVisible(false)
                 this.dude.setVelocityX(300);
                 this.dudePositionX = this.dude.x;
                 this.dude.anims.play('right', true)
