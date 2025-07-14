@@ -73,8 +73,7 @@ export class GameOver extends Phaser.Scene {
             .setDepth(0)
             .setScale(0.5)
 
-        if (this.image.texture.key === "happy_dude_corazzato" ||
-            this.image.texture.key === "sad_dude_corazzato") {
+        if (this.image.texture.key === "sad_dude_corazzato") {
             this.image.setScale(0.3)
         }
 
