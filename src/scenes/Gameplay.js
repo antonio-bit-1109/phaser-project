@@ -105,6 +105,15 @@ export class Gameplay extends Phaser.Scene {
         this.dudePompato = false;
         this.removingBullet = false;
         this.dudeCorazzato_sprite = null;
+        this.attackUp_sprite = null;
+        this.generatingAttackUpSprite = false
+        this.caricatoreBullets = null;
+        this.bulletsGroup = null
+        this.dudePompato = false;
+        this.removingBullet = false;
+        this.superBullet = null
+        this.textSuperBulletRemaining = null
+        this.dudePositionX = null;
     }
 
 
@@ -615,7 +624,7 @@ export class Gameplay extends Phaser.Scene {
             }
 
             if (this.dudeCorazzato_sprite &&
-                this.checkCollision_general(this.dudeCorazzato_sprite , thunder)){
+                this.checkCollision_general(this.dudeCorazzato_sprite, thunder)) {
                 this.hp -= 5;
             }
         })
@@ -723,7 +732,6 @@ export class Gameplay extends Phaser.Scene {
         }
 
 
-
         // controllo collisioni tra dude e gruppo degli shuriken
         this.shuriken_boss && this.shuriken_boss.children.iterate((shur) => {
 
@@ -771,7 +779,7 @@ export class Gameplay extends Phaser.Scene {
         // check if dude hitted by is own bullet
         if (this.bullet &&
             (this.dude || this.dudeCorazzato_sprite) &&
-            (this.checkCollision_general(this.bullet, this.dude) || this.checkCollision_general(this.bullet, this.dudeCorazzato_sprite)  )) {
+            (this.checkCollision_general(this.bullet, this.dude) || this.checkCollision_general(this.bullet, this.dudeCorazzato_sprite))) {
             this.hp -= 10;
             this.bullet.destroy()
             this.bullet = null;
@@ -781,7 +789,7 @@ export class Gameplay extends Phaser.Scene {
         // check if dude hitted by its own superbullet
         if (this.superBullet &&
             (this.dude || this.dudeCorazzato_sprite) &&
-            (this.checkCollision_general(this.superBullet, this.dudeCorazzato_sprite) || this.checkCollision_general(this.superBullet , this.dude) )) {
+            (this.checkCollision_general(this.superBullet, this.dudeCorazzato_sprite) || this.checkCollision_general(this.superBullet, this.dude))) {
             this.hp -= 18;
             this.superBullet.destroy()
             this.superBullet = null;
@@ -880,7 +888,7 @@ export class Gameplay extends Phaser.Scene {
 
             if (!this.dudePompato) {
                 // if dude is near the left corner of the canvas he must stop
-                if (this.dude && this.dude.x <= 20){
+                if (this.dude && this.dude.x <= 20) {
                     return;
                 }
 
@@ -896,7 +904,7 @@ export class Gameplay extends Phaser.Scene {
             if (this.dudePompato && this.dudeCorazzato_sprite) {
 
                 // if dude corazzato is near the left corner of the canvas he must stop
-                if (this.dudeCorazzato_sprite && this.dudeCorazzato_sprite.x <= 20){
+                if (this.dudeCorazzato_sprite && this.dudeCorazzato_sprite.x <= 20) {
                     return;
                 }
 
@@ -930,7 +938,7 @@ export class Gameplay extends Phaser.Scene {
             if (this.dudePompato) {
 
                 // if dude is near the right corner of the canvas he must stop
-                if ( this.dudeCorazzato_sprite &&
+                if (this.dudeCorazzato_sprite &&
                     this.dudeCorazzato_sprite && this.dudeCorazzato_sprite.x >= this.canvasWidth - 30) {
                     return;
                 }
@@ -1062,7 +1070,7 @@ export class Gameplay extends Phaser.Scene {
         }
 
 
-        console.log("dude è pompato??? ---> " , this.dudePompato)
+        console.log("dude è pompato??? ---> ", this.dudePompato)
     }
 
 
