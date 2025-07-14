@@ -857,6 +857,7 @@ export class Gameplay extends Phaser.Scene {
             this.sound.play('bossDeath', {
                 volume: 3
             })
+            this.hpBoss_number = 0;
             this.updateBossLife()
             this.boss.destroy()
             this.boss = null
