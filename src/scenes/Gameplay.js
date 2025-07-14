@@ -116,7 +116,6 @@ export class Gameplay extends Phaser.Scene {
         this.dudePositionX = null;
     }
 
-
     preload() {
         // key dell immagine e source da dove prenderla
         this.load.image('nature', 'assets/sky.png');
@@ -983,36 +982,37 @@ export class Gameplay extends Phaser.Scene {
                 this.textSuperBulletRemaining.setText(`Superbullets: ${this.caricatoreBullets.getLength()}`)
 
                 //
-            }
+            } else {
+//
+                if (this.bullet === null && !this.dudePompato) {
+                    this.bullet = this.physics.add.sprite(
+                        this.dude.x,
+                        this.dude.y - 40,
+                        'bullet'
+                    )
+                        .setAngle(180)
+                        .setScale(0.3) // Riduce anche il render grafico
+                        .setOrigin(0.5)
+                        .setBounce(1)
 
+                    // Calcola nuova dimensione hitbox in base alla scala e all’immagine originale
+                    const width = this.bullet.displayWidth;
+                    const height = this.bullet.displayHeight;
 
-            if (this.bullet === null && !this.dudePompato) {
-                this.bullet = this.physics.add.sprite(
-                    this.dude.x,
-                    this.dude.y - 40,
-                    'bullet'
-                )
-                    .setAngle(180)
-                    .setScale(0.3) // Riduce anche il render grafico
-                    .setOrigin(0.5)
-                    .setBounce(1)
+                    this.bullet.body.setSize(width, height);
+                    this.bullet.body.setOffset((this.bullet.width - width) / 2, (this.bullet.height - height) / 2);
+                    this.bullet.setVelocity(0, -250)
+                    this.sound.play('bulletSound')
+                    this.bullet.anims.play('flameBullet');
+                    // this.shooting_dude.setVisible(true)
+                    this.hideSprite(this.dudeCorazzato_sprite)
+                    this.hideSprite(this.dude);
+                    this.showSprite(this.shooting_dude)
+                    this.shooting_dude.x = this.dudePositionX;
+                    this.shooting_dude.y = this.dude.y - 9
+                    this.shooting_dude.anims.play('shoot', true);
+                }
 
-                // Calcola nuova dimensione hitbox in base alla scala e all’immagine originale
-                const width = this.bullet.displayWidth;
-                const height = this.bullet.displayHeight;
-
-                this.bullet.body.setSize(width, height);
-                this.bullet.body.setOffset((this.bullet.width - width) / 2, (this.bullet.height - height) / 2);
-                this.bullet.setVelocity(0, -250)
-                this.sound.play('bulletSound')
-                this.bullet.anims.play('flameBullet');
-                // this.shooting_dude.setVisible(true)
-                this.hideSprite(this.dudeCorazzato_sprite)
-                this.hideSprite(this.dude);
-                this.showSprite(this.shooting_dude)
-                this.shooting_dude.x = this.dudePositionX;
-                this.shooting_dude.y = this.dude.y - 9
-                this.shooting_dude.anims.play('shoot', true);
             }
 
 
