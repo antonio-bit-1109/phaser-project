@@ -870,7 +870,8 @@ export class Gameplay extends Phaser.Scene {
                     canvasHeigth: this.canvasHeight,
                     punteggioFinale: this.punteggio,
                     livello: this.livello,
-                    isGameVictory: true
+                    isGameVictory: true,
+                    isDudePompato: this.dudePompato
                 })
             })
 
@@ -1230,7 +1231,7 @@ export class Gameplay extends Phaser.Scene {
         // Ad esempio sparare il laser
         // Creo un rettangolo che rappresenta il laser dal boss fino a terra
         const laserWidth = 10;
-        const laserHeight = this.canvasHeight - this.boss.y;
+        const laserHeight = this.canvasHeight - (this.boss ? this.boss.y : 0);
 
         this.boss_laserBeam_1 = this.add.rectangle(
             this.boss.x - 40,
@@ -1288,7 +1289,8 @@ export class Gameplay extends Phaser.Scene {
             // sadDude: "assets/sad_dude_no_bg.png",
             // happyDude: null,
             // music: "assets/sounds/gameOver.mp3",
-            isGameVictory: false
+            isGameVictory: false,
+            isDudePompato: this.dudePompato
         })
     }
 
@@ -1393,7 +1395,7 @@ export class Gameplay extends Phaser.Scene {
                 console.log("passato alla modalità spawn bombe quadruplo")
             }
 
-            if (this.livello === 6) {
+            if (this.livello === 1) {
                 // metto in pausa la generazione di bombe
                 this.timerEventSpawnBomb.paused = true;
                 // interrompo musica di base facendo un fade out

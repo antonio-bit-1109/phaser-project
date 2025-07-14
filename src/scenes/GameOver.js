@@ -8,6 +8,8 @@ export class GameOver extends Phaser.Scene {
     sadDude = null;
     music = null;
     isGameVictory = null;
+    dudeIsPompato = null
+    image = null;
 
 
     constructor() {
@@ -20,12 +22,15 @@ export class GameOver extends Phaser.Scene {
         this.punteggioFinale = data.punteggioFinale;
         this.livello = data.livello;
         this.isGameVictory = data.isGameVictory
+        this.dudeIsPompato = data.isDudePompato
     }
 
     preload() {
         this.load.image('nature', 'assets/nature.jpg');
         this.load.image('sadDude', "assets/sad_dude_no_bg.png")
         this.load.image('happyDude', "assets/happyDude.png")
+        this.load.image("happy_dude_corazzato", "assets/happy_cavaliere.png")
+        this.load.image("sad_dude_corazzato", "assets/sad_cavaliere.png")
 
         this.load.audio('gameOver_loser', "assets/sounds/gameOver.mp3")
         this.load.audio('gameOver_winner', "assets/sounds/gameOver_victory.mp3")
@@ -40,12 +45,38 @@ export class GameOver extends Phaser.Scene {
         this.pressKeyToRestart()
     }
 
+
+    choseImageToShow() {
+
+        if (this.isGameVictory && this.dudeIsPompato) {
+            return "happy_dude_corazzato"
+        }
+
+        if (this.isGameVictory && !this.dudeIsPompato) {
+            return "happyDude"
+        }
+
+        if (!this.isGameVictory && !this.dudeIsPompato) {
+            return "sadDude"
+        }
+
+        if (!this.isGameVictory && this.dudeIsPompato) {
+            return "sad_dude_corazzato"
+        }
+
+    }
+
     showGameOver() {
 
-        this.add.image(this.canvasWidth / 2, this.canvasHeight / 3, this.isGameVictory ? 'happyDude' : 'sadDude')
+        this.image = this.add.image(this.canvasWidth / 2, this.canvasHeight / 3, this.choseImageToShow())
             .setOrigin(0.5, 0.5)
             .setDepth(0)
             .setScale(0.5)
+
+        if (this.image.texture.key === "happy_dude_corazzato" ||
+            this.image.texture.key === "sad_dude_corazzato") {
+            this.image.setScale(0.3)
+        }
 
         this.add.text(
             this.canvasWidth / 2,
