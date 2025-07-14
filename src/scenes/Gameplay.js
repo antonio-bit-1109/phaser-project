@@ -217,6 +217,7 @@ export class Gameplay extends Phaser.Scene {
 
         this.load.audio('bossHitted', "assets/sounds/bossDefeated.mp3")
         this.load.audio('bossDeath', "assets/sounds/bossIsDeath.mp3")
+        this.load.audio("superbulletSound", "assets/sounds/superBulletSound.mp3")
     }
 
     create() {
@@ -976,6 +977,7 @@ export class Gameplay extends Phaser.Scene {
                 bullet.setVelocityY(-500);
                 bullet.setVisible(true)
                 bullet.anims.play('flameBullet')
+                this.sound.play("superbulletSound", {volume: 1})
                 bullet.body.x = this.dudeCorazzato_sprite.x - 30
                 bullet.body.y = this.dudeCorazzato_sprite.y - 120
                 this.caricatoreBullets.remove(bullet);
@@ -1396,7 +1398,7 @@ export class Gameplay extends Phaser.Scene {
                 console.log("passato alla modalità spawn bombe quadruplo")
             }
 
-            if (this.livello === 1) {
+            if (this.livello === 6) {
                 // metto in pausa la generazione di bombe
                 this.timerEventSpawnBomb.paused = true;
                 // interrompo musica di base facendo un fade out
