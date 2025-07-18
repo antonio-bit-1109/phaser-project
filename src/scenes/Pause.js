@@ -19,6 +19,6 @@ export class Pause extends Phaser.Scene {
     }
 
     update(time, delta) {
-        super.update(time, delta);
+
     }
 }

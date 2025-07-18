@@ -60,7 +60,6 @@ export class Gameplay extends Phaser.Scene {
     bossShield = null;
     timerBossShield = null;
     playingThunderStorm = false
-
     attackUp_sprite = null;
     generatingAttackUpSprite = false
     caricatoreBullets = null;
@@ -71,6 +70,9 @@ export class Gameplay extends Phaser.Scene {
     textSuperBulletRemaining = null
     dudeCorazzato_sprite = null;
     dudePositionX = null;
+    gameIsPaused = false;
+    pauseButtonElement = null;
+
 
     // il constructor serve per dare un nome a questa classe, se la devo richiamare da qualche parte questo sarà il nome
     constructor() {
@@ -114,6 +116,7 @@ export class Gameplay extends Phaser.Scene {
         this.superBullet = null
         this.textSuperBulletRemaining = null
         this.dudePositionX = null;
+        this.gameIsPaused = false;
     }
 
     preload() {
@@ -128,6 +131,8 @@ export class Gameplay extends Phaser.Scene {
         });
 
         this.load.image('grass', 'assets/grass_no_bg.png');
+
+        this.load.image("pauseBtn", "assets/pause.png");
 
         // carico l immagine di frame come spritesheet in modo da poter utilizzare ogni singolo frame a un determinato evento
         this.load.spritesheet('dude', 'assets/dude.png', {
@@ -220,8 +225,26 @@ export class Gameplay extends Phaser.Scene {
         this.load.audio("superbulletSound", "assets/sounds/superBulletSound.mp3")
     }
 
+    showPauseButton() {
+        this.pauseButtonElement = this.add.image(this.canvasWidth / 1.07, this.canvasHeight / 11, "pauseBtn")
+            .setDepth(10)
+            .setScale(4)
+            .setInteractive()
+            .on("pointerover", () => {
+                console.log("metti la manina all over sul bottone.")
+            })
+            .on("pointerdown", () => {
+                this.sound.stopAll();
+                this.scene.stop("gameplay")
+                this.scene.start("pause")
+            })
+    }
+
+
     create() {
 
+
+        this.showPauseButton()
 
         //musica principale
         this.sound.play("gameMusic", {
