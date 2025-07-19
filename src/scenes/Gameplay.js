@@ -74,7 +74,6 @@ export class Gameplay extends Phaser.Scene {
     textSuperBulletRemaining = null
     dudeCorazzato_sprite = null;
     dudePositionX = null;
-    // pauseButtonElement = null;
     gameMusicRef = null;
     bossMusicRef = null;
 
@@ -990,11 +989,11 @@ export class Gameplay extends Phaser.Scene {
                 this.superBullet = bullet;
                 console.log("caricatore bullets rimasti dovrebbe essere x - 1 ", this.caricatoreBullets)
                 this.textSuperBulletRemaining.setText(`Superbullets: ${this.caricatoreBullets.getLength()}`)
-                
+
                 //
             } else {
 //
-                if (this.bullet === null && !this.dudePompato) {
+                if (this.bullet === null && !this.dudePompato && !this.superBullet) {
                     this.bullet = this.physics.add.sprite(
                         this.dude.x,
                         this.dude.y - 40,
