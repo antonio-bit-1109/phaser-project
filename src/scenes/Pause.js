@@ -23,6 +23,8 @@ export class Pause extends Phaser.Scene {
         this.load.image("sky", this.skyString)
         this.load.image("terrain", this.terrainString)
 
+        this.load.image("buttonResume", "assets/buttonResume.png")
+        this.load.image("canvasPause", "assets/canvasPause.png")
     }
 
     create() {
@@ -36,6 +38,19 @@ export class Pause extends Phaser.Scene {
             .setOrigin(0, 0)
             .setDepth(2)
             .setAlpha(0.4)
+
+        this.physics.add.staticSprite(this.CANVASWIDTH / 2, this.CANVASHEIGHT / 2, "canvasPause")
+            .setDepth(20)
+
+
+        this.physics.add.staticSprite(this.CANVASWIDTH / 2, this.CANVASHEIGHT / 2, "buttonResume")
+            .setDepth(20)
+            .setScale(0.5)
+            .setInteractive()
+            .on("pointerdown", () => {
+                this.scene.pause("pause")
+                this.scene.resume("gameplay")
+            })
 
     }
 

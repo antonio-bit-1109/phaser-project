@@ -74,7 +74,7 @@ export class Gameplay extends Phaser.Scene {
     textSuperBulletRemaining = null
     dudeCorazzato_sprite = null;
     dudePositionX = null;
-    pauseButtonElement = null;
+    // pauseButtonElement = null;
     gameMusicRef = null;
     bossMusicRef = null;
 
@@ -138,7 +138,7 @@ export class Gameplay extends Phaser.Scene {
 
         this.load.image('grass', this.TERRAINSTRING);
 
-        this.load.image("pauseBtn", "assets/pause.png");
+        // this.load.image("pauseBtn", "assets/pause.png");
 
         // carico l immagine di frame come spritesheet in modo da poter utilizzare ogni singolo frame a un determinato evento
         this.load.spritesheet('dude', 'assets/dude.png', {
@@ -225,26 +225,6 @@ export class Gameplay extends Phaser.Scene {
         this.load.audio("superbulletSound", "assets/sounds/superBulletSound.mp3")
     }
 
-    showPauseButton() {
-        this.pauseButtonElement = this.add.image(this.canvasWidth / 1.07, this.canvasHeight / 8, "pauseBtn")
-            .setDepth(10)
-            .setScale(4)
-            .setInteractive()
-            .on("pointerover", () => {
-                console.log("aggiungi manina al puntatore o dai qualche effetto di hover tipo cambiando colore dell img")
-            })
-            .on("pointerdown", () => {
-                this.gameMusicRef && this.gameMusicRef.pause()
-                this.bossMusicRef && this.bossMusicRef.pause()
-                this.scene.stop("gameplay")
-                this.scene.start("pause", {
-                    skyString: this.SKYSTRING,
-                    terrainString: this.TERRAINSTRING,
-                    canvasHeight: this.canvasHeight,
-                    canvasWidth: this.canvasWidth
-                })
-            })
-    }
 
     create() {
 
@@ -255,7 +235,7 @@ export class Gameplay extends Phaser.Scene {
         })
         this.gameMusicRef.play();
 
-        this.showPauseButton()
+
         this.bombsGroup = this.physics.add.group()
 
         // creo un gruppo nel quale inserire gli sprite che saranno attacchi del boss
@@ -890,7 +870,7 @@ export class Gameplay extends Phaser.Scene {
             this.boss = null
 
 
-            this.time.delayedCall(3000, () => {
+            this.time.delayedCall(1000, () => {
                 this.scene.stop('gameplay')
                 this.sound.stopAll();
                 this.scene.start('gameover', {
@@ -1010,7 +990,7 @@ export class Gameplay extends Phaser.Scene {
                 this.superBullet = bullet;
                 console.log("caricatore bullets rimasti dovrebbe essere x - 1 ", this.caricatoreBullets)
                 this.textSuperBulletRemaining.setText(`Superbullets: ${this.caricatoreBullets.getLength()}`)
-
+                
                 //
             } else {
 //
@@ -1044,7 +1024,6 @@ export class Gameplay extends Phaser.Scene {
                 }
 
             }
-
 
         }
 
@@ -1331,7 +1310,8 @@ export class Gameplay extends Phaser.Scene {
                 fontSize: '30px',
                 color: '#ff0000',
                 fontStyle: 'bold',
-            }).setOrigin(0.5, 0.5).setDepth(6)
+            }).setOrigin(0.5, 0.5)
+            .setDepth(6)
     }
 
     handleBombGeneration() {
@@ -1396,9 +1376,9 @@ export class Gameplay extends Phaser.Scene {
             this.livelloChanged = true;
             this.livello++
             this.livelloRef.setText(`Livello: ${this.livello}`)
-            setTimeout(() => {
+            this.time.delayedCall(1000, () => {
                 this.livelloChanged = false;
-            }, 1000)
+            });
 
             // riduco il tempo di delay per lo spawn di una bomba all aumentare del livello
             if (this.timerEventSpawnBomb.delay !== 1000) {
@@ -1483,8 +1463,9 @@ export class Gameplay extends Phaser.Scene {
 
         this.timer = roundedTimer
 
-        this.punteggioRef.setText(`Punteggio: ${this.punteggio}`)
-        // console.log(Math.floor(time / 1000))
+        if (this.punteggioRef) {
+            this.punteggioRef.setText(`Punteggio: ${this.punteggio}`)
+        }
 
     }
 
