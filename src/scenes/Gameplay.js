@@ -12,6 +12,12 @@ export class Gameplay extends Phaser.Scene {
     SKYSTRING = 'assets/sky.png';
     TERRAINSTRING = 'assets/grass_no_bg.png';
 
+
+    b = 0;
+    c = 0;
+    d = 0;
+    gameTimer = `${this.b}:${this.c}${this.d}`;
+    timerRef = null
     grassTerrain = null;
     dude = null;
     shooting_dude = null;
@@ -122,6 +128,10 @@ export class Gameplay extends Phaser.Scene {
         this.dudePositionX = null;
         this.gameMusicRef = null;
         this.bossMusicRef = null;
+        this.b = 0;
+        this.c = 0;
+        this.d = 0;
+
     }
 
     preload() {
@@ -225,6 +235,13 @@ export class Gameplay extends Phaser.Scene {
     }
 
 
+    showGameTimer() {
+        this.timerRef = this.add.text(this.canvasWidth / 2.2, this.canvasHeight / 9, this.gameTimer)
+            .setDepth(90)
+            .setScale(2)
+            .setColor('red')
+    }
+
     create() {
 
 
@@ -250,7 +267,7 @@ export class Gameplay extends Phaser.Scene {
         // visualizzo il punteggio della partita
         this.showPunteggio()
         this.showLivello()
-
+        this.showGameTimer()
         // inizializzo la variabile 'cursor' come variabile che recepisce gli eventi delle frecce direzionali
         // Dopo questa riga, cursors sarà un oggetto così:
         // {
@@ -436,6 +453,7 @@ export class Gameplay extends Phaser.Scene {
         this.updatePunteggio(time)
         this.updateLivello()
 
+        console.log(time)
 
         // ogni 300 punti spawn della bomba hp
         if (this.punteggio % 300 === 0 &&
@@ -869,7 +887,7 @@ export class Gameplay extends Phaser.Scene {
             this.boss = null
 
 
-            this.time.delayedCall(1000, () => {
+            this.time.delayedCall(3000, () => {
                 this.scene.stop('gameplay')
                 this.sound.stopAll();
                 this.scene.start('gameover', {
@@ -878,7 +896,8 @@ export class Gameplay extends Phaser.Scene {
                     punteggioFinale: this.punteggio,
                     livello: this.livello,
                     isGameVictory: true,
-                    isDudePompato: this.dudePompato
+                    isDudePompato: this.dudePompato,
+                    gameTime: this.gameTimer
                 })
             })
 
@@ -1294,7 +1313,8 @@ export class Gameplay extends Phaser.Scene {
             punteggioFinale: this.punteggio,
             livello: this.livello,
             isGameVictory: false,
-            isDudePompato: this.dudePompato
+            isDudePompato: this.dudePompato,
+            gameTime: this.gameTimer
         })
     }
 
@@ -1452,6 +1472,34 @@ export class Gameplay extends Phaser.Scene {
         this.hpBoss_bar.fillRect(this.canvasWidth - 250, 20, 200 * hpPercent, 20);
     }
 
+    updateGameTimer() {
+        if (this.d === 9) {
+            this.c++;
+            this.d = 0
+            this.refreshTime()
+            return
+        }
+
+        if (this.c === 5) {
+            this.b++
+            this.c = 0
+            this.d = 0;
+            this.refreshTime()
+            return
+        }
+
+        this.d++
+        this.refreshTime()
+        console.log(this.gameTimer)
+
+    }
+
+    refreshTime() {
+        this.gameTimer = `${this.b}:${this.c}${this.d}`;
+        this.timerRef.setText(this.gameTimer)
+
+    }
+
     // aggiorno il valore del punteggio allo scorrere del tempo
     updatePunteggio(time) {
         const roundedTimer = Math.floor(time / 1000)
@@ -1460,11 +1508,17 @@ export class Gameplay extends Phaser.Scene {
             this.punteggio += 10;
         }
 
+        // keep trace only when it changes
+        if (this.timer !== roundedTimer) {
+            this.updateGameTimer(roundedTimer)
+        }
+
         this.timer = roundedTimer
 
         if (this.punteggioRef) {
             this.punteggioRef.setText(`Punteggio: ${this.punteggio}`)
         }
+
 
     }
 

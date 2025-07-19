@@ -10,6 +10,7 @@ export class GameOver extends Phaser.Scene {
     isGameVictory = null;
     dudeIsPompato = null
     image = null;
+    finalTime = null
 
 
     constructor() {
@@ -23,6 +24,7 @@ export class GameOver extends Phaser.Scene {
         this.livello = data.livello;
         this.isGameVictory = data.isGameVictory
         this.dudeIsPompato = data.isDudePompato
+        this.finalTime = data.gameTime
     }
 
     preload() {
@@ -110,6 +112,16 @@ export class GameOver extends Phaser.Scene {
         this.add.text(
             this.canvasWidth / 2,
             this.canvasHeight / 1.2,
+            `Tempo di gioco: ${this.finalTime}`,
+            {
+                fontSize: '30px',
+                color: '#ff0000',
+                fontStyle: 'bold'
+            }).setOrigin(0.5, 0.5)
+
+        this.add.text(
+            this.canvasWidth / 2,
+            this.canvasHeight / 1.1,
             'premi spazio per ricominciare.',
             {
                 fontSize: '30px',
