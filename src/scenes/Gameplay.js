@@ -1,8 +1,17 @@
 export class Gameplay extends Phaser.Scene {
 
+// CONSTS
+    DEFAULT_GENERATION_BOMB = 'default'
+    DOUBLE_GENERATION_BOMB = 'double';
+    TRIPLE_GENERATION_BOMB = 'triple';
+    QUADRUPLE_GENERATION_BOMB = 'quadruple'
+    bombGenerationType = this.DEFAULT_GENERATION_BOMB;
     VELOCITY = 250;
     BOMB_DEFAULT_WIDTH = 100;
     BOMB_DEFAULT_HEIGHT = 100;
+    SKYSTRING = 'assets/sky.png';
+    TERRAINSTRING = 'assets/grass_no_bg.png';
+
     grassTerrain = null;
     dude = null;
     shooting_dude = null;
@@ -22,11 +31,6 @@ export class Gameplay extends Phaser.Scene {
     livelloChanged = false;
     bombsGroup = null;
     timerEventSpawnBomb = null;
-    DEFAULT_GENERATION_BOMB = 'default'
-    DOUBLE_GENERATION_BOMB = 'double';
-    TRIPLE_GENERATION_BOMB = 'triple';
-    QUADRUPLE_GENERATION_BOMB = 'quadruple'
-    bombGenerationType = this.DEFAULT_GENERATION_BOMB;
     bullet = null;
     explosion_bullet_bomb = null;
     boss = null;
@@ -70,8 +74,9 @@ export class Gameplay extends Phaser.Scene {
     textSuperBulletRemaining = null
     dudeCorazzato_sprite = null;
     dudePositionX = null;
-    gameIsPaused = false;
     pauseButtonElement = null;
+    gameMusicRef = null;
+    bossMusicRef = null;
 
 
     // il constructor serve per dare un nome a questa classe, se la devo richiamare da qualche parte questo sarà il nome
@@ -116,12 +121,13 @@ export class Gameplay extends Phaser.Scene {
         this.superBullet = null
         this.textSuperBulletRemaining = null
         this.dudePositionX = null;
-        this.gameIsPaused = false;
+        this.gameMusicRef = null;
+        this.bossMusicRef = null;
     }
 
     preload() {
         // key dell immagine e source da dove prenderla
-        this.load.image('nature', 'assets/sky.png');
+        this.load.image('sky', this.SKYSTRING);
 
         this.load.image('shield', "assets/shield.png")
 
@@ -130,7 +136,7 @@ export class Gameplay extends Phaser.Scene {
             frameWidth: 32, frameHeight: 32
         });
 
-        this.load.image('grass', 'assets/grass_no_bg.png');
+        this.load.image('grass', this.TERRAINSTRING);
 
         this.load.image("pauseBtn", "assets/pause.png");
 
@@ -185,12 +191,6 @@ export class Gameplay extends Phaser.Scene {
             frameHeight: 151, frameWidth: 93
         })
 
-        //load dude pompato
-        // this.load.spritesheet('dudePompato', 'assets/dudePompato.png', {
-        //     frameWidth: 216,
-        //     frameHeight: 490.5
-        // });
-
         this.load.spritesheet('dudeCorazzato', 'assets/dude_corazzato.png', {
             frameWidth: 43,
             frameHeight: 42
@@ -226,32 +226,36 @@ export class Gameplay extends Phaser.Scene {
     }
 
     showPauseButton() {
-        this.pauseButtonElement = this.add.image(this.canvasWidth / 1.07, this.canvasHeight / 11, "pauseBtn")
+        this.pauseButtonElement = this.add.image(this.canvasWidth / 1.07, this.canvasHeight / 8, "pauseBtn")
             .setDepth(10)
             .setScale(4)
             .setInteractive()
             .on("pointerover", () => {
-                console.log("metti la manina all over sul bottone.")
+                console.log("aggiungi manina al puntatore o dai qualche effetto di hover tipo cambiando colore dell img")
             })
             .on("pointerdown", () => {
-                this.sound.stopAll();
+                this.gameMusicRef && this.gameMusicRef.pause()
+                this.bossMusicRef && this.bossMusicRef.pause()
                 this.scene.stop("gameplay")
-                this.scene.start("pause")
+                this.scene.start("pause", {
+                    skyString: this.SKYSTRING,
+                    terrainString: this.TERRAINSTRING,
+                    canvasHeight: this.canvasHeight,
+                    canvasWidth: this.canvasWidth
+                })
             })
     }
-
 
     create() {
 
 
-        this.showPauseButton()
-
         //musica principale
-        this.sound.play("gameMusic", {
+        this.gameMusicRef = this.sound.add("gameMusic", {
             loop: true
         })
+        this.gameMusicRef.play();
 
-
+        this.showPauseButton()
         this.bombsGroup = this.physics.add.group()
 
         // creo un gruppo nel quale inserire gli sprite che saranno attacchi del boss
@@ -280,7 +284,6 @@ export class Gameplay extends Phaser.Scene {
         // }
         this.cursors = this.input.keyboard.createCursorKeys();
 
-
         // X
         // y
         // chiave dell oggetto precaricato che si vuole mostrare
@@ -294,7 +297,7 @@ export class Gameplay extends Phaser.Scene {
 
         // abbiamo detto di DEFAULT l'origin dell immagine che si sta inserendo è x:0,5 y:0,5 quindi al centro dell immagine
         // this.add.image(0,0, 'nature').setOrigin(0,0);
-        this.add.image(this.canvasWidth / 2, this.canvasHeight / 2, "nature").setOrigin(0.5, 0.5)
+        this.add.image(this.canvasWidth / 2, this.canvasHeight / 2, "sky").setOrigin(0.5, 0.5)
 
         // per dre fisica all oggetto bisogna chiamare l oggetto physics e aggiungerci lo sprite
         // in questo modo avrà accessoad oggetto 'fisica' sul quale sarà possibile applicare della fisica sul corpo
@@ -1312,9 +1315,6 @@ export class Gameplay extends Phaser.Scene {
             canvasHeigth: this.canvasHeight,
             punteggioFinale: this.punteggio,
             livello: this.livello,
-            // sadDude: "assets/sad_dude_no_bg.png",
-            // happyDude: null,
-            // music: "assets/sounds/gameOver.mp3",
             isGameVictory: false,
             isDudePompato: this.dudePompato
         })
@@ -1437,7 +1437,8 @@ export class Gameplay extends Phaser.Scene {
                 });
 
                 // inizializzo musica boss figth
-                this.sound.play('bossMusic')
+                this.bossMusicRef = this.sound.add('bossMusic')
+                this.bossMusicRef.play()
 
                 // genero il boss
                 this.generateBoss()

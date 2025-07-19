@@ -1,5 +1,10 @@
 export class Pause extends Phaser.Scene {
 
+    skyString = null;
+    terrainString = null;
+    CANVASWIDTH = null;
+    CANVASHEIGHT = null;
+
     // il constructor serve per dare un nome a questa classe, se la devo richiamare da qualche parte questo sarà il nome
     constructor() {
         super('pause');
@@ -7,18 +12,35 @@ export class Pause extends Phaser.Scene {
 
 
     init(data) {
-
+        this.skyString = data.skyString
+        this.terrainString = data.terrainString
+        this.CANVASWIDTH = data.canvasWidth
+        this.CANVASHEIGHT = data.canvasHeight
     }
 
     preload() {
+
+        this.load.image("sky", this.skyString)
+        this.load.image("terrain", this.terrainString)
 
     }
 
     create() {
 
+
+        this.add.image(this.CANVASWIDTH / 2, this.CANVASHEIGHT / 2, "sky")
+            .setOrigin(0.5, 0.5)
+            .setAlpha(0.6)
+        this.grassTerrain = this.physics.add
+            .staticSprite(0, this.CANVASHEIGHT - 80, 'terrain')
+            .setOrigin(0, 0)
+            .setDepth(2)
+            .setAlpha(0.4)
+
     }
 
     update(time, delta) {
+
 
     }
 }

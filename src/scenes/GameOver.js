@@ -26,7 +26,7 @@ export class GameOver extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image('nature', 'assets/nature.jpg');
+        this.load.image('sky', 'assets/sky.png');
         this.load.image('sadDude', "assets/sad_dude_no_bg.png")
         this.load.image('happyDude', "assets/happyDude.png")
         this.load.image("happy_dude_corazzato", "assets/happy_cavaliere.png")
@@ -38,7 +38,7 @@ export class GameOver extends Phaser.Scene {
     }
 
     create() {
-        this.add.image(this.canvasWidth / 2, this.canvasHeight / 2, "nature").setOrigin(0.5, 0.5).setDepth(0)
+        this.add.image(this.canvasWidth / 2, this.canvasHeight / 2, "sky").setOrigin(0.5, 0.5).setDepth(0)
         !this.isGameVictory && this.sound.play('gameOver_loser')
         this.isGameVictory && this.sound.play('gameOver_winner')
         this.showGameOver()
