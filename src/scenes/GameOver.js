@@ -70,7 +70,7 @@ export class GameOver extends Phaser.Scene {
 
     showGameOver() {
 
-        this.image = this.add.image(this.canvasWidth / 2, this.canvasHeight / 3, this.choseImageToShow())
+        this.image = this.add.image(this.canvasWidth / 2, this.canvasHeight / 4, this.choseImageToShow())
             .setOrigin(0.5, 0.5)
             .setDepth(0)
             .setScale(0.5)
@@ -81,7 +81,7 @@ export class GameOver extends Phaser.Scene {
 
         this.add.text(
             this.canvasWidth / 2,
-            this.canvasHeight / 1.8,
+            this.canvasHeight / 2,
             'Game Over.',
             {
                 fontSize: '30px',
@@ -91,7 +91,7 @@ export class GameOver extends Phaser.Scene {
 
         this.add.text(
             this.canvasWidth / 2,
-            this.canvasHeight / 1.6,
+            this.canvasHeight / 1.8,
             `Punteggio finale: ${this.punteggioFinale}`,
             {
                 fontSize: '30px',
@@ -101,7 +101,7 @@ export class GameOver extends Phaser.Scene {
 
         this.add.text(
             this.canvasWidth / 2,
-            this.canvasHeight / 1.4,
+            this.canvasHeight / 1.6,
             `Livello raggiunto: ${this.livello}`,
             {
                 fontSize: '30px',
@@ -111,7 +111,7 @@ export class GameOver extends Phaser.Scene {
 
         this.add.text(
             this.canvasWidth / 2,
-            this.canvasHeight / 1.2,
+            this.canvasHeight / 1.4,
             `Tempo di gioco: ${this.finalTime}`,
             {
                 fontSize: '30px',
@@ -121,8 +121,18 @@ export class GameOver extends Phaser.Scene {
 
         this.add.text(
             this.canvasWidth / 2,
-            this.canvasHeight / 1.1,
+            this.canvasHeight / 1.2,
             'premi spazio per ricominciare.',
+            {
+                fontSize: '30px',
+                color: '#ff0000',
+                fontStyle: 'bold'
+            }).setOrigin(0.5, 0.5)
+
+        this.add.text(
+            this.canvasWidth / 2,
+            this.canvasHeight / 1.1,
+            'premi Invio per salvare il tuo punteggio.',
             {
                 fontSize: '30px',
                 color: '#ff0000',

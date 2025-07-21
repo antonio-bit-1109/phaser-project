@@ -1,6 +1,7 @@
 import Phaser from "phaser";
 import {Gameplay} from "./scenes/Gameplay";
 import {GameOver} from "./scenes/GameOver";
+import {StartMenu} from "./scenes/StartMenu";
 
 
 const config = {
@@ -15,6 +16,7 @@ const config = {
         }
     },
     scene: [
+        StartMenu,
         Gameplay,
         GameOver
 
@@ -23,7 +25,7 @@ const config = {
 
 const game = new Phaser.Game(config);
 
-game.scene.start('gameplay', {
+game.scene.start('startmenu', {
     canvasWidth: config.width,
     canvasHeight: config.height
 })
