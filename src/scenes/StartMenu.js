@@ -28,9 +28,16 @@ export class StartMenu extends Phaser.Scene {
     preload() {
 
         this.load.image("menuCanvas", "assets/canvasMenu.png")
+        this.load.audio("bg_music", "assets/sounds/bg_music.mp3")
     };
 
     create() {
+
+        this.sound.play("bg_music", {
+            volume: 1,
+            loop: true
+        })
+
         this.canvasMenu = this.add.image(this.canvasWidth / 2, this.canvasHeight / 2, "menuCanvas")
             .setScale(1.3, 1.3)
             .setDepth(1)
@@ -49,6 +56,7 @@ export class StartMenu extends Phaser.Scene {
             .setOrigin(0.5, 0.5)
             .setInteractive({cursor: 'pointer'})
             .on("pointerdown", () => {
+                this.sound.stopAll()
                 this.scene.stop("startmenu");
                 this.scene.start("gameplay", {
                     canvasWidth: this.canvasWidth,
