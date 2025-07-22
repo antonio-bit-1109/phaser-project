@@ -18,7 +18,15 @@ export class StartMenu extends Phaser.Scene {
     canvasWidth = null;
     canvasHeight = null;
     startGameRef = null;
+    mezzoBusto1 = null;
+    mezzoBusto2 = null;
+    mezzoBusto3 = null;
+    mezzoBusto4 = null;
 
+
+    convertToRadiant(gradi) {
+        return Phaser.Math.DegToRad(gradi)
+    }
 
     init(data) {
         this.canvasWidth = data.canvasWidth
@@ -29,6 +37,7 @@ export class StartMenu extends Phaser.Scene {
 
         this.load.image("menuCanvas", "assets/canvasMenu.png")
         this.load.audio("bg_music", "assets/sounds/bg_music.mp3")
+        this.load.image("mezzoBustoDude", "assets/mezzoBustoDude.png")
     };
 
     create() {
@@ -73,10 +82,35 @@ export class StartMenu extends Phaser.Scene {
             .setDepth(2)
             .setOrigin(0.5, 0.5)
             .setInteractive({cursor: 'pointer'})
+
+
+// i quattro mezzi busti che dovranno fare su e giu!!! x.x
+        this.mezzoBusto1 = this.add.image(this.canvasWidth / 2, this.canvasHeight / 2, "mezzoBustoDude")
+            .setDepth(10)
+            .setScale(0.5)
+            .setRotation(this.convertToRadiant(90))
+
+        this.mezzoBusto2 = this.add.image(this.canvasWidth / 4, this.canvasHeight / 2, "mezzoBustoDude")
+            .setDepth(10)
+            .setScale(0.5)
+            .setRotation(this.convertToRadiant(90))
+
+        this.mezzoBusto3 = this.add.image(this.canvasWidth / 4, this.canvasHeight / 2, "mezzoBustoDude")
+            .setDepth(10)
+            .setScale(0.5)
+            .setRotation(this.convertToRadiant(270))
+
+        this.mezzoBusto4 = this.add.image(this.canvasWidth / 2, this.canvasHeight / 2, "mezzoBustoDude")
+            .setDepth(10)
+            .setScale(0.5)
+            .setRotation(this.convertToRadiant(270))
+
+
     };
 
     update(time, delta) {
-        super.update(time, delta);
+
+
     }
 
 }
