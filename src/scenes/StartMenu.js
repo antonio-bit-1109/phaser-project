@@ -22,6 +22,7 @@ export class StartMenu extends Phaser.Scene {
     mezzoBusto2 = null;
     mezzoBusto3 = null;
     mezzoBusto4 = null;
+    tweensChain = null;
 
 
     convertToRadiant(gradi) {
@@ -49,7 +50,7 @@ export class StartMenu extends Phaser.Scene {
 
         this.canvasMenu = this.add.image(this.canvasWidth / 2, this.canvasHeight / 2, "menuCanvas")
             .setScale(1.3, 1.3)
-            .setDepth(1)
+            .setDepth(5)
 
         this.add.text(this.canvasWidth / 2, this.canvasHeight / 5, this.title.toUpperCase(), {
             fontSize: '50px',
@@ -57,11 +58,11 @@ export class StartMenu extends Phaser.Scene {
             fontStyle: 'bold',
             fontFamily: "verdana"
         })
-            .setDepth(2)
+            .setDepth(6)
             .setOrigin(0.5, 0.5)
 
         this.startGameRef = this.add.text(this.canvasWidth / 2, this.canvasHeight / 3, "Start Game", styleDefault)
-            .setDepth(2)
+            .setDepth(6)
             .setOrigin(0.5, 0.5)
             .setInteractive({cursor: 'pointer'})
             .on("pointerdown", () => {
@@ -79,38 +80,48 @@ export class StartMenu extends Phaser.Scene {
             fontStyle: 'bold',
             fontFamily: "verdana"
         })
-            .setDepth(2)
+            .setDepth(6)
             .setOrigin(0.5, 0.5)
             .setInteractive({cursor: 'pointer'})
 
 
-// i quattro mezzi busti che dovranno fare su e giu!!! x.x
-        this.mezzoBusto1 = this.add.image(this.canvasWidth / 2, this.canvasHeight / 2, "mezzoBustoDude")
-            .setDepth(10)
+        this.mezzoBusto1 = this.physics.add.image(
+            this.canvasMenu.x + this.canvasMenu.displayWidth / 4,
+            this.canvasHeight / 3.5,
+            "mezzoBustoDude")
+            .setDepth(4)
             .setScale(0.5)
+            .setOrigin(0.5, 0.5)
             .setRotation(this.convertToRadiant(90))
 
-        this.mezzoBusto2 = this.add.image(this.canvasWidth / 4, this.canvasHeight / 2, "mezzoBustoDude")
-            .setDepth(10)
-            .setScale(0.5)
-            .setRotation(this.convertToRadiant(90))
 
-        this.mezzoBusto3 = this.add.image(this.canvasWidth / 4, this.canvasHeight / 2, "mezzoBustoDude")
-            .setDepth(10)
-            .setScale(0.5)
-            .setRotation(this.convertToRadiant(270))
-
-        this.mezzoBusto4 = this.add.image(this.canvasWidth / 2, this.canvasHeight / 2, "mezzoBustoDude")
-            .setDepth(10)
-            .setScale(0.5)
-            .setRotation(this.convertToRadiant(270))
-
-
+        this.moveMezzoBusto(this.mezzoBusto1)
     };
 
     update(time, delta) {
-
-
     }
 
+    moveMezzoBusto(mezzobusto) {
+
+        const chain = this.tweens.timeline({
+            targets: this.mezzoBusto1,
+            loop: -1,
+            tweens: [
+                {
+
+                    duration: 1000,
+                    ease: 'Linear',
+                    x: mezzobusto.x + 250,
+                },
+                {
+
+                    duration: 1000,
+                    ease: 'Linear',
+                    x: mezzobusto.x - 200,
+                },
+
+            ]
+        });
+
+    }
 }
