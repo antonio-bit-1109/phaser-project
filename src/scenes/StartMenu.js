@@ -19,10 +19,7 @@ export class StartMenu extends Phaser.Scene {
     canvasHeight = null;
     startGameRef = null;
     mezzoBusto1 = null;
-    mezzoBusto2 = null;
-    mezzoBusto3 = null;
-    mezzoBusto4 = null;
-    tweensChain = null;
+    tweenChain = null
 
 
     convertToRadiant(gradi) {
@@ -103,12 +100,12 @@ export class StartMenu extends Phaser.Scene {
 
     moveMezzoBusto(mezzobusto) {
 
-        const chain = this.tweens.timeline({
+        this.tweenChain = this.tweens.timeline({
             targets: this.mezzoBusto1,
             loop: -1,
             tweens: [
                 {
-
+                    angle: 90,
                     duration: 1000,
                     ease: 'Linear',
                     x: mezzobusto.x + 250,
@@ -119,7 +116,46 @@ export class StartMenu extends Phaser.Scene {
                     ease: 'Linear',
                     x: mezzobusto.x - 200,
                 },
+                {
 
+                    duration: 1000,
+                    ease: 'Linear',
+                    y: mezzobusto.y + 230,
+                    angle: 0
+                },
+                {
+
+                    duration: 1000,
+                    ease: 'Linear',
+                    x: mezzobusto.x - 600,
+
+                },
+                {
+
+                    duration: 2000,
+                    ease: 'Linear',
+                    x: mezzobusto.x + 250,
+
+                },
+                {
+
+                    duration: 1000,
+                    ease: 'Linear',
+                    x: mezzobusto.x - 250,
+
+                },
+                {
+                    angle: -90,
+                    y: mezzobusto.y
+                },
+                {
+                    duration: 1000,
+                    x: 100
+                },
+                {
+                    duration: 3000,
+                    x: 200
+                }
             ]
         });
 
