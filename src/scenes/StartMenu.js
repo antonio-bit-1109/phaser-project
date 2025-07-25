@@ -19,6 +19,7 @@ export class StartMenu extends Phaser.Scene {
     canvasHeight = null;
     startGameRef = null;
     mezzoBusto1 = null;
+    mezzoBusto_boss = null
     tweenChain = null
 
 
@@ -36,6 +37,7 @@ export class StartMenu extends Phaser.Scene {
         this.load.image("menuCanvas", "assets/canvasMenu.png")
         this.load.audio("bg_music", "assets/sounds/bg_music.mp3")
         this.load.image("mezzoBustoDude", "assets/mezzoBustoDude.png")
+        this.load.image("boss_silly", "assets/boss_silly.png")
     };
 
     create() {
@@ -91,17 +93,37 @@ export class StartMenu extends Phaser.Scene {
             .setOrigin(0.5, 0.5)
             .setRotation(this.convertToRadiant(90))
 
+        this.mezzoBusto_boss = this.physics.add.image(
+            this.canvasWidth + 100,
+            this.canvasHeight - 100,
+            "boss_silly")
+            .setDepth(4)
+            .setScale(0.5)
+            .setOrigin(0.5, 0.5)
+            .setRotation(this.convertToRadiant(90))
+
 
         this.moveMezzoBusto(this.mezzoBusto1)
+        this.moveMezzoBustoStraigth(this.mezzoBusto_boss)
     };
 
     update(time, delta) {
     }
 
+    moveMezzoBustoStraigth(mezzobusto) {
+        this.add.tween({
+            targets: mezzobusto,
+            x: -200,
+            duration: 4000,
+            ease: 'Linear',
+            angle: 0
+        })
+    }
+
     moveMezzoBusto(mezzobusto) {
 
-        this.tweenChain = this.tweens.timeline({
-            targets: this.mezzoBusto1,
+        this.tweens.timeline({
+            targets: mezzobusto,
             loop: -1,
             tweens: [
                 {
