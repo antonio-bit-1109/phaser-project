@@ -97,10 +97,10 @@ export class StartMenu extends Phaser.Scene {
             this.canvasWidth + 100,
             this.canvasHeight - 100,
             "boss_silly")
-            .setDepth(4)
+            .setDepth(10)
             .setScale(0.5)
             .setOrigin(0.5, 0.5)
-            .setRotation(this.convertToRadiant(90))
+        // .setRotation(this.convertToRadiant(90))
 
 
         this.moveMezzoBusto(this.mezzoBusto1)
@@ -116,7 +116,7 @@ export class StartMenu extends Phaser.Scene {
             x: -200,
             duration: 4000,
             ease: 'Linear',
-            angle: 0
+
         })
     }
 
