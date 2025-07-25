@@ -155,6 +155,10 @@ export class StartMenu extends Phaser.Scene {
                 {
                     duration: 3000,
                     x: 200
+                },
+                {
+                    duration: 500,
+                    x: 400
                 }
             ]
         });

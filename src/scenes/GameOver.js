@@ -43,8 +43,9 @@ export class GameOver extends Phaser.Scene {
         this.add.image(this.canvasWidth / 2, this.canvasHeight / 2, "sky").setOrigin(0.5, 0.5).setDepth(0)
         !this.isGameVictory && this.sound.play('gameOver_loser')
         this.isGameVictory && this.sound.play('gameOver_winner')
-        this.showGameOver()
-        this.pressKeyToRestart()
+        this.showGameOver();
+        this.pressSpaceToRestart();
+        this.pressEnterToSavePunteggio();
     }
 
 
@@ -140,10 +141,22 @@ export class GameOver extends Phaser.Scene {
             }).setOrigin(0.5, 0.5)
     }
 
-    pressKeyToRestart() {
+    pressSpaceToRestart() {
         this.input.keyboard.once('keydown-SPACE', () => {
             this.sound.removeAll()
             this.scene.start('gameplay')
+        })
+    }
+
+    pressEnterToSavePunteggio() {
+        this.input.keyboard.once('keydown-ENTER', () => {
+            this.sound.stopAll()
+            this.scene.stop("gameover");
+            this.scene.start("savescore", {
+                punteggioFinale: this.punteggioFinale,
+                livello: this.livello,
+                tempoGioco: this.finalTime
+            })
         })
     }
 

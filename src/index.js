@@ -2,6 +2,7 @@ import Phaser from "phaser";
 import {Gameplay} from "./scenes/Gameplay";
 import {GameOver} from "./scenes/GameOver";
 import {StartMenu} from "./scenes/StartMenu";
+import {SaveScore} from "./scenes/SaveScore";
 
 
 const config = {
@@ -12,13 +13,15 @@ const config = {
         default: 'arcade',
         arcade: {
             gravity: {y: 0},
-            debug: false
+            debug: true
         }
     },
     scene: [
         StartMenu,
         Gameplay,
-        GameOver
+        GameOver,
+        SaveScore
+
 
     ]
 };
