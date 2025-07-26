@@ -94,8 +94,8 @@ export class StartMenu extends Phaser.Scene {
             .setRotation(this.convertToRadiant(90))
 
         this.mezzoBusto_boss = this.physics.add.image(
-            this.canvasWidth + 100,
-            this.canvasHeight - 100,
+            100,
+            this.canvasHeight + 100,
             "boss_silly")
             .setDepth(10)
             .setScale(0.5)
@@ -111,12 +111,52 @@ export class StartMenu extends Phaser.Scene {
     }
 
     moveMezzoBustoStraigth(mezzobusto) {
-        this.add.tween({
-            targets: mezzobusto,
-            x: -200,
-            duration: 4000,
-            ease: 'Linear',
 
+
+        this.tweens.timeline({
+            targets: mezzobusto,
+            loop: -1,
+            tweens: [
+                {
+                    duration: 1500,
+                    y: this.canvasHeight - 100
+                },
+                {
+                    duration: 1500,
+                    y: this.canvasHeight + 100
+                },
+                {
+                    x: this.canvasWidth / 2
+                },
+                {
+                    duration: 1500,
+                    y: this.canvasHeight - 100
+                },
+                {
+                    duration: 1500,
+                    y: this.canvasHeight + 100
+                },
+                {
+                    x: this.canvasWidth - 100
+                },
+                {
+                    duration: 1500,
+                    y: this.canvasHeight - 100
+                },
+                {
+                    y: this.canvasHeight + 100
+                },
+                {
+                    duration: 5000,
+                    x: this.canvasWidth / 2,
+                    y: this.canvasHeight - 100
+                },
+                {
+                    duration: 5000,
+                    x: 100,
+                    y: this.canvasHeight + 100
+                }
+            ]
         })
     }
 
