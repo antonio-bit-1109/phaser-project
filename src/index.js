@@ -13,7 +13,7 @@ const config = {
         default: 'arcade',
         arcade: {
             gravity: {y: 0},
-            debug: true
+            debug: false
         }
     },
     scene: [
@@ -23,7 +23,8 @@ const config = {
         SaveScore
 
 
-    ]
+    ],
+
 };
 
 const game = new Phaser.Game(config);
