@@ -451,9 +451,9 @@ export class Gameplay extends Phaser.Scene {
 
 
         // just to skip directly to gameOver scene
-        if (this.dude && this.dude.x === 300) {
-            this.hp = 0;
-        }
+        // if (this.dude && this.dude.x === 300) {
+        //     this.hp = 0;
+        // }
 
 
         this.updatePunteggio(time)
