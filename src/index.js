@@ -3,6 +3,7 @@ import {Gameplay} from "./scenes/Gameplay";
 import {GameOver} from "./scenes/GameOver";
 import {StartMenu} from "./scenes/StartMenu";
 import {SaveScore} from "./scenes/SaveScore";
+import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
 
 
 const config = {
@@ -21,10 +22,14 @@ const config = {
         Gameplay,
         GameOver,
         SaveScore
-
-
     ],
-
+    plugins: {
+        scene: [{
+            key: 'rexUI',
+            plugin: RexUIPlugin,
+            mapping: 'rexUI'
+        }]
+    }
 };
 
 const game = new Phaser.Game(config);

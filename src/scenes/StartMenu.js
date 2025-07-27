@@ -113,7 +113,7 @@ export class StartMenu extends Phaser.Scene {
     moveMezzoBustoStraigth(mezzobusto) {
 
 
-        this.tweens.timeline({
+        this.tweens.chain({
             targets: mezzobusto,
             loop: -1,
             tweens: [
@@ -162,7 +162,7 @@ export class StartMenu extends Phaser.Scene {
 
     moveMezzoBusto(mezzobusto) {
 
-        this.tweens.timeline({
+        this.tweens.chain({
             targets: mezzobusto,
             loop: -1,
             tweens: [
