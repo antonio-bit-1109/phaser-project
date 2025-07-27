@@ -9,6 +9,9 @@ export class SaveScore extends Phaser.Scene {
     punteggioFinale = null;
     livelloRaggiunto = null;
     tempoDiGioco = null;
+    canvasWidth = null;
+    canvasHeight = null;
+    uniqueVal = Math.floor(Math.random() * 9999999999);
 
     constructor() {
         super("savescore");
@@ -18,6 +21,8 @@ export class SaveScore extends Phaser.Scene {
         this.punteggioFinale = data.punteggioFinale;
         this.livelloRaggiunto = data.livello;
         this.tempoDiGioco = data.tempoGioco;
+        this.canvasHeight = data.canvasHeight;
+        this.canvasWidth = data.canvasWidth
     }
 
     preload() {
@@ -25,10 +30,21 @@ export class SaveScore extends Phaser.Scene {
     }
 
     create() {
+
+        console.log(this.canvasWidth, this.canvasHeight)
+
         var print = this.add.text(0, 0, '').setDepth(1);
 
         var style = {
-            x: 400, y: 300,
+
+            val: {
+                punteggioFinale: this.punteggioFinale,
+                tempoDiGioco: this.tempoDiGioco,
+                livelloRaggiunto: this.livelloRaggiunto,
+                uniqueVal: this.uniqueVal
+            },
+
+            x: this.canvasWidth / 2, y: this.canvasHeight / 2,
             // width: 400,
             space: {
                 left: 20, right: 20, top: 20, bottom: 20,
@@ -74,20 +90,39 @@ export class SaveScore extends Phaser.Scene {
                 title: 'My name is...',
                 button: 'OK',
 
-                firstName: 'BBB',
-                lastName: 'AAA',
+                firstName: 'First Name',
+                lastName: 'Last Name',
             })
             .layout()
             .modalPromise()
             .then(function (data) {
-                print.text = `\
-First name: ${data.firstName}
-Last name : ${data.lastName}
-`
+                    print.text = `\
+                First name: ${data.firstName}
+                Last name : ${data.lastName}
+                Level: ${style.val.livelloRaggiunto}
+                Final Score: ${style.val.punteggioFinale}
+                Game Time: ${style.val.tempoDiGioco}
+                `
+
+                    localStorage.setItem(
+                        `${data.firstName} ${data.lastName}-${style.val.uniqueVal}`,
+                        `firstName: ${data.firstName} lastName: ${data.lastName} Level: ${style.val.livelloRaggiunto} finalScore: ${style.val.punteggioFinale} gameTime: ${style.val.tempoDiGioco}`
+                    )
+                }
+            ).then(() => {
+                this.time.delayedCall(3000, () => {
+                    this.scene.stop("savescore");
+                    this.scene.start("startmenu", {
+                        canvasWidth: this.canvasWidth,
+                        canvasHeight: this.canvasHeight
+                    })
+                })
             })
+
     }
 
     update() {
     }
+
 
 }

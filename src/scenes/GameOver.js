@@ -155,7 +155,9 @@ export class GameOver extends Phaser.Scene {
             this.scene.start("savescore", {
                 punteggioFinale: this.punteggioFinale,
                 livello: this.livello,
-                tempoGioco: this.finalTime
+                tempoGioco: this.finalTime,
+                canvasWidth: this.canvasWidth,
+                canvasHeight: this.canvasHeight
             })
         })
     }

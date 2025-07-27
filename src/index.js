@@ -4,6 +4,7 @@ import {GameOver} from "./scenes/GameOver";
 import {StartMenu} from "./scenes/StartMenu";
 import {SaveScore} from "./scenes/SaveScore";
 import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
+import {DisplayAllScores} from "./scenes/DisplayAllScores";
 
 
 const config = {
@@ -21,7 +22,8 @@ const config = {
         StartMenu,
         Gameplay,
         GameOver,
-        SaveScore
+        SaveScore,
+        DisplayAllScores
     ],
     plugins: {
         scene: [{
