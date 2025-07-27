@@ -21,6 +21,7 @@ export class StartMenu extends Phaser.Scene {
     mezzoBusto1 = null;
     mezzoBusto_boss = null
     tweenChain = null
+    introMusicAuthor = `Menù music made by Fassounds - play time`
 
 
     convertToRadiant(gradi) {
@@ -41,6 +42,10 @@ export class StartMenu extends Phaser.Scene {
     };
 
     create() {
+
+        this.add.text(this.canvasWidth / 2, this.canvasHeight - 100, this.introMusicAuthor)
+            .setDepth(6)
+            .setOrigin(0.5, 0.5)
 
         this.sound.play("bg_music", {
             volume: 1,
