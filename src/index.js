@@ -21,8 +21,6 @@ const config = {
         Gameplay,
         GameOver,
         SaveScore
-
-
     ],
 
 };
