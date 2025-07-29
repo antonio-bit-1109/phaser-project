@@ -87,7 +87,14 @@ export class StartMenu extends Phaser.Scene {
             .setDepth(6)
             .setOrigin(0.5, 0.5)
             .setInteractive({cursor: 'pointer'})
-
+            .on("pointerdown", () => {
+                this.sound.stopAll()
+                this.scene.stop("startmenu");
+                this.scene.start("displayallscores", {
+                    canvasWidth: this.canvasWidth,
+                    canvasHeight: this.canvasHeight
+                })
+            })
 
         this.mezzoBusto1 = this.physics.add.image(
             this.canvasMenu.x + this.canvasMenu.displayWidth / 4,
