@@ -121,16 +121,6 @@ export class GameOver extends Phaser.Scene {
             }).setOrigin(0.5, 0.5)
 
 
-        this.add.text(
-            this.canvasWidth / 2,
-            this.canvasHeight / 1.2,
-            'premi spazio per ricominciare.',
-            {
-                fontSize: '30px',
-                color: '#ff0000',
-                fontStyle: 'bold'
-            }).setOrigin(0.5, 0.5)
-
         if (this.isGameVictory) {
 
             //
@@ -141,7 +131,7 @@ export class GameOver extends Phaser.Scene {
                 'premi Invio per salvare il tuo punteggio.',
                 {
                     fontSize: '30px',
-                    color: '#09f114',
+                    color: '#f1bb09',
                     fontStyle: 'bold'
                 }).setOrigin(0.5, 0.5)
             //
@@ -159,6 +149,15 @@ export class GameOver extends Phaser.Scene {
                 }).setOrigin(0.5, 0.5)
         }
 
+        this.add.text(
+            this.canvasWidth / 2,
+            this.canvasHeight / 1.2,
+            'premi spazio per ricominciare.',
+            {
+                fontSize: '30px',
+                color: '#ff0000',
+                fontStyle: 'bold'
+            }).setOrigin(0.5, 0.5)
 
     }
 
