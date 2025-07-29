@@ -448,7 +448,7 @@ export class Gameplay extends Phaser.Scene {
 // delta:tempo passato dall ultimavolta che la funzione è stata chiamata (ogni 16ms )
 // time: tempo totale in cui la func viene chiamata
     update(time, delta) {
-        
+
         this.updatePunteggio(time)
         this.updateLivello()
 

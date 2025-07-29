@@ -13,6 +13,7 @@ export class SaveScore extends Phaser.Scene {
     canvasHeight = null;
     uniqueVal = Math.floor(Math.random() * 9999999999);
 
+
     constructor() {
         super("savescore");
     }
@@ -96,6 +97,9 @@ export class SaveScore extends Phaser.Scene {
             .layout()
             .modalPromise()
             .then(function (data) {
+
+                    const date = new Date();
+
                     print.text = `\
                 First name: ${data.firstName}
                 Last name : ${data.lastName}
@@ -106,7 +110,7 @@ export class SaveScore extends Phaser.Scene {
 
                     localStorage.setItem(
                         `${data.firstName} ${data.lastName}-${style.val.uniqueVal}`,
-                        `firstName: ${data.firstName} lastName: ${data.lastName} Level: ${style.val.livelloRaggiunto} finalScore: ${style.val.punteggioFinale} gameTime: ${style.val.tempoDiGioco}`
+                        `firstName: ${data.firstName} lastName: ${data.lastName} Level: ${style.val.livelloRaggiunto} finalScore: ${style.val.punteggioFinale} gameTime: ${style.val.tempoDiGioco} Date: ${date}`
                     )
                 }
             ).then(() => {
