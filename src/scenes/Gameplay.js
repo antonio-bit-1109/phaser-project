@@ -448,14 +448,7 @@ export class Gameplay extends Phaser.Scene {
 // delta:tempo passato dall ultimavolta che la funzione è stata chiamata (ogni 16ms )
 // time: tempo totale in cui la func viene chiamata
     update(time, delta) {
-
-
-        // just to skip directly to gameOver scene
-        if (this.dude && this.dude.x === 300) {
-            this.hp = 0;
-        }
-
-
+        
         this.updatePunteggio(time)
         this.updateLivello()
 

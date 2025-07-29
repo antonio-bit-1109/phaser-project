@@ -21,6 +21,7 @@ export class StartMenu extends Phaser.Scene {
     mezzoBusto1 = null;
     mezzoBusto_boss = null
     tweenChain = null
+    introMusicAuthor = `Menù music made by Fassounds - play time`
 
 
     convertToRadiant(gradi) {
@@ -41,6 +42,10 @@ export class StartMenu extends Phaser.Scene {
     };
 
     create() {
+
+        this.add.text(this.canvasWidth / 2, this.canvasHeight - 100, this.introMusicAuthor)
+            .setDepth(6)
+            .setOrigin(0.5, 0.5)
 
         this.sound.play("bg_music", {
             volume: 1,
@@ -113,7 +118,7 @@ export class StartMenu extends Phaser.Scene {
     moveMezzoBustoStraigth(mezzobusto) {
 
 
-        this.tweens.timeline({
+        this.tweens.chain({
             targets: mezzobusto,
             loop: -1,
             tweens: [
@@ -162,7 +167,7 @@ export class StartMenu extends Phaser.Scene {
 
     moveMezzoBusto(mezzobusto) {
 
-        this.tweens.timeline({
+        this.tweens.chain({
             targets: mezzobusto,
             loop: -1,
             tweens: [
@@ -219,8 +224,12 @@ export class StartMenu extends Phaser.Scene {
                     x: 200
                 },
                 {
-                    duration: 500,
+                    duration: 1000,
                     x: 400
+                },
+                {
+                    duration: 10,
+                    angle: 90
                 }
             ]
         });

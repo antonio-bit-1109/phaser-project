@@ -45,7 +45,7 @@ export class GameOver extends Phaser.Scene {
         this.isGameVictory && this.sound.play('gameOver_winner')
         this.showGameOver();
         this.pressSpaceToRestart();
-        this.pressEnterToSavePunteggio();
+
     }
 
 
@@ -120,6 +120,7 @@ export class GameOver extends Phaser.Scene {
                 fontStyle: 'bold'
             }).setOrigin(0.5, 0.5)
 
+
         this.add.text(
             this.canvasWidth / 2,
             this.canvasHeight / 1.2,
@@ -130,15 +131,35 @@ export class GameOver extends Phaser.Scene {
                 fontStyle: 'bold'
             }).setOrigin(0.5, 0.5)
 
-        this.add.text(
-            this.canvasWidth / 2,
-            this.canvasHeight / 1.1,
-            'premi Invio per salvare il tuo punteggio.',
-            {
-                fontSize: '30px',
-                color: '#ff0000',
-                fontStyle: 'bold'
-            }).setOrigin(0.5, 0.5)
+        if (this.isGameVictory) {
+
+            //
+            this.pressEnterToSavePunteggio();
+            this.add.text(
+                this.canvasWidth / 2,
+                this.canvasHeight / 1.1,
+                'premi Invio per salvare il tuo punteggio.',
+                {
+                    fontSize: '30px',
+                    color: '#09f114',
+                    fontStyle: 'bold'
+                }).setOrigin(0.5, 0.5)
+            //
+        } else {
+
+            //
+            this.add.text(
+                this.canvasWidth / 2,
+                this.canvasHeight / 1.1,
+                'Puoi salvare il tuo punteggio solo battendo il boss.',
+                {
+                    fontSize: '30px',
+                    color: '#e05e0f',
+                    fontStyle: 'bold'
+                }).setOrigin(0.5, 0.5)
+        }
+
+
     }
 
     pressSpaceToRestart() {
@@ -155,7 +176,9 @@ export class GameOver extends Phaser.Scene {
             this.scene.start("savescore", {
                 punteggioFinale: this.punteggioFinale,
                 livello: this.livello,
-                tempoGioco: this.finalTime
+                tempoGioco: this.finalTime,
+                canvasWidth: this.canvasWidth,
+                canvasHeight: this.canvasHeight
             })
         })
     }
