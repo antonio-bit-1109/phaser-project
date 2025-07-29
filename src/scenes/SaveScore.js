@@ -86,7 +86,7 @@ export class SaveScore extends Phaser.Scene {
                 text: {fontSize: 20},
             }
         }
-        var dialog = this.rexUI.add.nameInputDialog(style)
+        this.rexUI.add.nameInputDialog(style)
             .resetDisplayContent({
                 title: 'My name is...',
                 button: 'OK',
@@ -99,29 +99,35 @@ export class SaveScore extends Phaser.Scene {
             .then(function (data) {
 
                     const date = new Date();
+                    const dateCom = date.toLocaleDateString('it-IT')
+                    const hour = date.getHours()
+                    const min = date.getMinutes()
 
                     print.text = `\
-                First name: ${data.firstName}
-                Last name : ${data.lastName}
-                Level: ${style.val.livelloRaggiunto}
-                Final Score: ${style.val.punteggioFinale}
-                Game Time: ${style.val.tempoDiGioco}
+                FIRSTNAME: ${data.firstName}
+                LASTNAME: ${data.lastName}
+                LEVEL: ${style.val.livelloRaggiunto}
+                FINAL SCORE: ${style.val.punteggioFinale}
+                TIME: ${style.val.tempoDiGioco}
+                DATE: ${dateCom + " " + hour + ":" + min}
+                --------------------------------------------------------------------
                 `
 
+
                     localStorage.setItem(
-                        `${data.firstName} ${data.lastName}-${style.val.uniqueVal}`,
-                        `firstName: ${data.firstName} lastName: ${data.lastName} Level: ${style.val.livelloRaggiunto} finalScore: ${style.val.punteggioFinale} gameTime: ${style.val.tempoDiGioco} Date: ${date}`
+                        ` PHASER-BOMB-BURNER-${data.firstName} ${data.lastName}-${style.val.uniqueVal}`,
+                        `FIRSTNAME: ${data.firstName} , LASTNAME: ${data.lastName} , LEVEL: ${style.val.livelloRaggiunto} , FINAL SCORE: ${style.val.punteggioFinale} , TIME: ${style.val.tempoDiGioco} , DATE: ${dateCom + " " + hour + ":" + min}`
                     )
                 }
             ).then(() => {
-                this.time.delayedCall(3000, () => {
-                    this.scene.stop("savescore");
-                    this.scene.start("startmenu", {
-                        canvasWidth: this.canvasWidth,
-                        canvasHeight: this.canvasHeight
-                    })
+            this.time.delayedCall(3000, () => {
+                this.scene.stop("savescore");
+                this.scene.start("startmenu", {
+                    canvasWidth: this.canvasWidth,
+                    canvasHeight: this.canvasHeight
                 })
             })
+        })
 
     }
 
