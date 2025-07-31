@@ -8,8 +8,13 @@ export class PingPong extends Phaser.Scene {
     bossShip = null;
     ball = null
     cursor = null
-    ballSpin = Math.random()
+    ballSpin = null;
     isFirstStart = true;
+    dudePoints_Ref = null;
+    bossPoints_Ref = null;
+    dudePoints = "0";
+    bossPoints = "0"
+
 
     constructor() {
         super("pingpong");
@@ -33,6 +38,13 @@ export class PingPong extends Phaser.Scene {
         this.cursor = this.input.keyboard.createCursorKeys();
         this.bg = this.add.image(this.canvasWidth / 2, this.canvasHeight / 2, "bg_space")
 
+        this.dudePoints_Ref = this.add.text((this.canvasWidth / 2) - 80, 50, this.dudePoints)
+            .setScale(4)
+
+        this.bossPoints_Ref = this.add.text((this.canvasWidth / 2) + 45, 50, this.bossPoints)
+            .setScale(4)
+
+
         this.dudeShip = this.physics.add.sprite(100, this.canvasHeight / 2, "dudeShip")
             .setRotation(Phaser.Math.DegToRad(-90))
             .setSize(300, 300)
@@ -51,7 +63,7 @@ export class PingPong extends Phaser.Scene {
             .setScale(0.1)
             .setBounce(1, 1)
             .setCollideWorldBounds(true)
-            .setVelocityX(-150)
+            .setVelocityX(-220)
 
         this.physics.add.collider(this.dudeShip, this.ball, this.onBallCollided, null, this);
         this.physics.add.collider(this.bossShip, this.ball, this.onBallCollided, null, this);
@@ -59,16 +71,21 @@ export class PingPong extends Phaser.Scene {
 
     update(delta, time) {
 
-        this.ballRotateRight()
+        if (this.isFirstStart || this.ballSpin <= 0.5) {
+            this.ballRotateRight()
+        } else {
+            this.ballRotateLeft()
+        }
 
         this.checkCursorInput()
-       
-
+        
     }
 
     onBallCollided() {
-        // this.ballSpin = Math.random()
-        // console.log(this.ballSpin)
+        this.isFirstStart = false;
+        this.ballSpin = Math.random()
+
+        this.ball.setVelocity(220)
     }
 
     ballRotateRight() {
@@ -78,6 +95,7 @@ export class PingPong extends Phaser.Scene {
     ballRotateLeft() {
         this.ball.rotation -= 0.1
     }
+
 
     checkCursorInput() {
         if (this.dudeShip.y <= 80) {
