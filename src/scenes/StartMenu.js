@@ -22,6 +22,7 @@ export class StartMenu extends Phaser.Scene {
     mezzoBusto_boss = null
     tweenChain = null
     introMusicAuthor = `Menù music made by Fassounds - play time`
+    bombBurnerGameName = "Bomb Burner"
 
 
     convertToRadiant(gradi) {
@@ -65,7 +66,7 @@ export class StartMenu extends Phaser.Scene {
             .setDepth(6)
             .setOrigin(0.5, 0.5)
 
-        this.startGameRef = this.add.text(this.canvasWidth / 2, this.canvasHeight / 3, "Start Game", styleDefault)
+        this.startGameRef = this.add.text(this.canvasWidth / 2, this.canvasHeight / 3, this.bombBurnerGameName, styleDefault)
             .setDepth(6)
             .setOrigin(0.5, 0.5)
             .setInteractive({cursor: 'pointer'})
@@ -74,7 +75,8 @@ export class StartMenu extends Phaser.Scene {
                 this.scene.stop("startmenu");
                 this.scene.start("gameplay", {
                     canvasWidth: this.canvasWidth,
-                    canvasHeight: this.canvasHeight
+                    canvasHeight: this.canvasHeight,
+                    gameName: this.bombBurnerGameName
                 })
             })
 
