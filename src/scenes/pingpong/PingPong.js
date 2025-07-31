@@ -78,14 +78,14 @@ export class PingPong extends Phaser.Scene {
         }
 
         this.checkCursorInput()
-        
+
     }
 
     onBallCollided() {
         this.isFirstStart = false;
         this.ballSpin = Math.random()
 
-        this.ball.setVelocity(220)
+        this.ball.setVelocity(250)
     }
 
     ballRotateRight() {
