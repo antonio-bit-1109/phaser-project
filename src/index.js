@@ -1,10 +1,10 @@
 import Phaser from "phaser";
-import {Gameplay} from "./scenes/Gameplay";
-import {GameOver} from "./scenes/GameOver";
-import {StartMenu} from "./scenes/StartMenu";
-import {SaveScore} from "./scenes/SaveScore";
+import {Gameplay} from "./scenes/bombburner/Gameplay";
+import {GameOver} from "./scenes/bombburner/GameOver";
+import {StartMenu} from "./scenes/common/StartMenu";
+import {SaveScore} from "./scenes/common/SaveScore";
 import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
-import {DisplayAllScores} from "./scenes/DisplayAllScores";
+import {DisplayAllScores} from "./scenes/common/DisplayAllScores";
 
 
 const config = {
