@@ -12,7 +12,7 @@ export class Gameplay extends Phaser.Scene {
     SKYSTRING = 'assets/sky.png';
     TERRAINSTRING = 'assets/grass_no_bg.png';
 
-
+    gameName = null;
     b = 0;
     c = 0;
     d = 0;
@@ -91,6 +91,7 @@ export class Gameplay extends Phaser.Scene {
 
     // si avvia prima di preload e serve per prendere dati dalla scena precedente o dall index
     init(data) {
+        this.gameName = data.gameName
         this.canvasWidth = data.canvasWidth;
         this.canvasHeight = data.canvasHeight
         this.VELOCITY = 250
@@ -890,6 +891,7 @@ export class Gameplay extends Phaser.Scene {
                 this.scene.stop('gameplay')
                 this.sound.stopAll();
                 this.scene.start('gameover', {
+                    gameName: this.gameName,
                     canvasWidth: this.canvasWidth,
                     canvasHeigth: this.canvasHeight,
                     punteggioFinale: this.punteggio,
@@ -1313,7 +1315,8 @@ export class Gameplay extends Phaser.Scene {
             livello: this.livello,
             isGameVictory: false,
             isDudePompato: this.dudePompato,
-            gameTime: this.gameTimer
+            gameTime: this.gameTimer,
+            gameName: this.gameName,
         })
     }
 
