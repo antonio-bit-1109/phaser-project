@@ -5,7 +5,7 @@ import {StartMenu} from "./scenes/common/StartMenu";
 import {SaveScore} from "./scenes/common/SaveScore";
 import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
 import {DisplayAllScores} from "./scenes/common/DisplayAllScores";
-
+import {PingPong} from "./scenes/pingpong/PingPong";
 
 const config = {
     type: Phaser.AUTO,
@@ -15,7 +15,7 @@ const config = {
         default: 'arcade',
         arcade: {
             gravity: {y: 0},
-            debug: false
+            debug: true
         }
     },
     scene: [
@@ -23,7 +23,8 @@ const config = {
         Gameplay,
         GameOver,
         SaveScore,
-        DisplayAllScores
+        DisplayAllScores,
+        PingPong
     ],
     plugins: {
         scene: [{
