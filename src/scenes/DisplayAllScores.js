@@ -121,7 +121,7 @@ function obtainValuesFromLocalStorage() {
         const key = localStorage.key(i);
         const value = localStorage.getItem(key);
 
-        if (key.startsWith(" PHASER-BOMB-BURNER-")) {
+        if (key.startsWith(" PHASER-")) {
             // style.val.scores.add([key, value])
             map.set(key, value)
         }
