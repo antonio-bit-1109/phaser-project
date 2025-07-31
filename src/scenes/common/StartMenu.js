@@ -6,7 +6,6 @@ const styleDefault = {
 
 }
 
-
 export class StartMenu extends Phaser.Scene {
 
     constructor() {
@@ -20,7 +19,6 @@ export class StartMenu extends Phaser.Scene {
     startGameRef = null;
     mezzoBusto1 = null;
     mezzoBusto_boss = null
-    tweenChain = null
     introMusicAuthor = `Menù music made by Fassounds - play time`
     bombBurnerGameName = "Bomb Burner"
 
