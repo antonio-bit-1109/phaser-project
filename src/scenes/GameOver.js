@@ -11,7 +11,7 @@ export class GameOver extends Phaser.Scene {
     dudeIsPompato = null
     image = null;
     finalTime = null
-
+    gameName = null
 
     constructor() {
         super('gameover');
@@ -25,6 +25,8 @@ export class GameOver extends Phaser.Scene {
         this.isGameVictory = data.isGameVictory
         this.dudeIsPompato = data.isDudePompato
         this.finalTime = data.gameTime
+        this.gameName = data.gameName
+
     }
 
     preload() {
@@ -173,6 +175,7 @@ export class GameOver extends Phaser.Scene {
             this.sound.stopAll()
             this.scene.stop("gameover");
             this.scene.start("savescore", {
+                gameName: this.gameName,
                 punteggioFinale: this.punteggioFinale,
                 livello: this.livello,
                 tempoGioco: this.finalTime,
