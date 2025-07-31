@@ -12,7 +12,7 @@ export class SaveScore extends Phaser.Scene {
     canvasWidth = null;
     canvasHeight = null;
     uniqueVal = Math.floor(Math.random() * 9999999999);
-
+    gameName = null
 
     constructor() {
         super("savescore");
@@ -24,6 +24,7 @@ export class SaveScore extends Phaser.Scene {
         this.tempoDiGioco = data.tempoGioco;
         this.canvasHeight = data.canvasHeight;
         this.canvasWidth = data.canvasWidth
+        this.gameName = data.gameName
     }
 
     preload() {
@@ -42,7 +43,8 @@ export class SaveScore extends Phaser.Scene {
                 punteggioFinale: this.punteggioFinale,
                 tempoDiGioco: this.tempoDiGioco,
                 livelloRaggiunto: this.livelloRaggiunto,
-                uniqueVal: this.uniqueVal
+                uniqueVal: this.uniqueVal,
+                gameName: this.gameName
             },
 
             x: this.canvasWidth / 2, y: this.canvasHeight / 2,
@@ -104,6 +106,7 @@ export class SaveScore extends Phaser.Scene {
                     const min = date.getMinutes()
 
                     print.text = `\
+                GAMENAME: ${style.val.gameName}    
                 FIRSTNAME: ${data.firstName}
                 LASTNAME: ${data.lastName}
                 LEVEL: ${style.val.livelloRaggiunto}
@@ -115,8 +118,8 @@ export class SaveScore extends Phaser.Scene {
 
 
                     localStorage.setItem(
-                        ` PHASER-BOMB-BURNER-${data.firstName} ${data.lastName}-${style.val.uniqueVal}`,
-                        `FIRSTNAME: ${data.firstName} , LASTNAME: ${data.lastName} , LEVEL: ${style.val.livelloRaggiunto} , FINAL SCORE: ${style.val.punteggioFinale} , TIME: ${style.val.tempoDiGioco} , DATE: ${dateCom + " " + hour + ":" + min}`
+                        ` PHASER-${style.val.gameName}-${data.firstName} ${data.lastName}-${style.val.uniqueVal}`,
+                        `GAMENAME: ${style.val.gameName} , FIRSTNAME: ${data.firstName} , LASTNAME: ${data.lastName} , LEVEL: ${style.val.livelloRaggiunto} , FINAL SCORE: ${style.val.punteggioFinale} , TIME: ${style.val.tempoDiGioco} , DATE: ${dateCom + " " + hour + ":" + min}`
                     )
                 }
             ).then(() => {
