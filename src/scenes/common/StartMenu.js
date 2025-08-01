@@ -34,10 +34,10 @@ export class StartMenu extends Phaser.Scene {
 
     preload() {
 
-        this.load.image("menuCanvas", "assets/canvasMenu.png")
-        this.load.audio("bg_music", "assets/sounds/bg_music.mp3")
-        this.load.image("mezzoBustoDude", "assets/mezzoBustoDude.png")
-        this.load.image("boss_silly", "assets/boss_silly.png")
+        this.load.image("menuCanvas", "assets/bombburner/images/canvasMenu.png")
+        this.load.audio("bg_music", "assets/bombburner/sounds/bg_music.mp3")
+        this.load.image("mezzoBustoDude", "assets/bombburner/images/mezzoBustoDude.png")
+        this.load.image("boss_silly", "assets/bombburner/images/boss_silly.png")
     };
 
     create() {
@@ -85,7 +85,7 @@ export class StartMenu extends Phaser.Scene {
             .on("pointerdown", () => {
                 this.sound.stopAll()
                 this.scene.stop("startmenu");
-                this.scene.start("pingpong", {
+                this.scene.start("choosepongdifficulty", {
                     canvasWidth: this.canvasWidth,
                     canvasHeight: this.canvasHeight,
                     gameName: this.pingPongGameName

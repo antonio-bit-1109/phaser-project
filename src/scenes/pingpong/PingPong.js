@@ -1,6 +1,7 @@
 export class PingPong extends Phaser.Scene {
 
     BALLVELOCITY = 280
+    GAMEDIFFICULTY = null
     canvasWidth = null;
     canvasHeight = null;
     gameName = null;
@@ -17,6 +18,7 @@ export class PingPong extends Phaser.Scene {
     bossPoints = "0"
     scoreLine0 = null;
     scoreLine1 = null;
+    backGroundMusic = null;
 
 
     constructor() {
@@ -27,17 +29,28 @@ export class PingPong extends Phaser.Scene {
         this.canvasWidth = data.canvasWidth
         this.canvasHeight = data.canvasHeight
         this.gameName = data.gameName
+        this.GAMEDIFFICULTY = data.gameDifficulty
     }
 
     preload() {
 
-        this.load.image("bg_space", "assets/pingpong/spaceField.png")
-        this.load.image("dudeShip", "assets/pingpong/dude_ping_pong.png")
-        this.load.image("bossShip", "assets/pingpong/boss_ping_pong.png")
-        this.load.image("ball", "assets/pingpong/pingpongBall.png")
+        this.load.image("bg_space", "assets/pingpong/images/spaceField.png")
+        this.load.image("dudeShip", "assets/pingpong/images/dude_ping_pong.png")
+        this.load.image("bossShip", "assets/pingpong/images/boss_ping_pong.png")
+        this.load.image("ball", "assets/pingpong/images/pingpongBall.png")
+
+
+        this.load.audio("bg_music_pingPong", "assets/pingpong/sounds/bg_groove.mp3")
+        this.load.audio("crowd_gol", "assets/pingpong/sounds/crowd_gool.mp3")
     }
 
     create() {
+        
+        this.backGroundMusic = this.sound.add("bg_music_pingPong", {
+            loop: true,
+            volume: 1
+        });
+        this.backGroundMusic.play();
         this.cursor = this.input.keyboard.createCursorKeys();
         this.bg = this.add.image(this.canvasWidth / 2, this.canvasHeight / 2, "bg_space")
 
@@ -110,6 +123,8 @@ export class PingPong extends Phaser.Scene {
             this.bossPoints = numberFormat.toString()
             this.updateVisualScore(this.bossPoints_Ref, this.bossPoints)
             this.ball.body.moves = false;
+            this.sound.add("crowd_gol").play()
+
             this.time.delayedCall(2000, () => {
                 this.resetBall()
                 this.ball.body.moves = true;
@@ -124,6 +139,8 @@ export class PingPong extends Phaser.Scene {
             this.dudePoints = numberFormat.toString()
             this.updateVisualScore(this.dudePoints_Ref, this.dudePoints)
             this.ball.body.moves = false;
+            this.sound.add("crowd_gol").play()
+
             this.time.delayedCall(2000, () => {
                 this.resetBall()
                 this.ball.body.moves = true;

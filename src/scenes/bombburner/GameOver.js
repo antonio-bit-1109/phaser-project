@@ -30,15 +30,15 @@ export class GameOver extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image('sky', 'assets/sky.png');
-        this.load.image('sadDude', "assets/sad_dude_no_bg.png")
-        this.load.image('happyDude', "assets/happyDude.png")
-        this.load.image("happy_dude_corazzato", "assets/happy_cavaliere.png")
-        this.load.image("sad_dude_corazzato", "assets/sad_cavaliere.png")
-        this.load.image("btn_home", "assets/btn_sfondo.png")
+        this.load.image('sky', 'assets/bombburner/images/sky.png');
+        this.load.image('sadDude', "assets/bombburner/images/sad_dude_no_bg.png")
+        this.load.image('happyDude', "assets/bombburner/images/happyDude.png")
+        this.load.image("happy_dude_corazzato", "assets/bombburner/images/happy_cavaliere.png")
+        this.load.image("sad_dude_corazzato", "assets/bombburner/images/sad_cavaliere.png")
+        this.load.image("btn_home", "assets/bombburner/images/btn_sfondo.png")
 
-        this.load.audio('gameOver_loser', "assets/sounds/gameOver.mp3")
-        this.load.audio('gameOver_winner', "assets/sounds/gameOver_victory.mp3")
+        this.load.audio('gameOver_loser', "assets/bombburner/sounds/gameOver.mp3")
+        this.load.audio('gameOver_winner', "assets/bombburner/sounds/gameOver_victory.mp3")
 
     }
 

@@ -9,8 +9,8 @@ export class Gameplay extends Phaser.Scene {
     VELOCITY = 250;
     BOMB_DEFAULT_WIDTH = 100;
     BOMB_DEFAULT_HEIGHT = 100;
-    SKYSTRING = 'assets/sky.png';
-    TERRAINSTRING = 'assets/grass_no_bg.png';
+    SKYSTRING = 'assets/bombburner/images/sky.png';
+    TERRAINSTRING = 'assets/bombburner/images/grass_no_bg.png';
 
     gameName = null;
     b = 0;
@@ -139,10 +139,10 @@ export class Gameplay extends Phaser.Scene {
         // key dell immagine e source da dove prenderla
         this.load.image('sky', this.SKYSTRING);
 
-        this.load.image('shield', "assets/shield.png")
+        this.load.image('shield', "assets/bombburner/images/shield.png")
 
         // spritesheet della bomba con rapida animazione
-        this.load.spritesheet('bomb', "assets/bomb_spritesheet.png", {
+        this.load.spritesheet('bomb', "assets/bombburner/images/bomb_spritesheet.png", {
             frameWidth: 32, frameHeight: 32
         });
 
@@ -151,88 +151,88 @@ export class Gameplay extends Phaser.Scene {
         // this.load.image("pauseBtn", "assets/pause.png");
 
         // carico l immagine di frame come spritesheet in modo da poter utilizzare ogni singolo frame a un determinato evento
-        this.load.spritesheet('dude', 'assets/dude.png', {
+        this.load.spritesheet('dude', 'assets/bombburner/images/dude.png', {
             frameHeight: 45,
             frameWidth: 32
         })
 
         //carico immagine della bomba gainHp
-        this.load.spritesheet("hpBomb", "assets/lifeBomb.png", {
+        this.load.spritesheet("hpBomb", "assets/bombburner/images/lifeBomb.png", {
             frameWidth: 261, frameHeight: 264.5
         })
 
         //carico spritesheet da cui prendo animazione dello sparo
-        this.load.spritesheet('dude-shooting', "assets/dude_2.0.png", {
+        this.load.spritesheet('dude-shooting', "assets/bombburner/images/dude_2.0.png", {
             frameHeight: 204,
             frameWidth: 122
         })
 
         // carico l'immagine di animazione dello scoppio della bomba
-        this.load.spritesheet('explosion', "assets/explosion.png", {
+        this.load.spritesheet('explosion', "assets/bombburner/images/explosion.png", {
             frameHeight: 115,
             frameWidth: 160
         })
 
         // carico lo spritesheet dell esplosione causata dal contatto proiettile e bomba
-        this.load.spritesheet('bullet_bomb_explosion', "assets/explosion_sprite.png", {
+        this.load.spritesheet('bullet_bomb_explosion', "assets/bombburner/images/explosion_sprite.png", {
             frameHeight: 145,
             frameWidth: 120
         })
 
         // carico un suono di un esplosione
-        this.load.audio('expl_sound', 'assets/sounds/expl_sound.mp3')
-        this.load.audio("gameMusic", "assets/sounds/gameMusic.mp3")
-        this.load.audio('expl_bomb_bullet', "assets/sounds/explosion_bullet_bomb.mp3")
-        this.load.audio('bossMusic', "assets/sounds/bossMusic.mp3")
-        this.load.audio('hpUp', "assets/sounds/hpUp.mp3")
+        this.load.audio('expl_sound', 'assets/bombburner/sounds/expl_sound.mp3')
+        this.load.audio("gameMusic", "assets/bombburner/sounds/gameMusic.mp3")
+        this.load.audio('expl_bomb_bullet', "assets/bombburner/sounds/explosion_bullet_bomb.mp3")
+        this.load.audio('bossMusic', "assets/bombburner/sounds/bossMusic.mp3")
+        this.load.audio('hpUp', "assets/bombburner/sounds/hpUp.mp3")
 
         // caricamento suono danno subito dal dude
-        this.load.audio("dude_damage_1", "assets/sounds/hurt_1.mp3")
-        this.load.audio("dude_damage_2", "assets/sounds/hurt_2.mp3")
-        this.load.audio("dude_damage_3", "assets/sounds/hurt_3.mp3")
-        this.load.audio("dude_damage_4", "assets/sounds/hurt_4.mp3")
+        this.load.audio("dude_damage_1", "assets/bombburner/sounds/hurt_1.mp3")
+        this.load.audio("dude_damage_2", "assets/bombburner/sounds/hurt_2.mp3")
+        this.load.audio("dude_damage_3", "assets/bombburner/sounds/hurt_3.mp3")
+        this.load.audio("dude_damage_4", "assets/bombburner/sounds/hurt_4.mp3")
 
-        this.load.audio("clicking-clock", "assets/sounds/clock-timer.mp3")
-        this.load.audio("thunderstorm", "assets/sounds/thunderstorm.mp3");
-        this.load.audio("attackUpSound", "assets/sounds/attackUpSound.mp3")
+        this.load.audio("clicking-clock", "assets/bombburner/sounds/clock-timer.mp3")
+        this.load.audio("thunderstorm", "assets/bombburner/sounds/thunderstorm.mp3");
+        this.load.audio("attackUpSound", "assets/bombburner/sounds/attackUpSound.mp3")
 
         //carico spritesheet proiettile
-        this.load.spritesheet('bullet', "assets/bullet_2.png", {
+        this.load.spritesheet('bullet', "assets/bombburner/images/bullet_2.png", {
             frameHeight: 151, frameWidth: 93
         })
 
-        this.load.spritesheet('dudeCorazzato', 'assets/dude_corazzato.png', {
+        this.load.spritesheet('dudeCorazzato', 'assets/bombburner/images/dude_corazzato.png', {
             frameWidth: 43,
             frameHeight: 42
         });
 
         //caricamento boss nemico
-        this.load.spritesheet('bossSpriteSheet', "assets/boss.png", {
+        this.load.spritesheet('bossSpriteSheet', "assets/bombburner/images/boss.png", {
             frameWidth: 87, frameHeight: 110
         })
 
         // caricamento shuriken - boss's attack
-        this.load.spritesheet('shuriken_boss', 'assets/shuriken_boss.png', {
+        this.load.spritesheet('shuriken_boss', 'assets/bombburner/images/shuriken_boss.png', {
             frameWidth: 15.5,
             frameHeight: 17
         })
 
         // add texture laser layer boss's attack
-        this.load.spritesheet('layer', "assets/texture_laser.png", {
+        this.load.spritesheet('layer', "assets/bombburner/images/texture_laser.png", {
             frameWidth: 68, frameHeight: 422
         })
 
         // carico immagine del raggio laser del boss
-        this.load.image('laserBeam', "assets/laserBeam.png");
+        this.load.image('laserBeam', "assets/bombburner/images/laserBeam.png");
 
-        this.load.image("attackUp", "assets/attackUp.png")
+        this.load.image("attackUp", "assets/bombburner/images/attackUp.png")
 
         // carico suono bullet
-        this.load.audio('bulletSound', "assets/sounds/fireBall.mp3");
+        this.load.audio('bulletSound', "assets/bombburner/sounds/fireBall.mp3");
 
-        this.load.audio('bossHitted', "assets/sounds/bossDefeated.mp3")
-        this.load.audio('bossDeath', "assets/sounds/bossIsDeath.mp3")
-        this.load.audio("superbulletSound", "assets/sounds/superBulletSound.mp3")
+        this.load.audio('bossHitted', "assets/bombburner/sounds/bossDefeated.mp3")
+        this.load.audio('bossDeath', "assets/bombburner/sounds/bossIsDeath.mp3")
+        this.load.audio("superbulletSound", "assets/bombburner/sounds/superBulletSound.mp3")
     }
 
 
