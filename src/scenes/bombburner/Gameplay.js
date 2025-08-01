@@ -449,23 +449,7 @@ export class Gameplay extends Phaser.Scene {
 // delta:tempo passato dall ultimavolta che la funzione è stata chiamata (ogni 16ms )
 // time: tempo totale in cui la func viene chiamata
     update(time, delta) {
-
-        this.time.delayedCall(1000, () => {
-            this.scene.stop('gameplay')
-            this.sound.stopAll();
-            this.scene.start('gameover', {
-                gameName: this.gameName,
-                canvasWidth: this.canvasWidth,
-                canvasHeigth: this.canvasHeight,
-                punteggioFinale: this.punteggio,
-                livello: this.livello,
-                isGameVictory: true,
-                isDudePompato: this.dudePompato,
-                gameTime: this.gameTimer
-            })
-        })
-
-
+        
         this.updatePunteggio(time)
         this.updateLivello()
 
