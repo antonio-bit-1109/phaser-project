@@ -19,6 +19,8 @@ export class PingPong extends Phaser.Scene {
     scoreLine0 = null;
     scoreLine1 = null;
     backGroundMusic = null;
+    computing = false;
+    bossInterceptingBall = false;
 
 
     constructor() {
@@ -45,7 +47,7 @@ export class PingPong extends Phaser.Scene {
     }
 
     create() {
-        
+
         this.backGroundMusic = this.sound.add("bg_music_pingPong", {
             loop: true,
             volume: 1
@@ -114,6 +116,102 @@ export class PingPong extends Phaser.Scene {
 
         this.checkCursorInput()
         this.isScoreMade()
+        this.isOpponentInterceptingBall()
+    }
+
+    isOpponentInterceptingBall() {
+
+        switch (this.GAMEDIFFICULTY) {
+
+            case "EASY" :
+                this.easyMode(this.GAMEDIFFICULTY)
+                break;
+            case "MEDIUM" :
+                this.mediumMode(this.GAMEDIFFICULTY)
+                break;
+            case "HARD" :
+                this.hardMode(this.GAMEDIFFICULTY)
+                break;
+        }
+
+    }
+
+    isBallInBossSide() {
+        return this.ball.x > this.canvasWidth / 2 && this.ball.x < this.canvasWidth - 50
+    }
+
+    interceptBall(difficulty) {
+
+        if (this.isBallInBossSide()
+            //&& !this.computing
+        ) {
+            console.log("start computing")
+            this.startComputing(difficulty)
+        }
+
+    }
+
+    startComputing(difficulty) {
+        //this.computing = true;
+        let v = Math.random()
+        console.log(v)
+
+        if (difficulty === "EASY" && v < 0.5) {
+            this.bossInterceptingBall = true
+            this.bossShip.body.immovable = false;
+            // durante il tween viene spostato lo sprite ma non il suo body
+            // collisione success
+            // rimbalzo fail
+            if (this.canvasWidth - this.ball.x <= 400) {
+                console.log("palla abbastanza vicina - attivazione tween");
+
+                this.tweens.add({
+                    targets: this.bossShip,
+                    y: this.ball.body.y,
+                    duration: 400,
+                    ease: "Linear",
+                    onUpdate: () => {
+                        this.bossShip.body.y = this.bossShip.y - this.bossShip.displayHeight / 2;
+                        if (this.checkCollision_general(this.ball, this.bossShip)) {
+                            this.invertBallVelocity()
+                        }
+                    },
+                    onComplete: () => {
+                        this.bossShip.setPosition(this.canvasWidth - 100, this.canvasHeight / 2);
+                        this.bossShip.body.reset(this.canvasWidth - 100, this.canvasHeight / 2);
+                        this.bossShip.body.immovable = true;
+                        this.bossInterceptingBall = false;
+                    }
+                });
+            }
+        }
+    }
+
+    invertBallVelocity() {
+        // Prendi la velocità attuale della palla
+        let vx = this.ball.body.velocity.x;
+        let vy = this.ball.body.velocity.y;
+
+        // Inverti la direzione X (rimbalzo orizzontale)
+        vx = -vx;
+
+        // Eventualmente aggiungi un po' di variazione verticale per rendere il gioco meno prevedibile
+        vy += (Math.random() - 0.5) * 100; // piccolo scostamento casuale
+
+        // Imposta la nuova velocità alla palla
+        this.ball.body.setVelocity(vx, vy);
+    }
+
+    easyMode(difficulty) {
+        this.interceptBall(difficulty)
+    }
+
+    mediumMode(difficulty) {
+        this.interceptBall(difficulty)
+    }
+
+    hardMode(difficulty) {
+        this.interceptBall(difficulty)
     }
 
     isScoreMade() {
