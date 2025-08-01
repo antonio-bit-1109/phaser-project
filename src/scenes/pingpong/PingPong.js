@@ -1,5 +1,6 @@
 export class PingPong extends Phaser.Scene {
 
+    BALLVELOCITY = 280
     canvasWidth = null;
     canvasHeight = null;
     gameName = null;
@@ -14,6 +15,8 @@ export class PingPong extends Phaser.Scene {
     bossPoints_Ref = null;
     dudePoints = "0";
     bossPoints = "0"
+    scoreLine0 = null;
+    scoreLine1 = null;
 
 
     constructor() {
@@ -67,6 +70,25 @@ export class PingPong extends Phaser.Scene {
 
         this.physics.add.collider(this.dudeShip, this.ball, this.onBallCollided, null, this);
         this.physics.add.collider(this.bossShip, this.ball, this.onBallCollided, null, this);
+
+        this.scoreLine0 = this.add.rectangle(
+            0,
+            this.canvasHeight / 2,
+            10,
+            this.canvasHeight,
+            0x00ff00)
+            .setOrigin(0.5, 0.5)
+
+        this.scoreLine1 = this.add.rectangle(
+            this.canvasWidth,
+            this.canvasHeight / 2,
+            10,
+            this.canvasHeight,
+            0xFF0000)
+            .setOrigin(0.5, 0.5)
+
+        this.physics.add.existing(this.scoreLine0, true);
+        this.physics.add.existing(this.scoreLine1, true);
     }
 
     update(delta, time) {
@@ -78,14 +100,62 @@ export class PingPong extends Phaser.Scene {
         }
 
         this.checkCursorInput()
+        this.isScoreMade()
+    }
 
+    isScoreMade() {
+        // boss has made a point
+        if (this.checkCollision_general(this.ball, this.scoreLine0)) {
+            let numberFormat = parseInt(this.bossPoints) + 1
+            this.bossPoints = numberFormat.toString()
+            this.updateVisualScore(this.bossPoints_Ref, this.bossPoints)
+            this.ball.body.moves = false;
+            this.time.delayedCall(2000, () => {
+                this.resetBall()
+                this.ball.body.moves = true;
+            })
+
+
+        }
+
+        // dude has made a point
+        if (this.checkCollision_general(this.ball, this.scoreLine1)) {
+            let numberFormat = parseInt(this.dudePoints) + 1
+            this.dudePoints = numberFormat.toString()
+            this.updateVisualScore(this.dudePoints_Ref, this.dudePoints)
+            this.ball.body.moves = false;
+            this.time.delayedCall(2000, () => {
+                this.resetBall()
+                this.ball.body.moves = true;
+            })
+        }
+
+    }
+
+    updateVisualScore(ref, newPoints) {
+        ref.setText(newPoints)
+    }
+
+    resetBall() {
+        this.isFirstStart = true;
+        this.ball.setPosition(this.canvasWidth / 2, this.canvasHeight / 2)
+
+        let direction = Math.random();
+        this.ball.setVelocity(direction <= 0.5 ? this.BALLVELOCITY : this.BALLVELOCITY - (this.BALLVELOCITY * 2))
+    }
+
+    checkCollision_general(p1, p2) {
+        if (p1 && p2 && this.physics.overlap(p1, p2)) {
+            return true;
+        }
     }
 
     onBallCollided() {
         this.isFirstStart = false;
         this.ballSpin = Math.random()
 
-        this.ball.setVelocity(250)
+        this.ball.setVelocity(this.BALLVELOCITY)
+
     }
 
     ballRotateRight() {
@@ -115,10 +185,6 @@ export class PingPong extends Phaser.Scene {
             this.dudeShip.setVelocityY(200)
 
         }
-
-    }
-
-    startBallMove() {
 
     }
 }
