@@ -168,7 +168,7 @@ export class PingPong extends Phaser.Scene {
                 this.tweens.add({
                     targets: this.bossShip,
                     y: this.ball.body.y,
-                    duration: 400,
+                    duration: 200,
                     ease: "Linear",
                     onUpdate: () => {
                         this.bossShip.body.y = this.bossShip.y - this.bossShip.displayHeight / 2;

@@ -12,3 +12,5 @@
 - [] impostazione di salvataggio del punteggio solo se hai vinto la partita
 - [] fai un chain di tweens e riporta smootly il dudeship al centro della scena
 - [] imposta un destabilizzatore di gioco (onda d'urto per aumentare velocità palla repentinamente??)
+- oppure fare che ad ogni rimbalzo sulla navicella aumenta velocita palla ? restart peròvelocita quando fai punto
+- la duration del tweet puo impostare la difficoltà della cpu ???
