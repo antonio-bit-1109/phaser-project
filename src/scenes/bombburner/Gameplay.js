@@ -82,6 +82,7 @@ export class Gameplay extends Phaser.Scene {
     dudePositionX = null;
     gameMusicRef = null;
     bossMusicRef = null;
+    btnHome_Ref = null
 
 
     // il constructor serve per dare un nome a questa classe, se la devo richiamare da qualche parte questo sarà il nome
@@ -136,6 +137,9 @@ export class Gameplay extends Phaser.Scene {
     }
 
     preload() {
+
+        this.load.image("home_btn", "assets/bombburner/images/btn_sfondo.png")
+
         // key dell immagine e source da dove prenderla
         this.load.image('sky', this.SKYSTRING);
 
@@ -245,6 +249,15 @@ export class Gameplay extends Phaser.Scene {
 
     create() {
 
+        this.btnHome_Ref = this.add.image(this.canvasWidth / 1.1, 50, "home_btn")
+            .setDepth(3)
+            .setScale(0.5)
+            .setInteractive({cursor: "pointer"})
+            .on("pointerdown", () => {
+                this.sound.stopAll()
+                this.scene.stop("pingpong");
+                this.scene.start("startmenu")
+            })
 
         //musica principale
         this.gameMusicRef = this.sound.add("gameMusic", {
@@ -449,7 +462,7 @@ export class Gameplay extends Phaser.Scene {
 // delta:tempo passato dall ultimavolta che la funzione è stata chiamata (ogni 16ms )
 // time: tempo totale in cui la func viene chiamata
     update(time, delta) {
-        
+
         this.updatePunteggio(time)
         this.updateLivello()
 

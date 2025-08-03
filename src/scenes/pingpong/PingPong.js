@@ -19,9 +19,8 @@ export class PingPong extends Phaser.Scene {
     scoreLine0 = null;
     scoreLine1 = null;
     backGroundMusic = null;
-    computing = false;
     bossInterceptingBall = false;
-
+    btnHome_Ref = null;
 
     constructor() {
         super("pingpong");
@@ -35,18 +34,29 @@ export class PingPong extends Phaser.Scene {
     }
 
     preload() {
-
         this.load.image("bg_space", "assets/pingpong/images/spaceField.png")
         this.load.image("dudeShip", "assets/pingpong/images/dude_ping_pong.png")
         this.load.image("bossShip", "assets/pingpong/images/boss_ping_pong.png")
         this.load.image("ball", "assets/pingpong/images/pingpongBall.png")
+        this.load.image("home_btn", "assets/bombburner/images/btn_sfondo.png")
 
 
         this.load.audio("bg_music_pingPong", "assets/pingpong/sounds/bg_groove.mp3")
         this.load.audio("crowd_gol", "assets/pingpong/sounds/crowd_gool.mp3")
+        this.load.audio("boing0", "assets/pingpong/sounds/boing0.mp3")
     }
 
     create() {
+
+        this.btnHome_Ref = this.add.image(this.canvasWidth / 1.1, 50, "home_btn")
+            .setDepth(3)
+            .setScale(0.5)
+            .setInteractive({cursor: "pointer"})
+            .on("pointerdown", () => {
+                this.sound.stopAll()
+                this.scene.stop("pingpong");
+                this.scene.start("startmenu")
+            })
 
         this.backGroundMusic = this.sound.add("bg_music_pingPong", {
             loop: true,
@@ -266,6 +276,7 @@ export class PingPong extends Phaser.Scene {
     }
 
     onBallCollided() {
+        this.sound.play("boing0")
         this.isFirstStart = false;
         this.ballSpin = Math.random()
 
