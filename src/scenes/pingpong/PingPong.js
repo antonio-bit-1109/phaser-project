@@ -21,6 +21,13 @@ export class PingPong extends Phaser.Scene {
     backGroundMusic = null;
     bossInterceptingBall = false;
     btnHome_Ref = null;
+    easyModeParams = {
+        name: "EASY",
+        tweensDuration: 400,
+        yVariation: 0.5,
+        incrementVx: 1,
+        incrementVy: 1
+    }
 
     constructor() {
         super("pingpong");
@@ -152,9 +159,7 @@ export class PingPong extends Phaser.Scene {
 
     interceptBall(difficulty) {
 
-        if (this.isBallInBossSide()
-            //&& !this.computing
-        ) {
+        if (this.isBallInBossSide()) {
             console.log("start computing")
             this.startComputing(difficulty)
         }
@@ -163,10 +168,10 @@ export class PingPong extends Phaser.Scene {
 
     startComputing(difficulty) {
         //this.computing = true;
-        let v = Math.random()
-        console.log(v)
+        // let v = Math.random()
+        // console.log(v)
 
-        if (difficulty === "EASY" && v < 0.5) {
+        if (difficulty === "EASY") {
             this.bossInterceptingBall = true
             this.bossShip.body.immovable = false;
             // durante il tween viene spostato lo sprite ma non il suo body
@@ -178,7 +183,7 @@ export class PingPong extends Phaser.Scene {
                 this.tweens.add({
                     targets: this.bossShip,
                     y: this.ball.body.y,
-                    duration: 200,
+                    duration: this.easyModeParams.tweensDuration,
                     ease: "Linear",
                     onUpdate: () => {
                         this.bossShip.body.y = this.bossShip.y - this.bossShip.displayHeight / 2;
@@ -206,10 +211,13 @@ export class PingPong extends Phaser.Scene {
         vx = -vx;
 
         // Eventualmente aggiungi un po' di variazione verticale per rendere il gioco meno prevedibile
-        vy += (Math.random() - 0.5) * 100; // piccolo scostamento casuale
+        vy += (Math.random() - this.easyModeParams.yVariation) * 100; // piccolo scostamento casuale
 
         // Imposta la nuova velocità alla palla
-        this.ball.body.setVelocity(vx, vy);
+        this.ball.body.setVelocity(
+            vx * this.easyModeParams.incrementVx,
+            vy * this.easyModeParams.incrementVy
+        );
     }
 
     easyMode(difficulty) {
