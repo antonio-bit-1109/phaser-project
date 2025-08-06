@@ -21,19 +21,21 @@ export class PingPong extends Phaser.Scene {
     backGroundMusic = null;
     bossInterceptingBall = false;
     btnHome_Ref = null;
-    easyModeParams = {
-        name: "EASY",
-        tweensDuration: 400,
-        yVariation: 0.5,
-        incrementVx: 1,
-        incrementVy: 1
+    difficultyParams = {
+        tweenDuration: {easy: 500, medium: 400, hard: 300},
+        yVariation: {easy: 0.5, medium: 0.7, hard: 1},
+        incrementV: {easy: 1, medium: 1.05, hard: 1.2},
+        // incrementVy: {easy: 1, medium: 1.05, hard: 1.1}
     }
+    boingSound = null;
 
     constructor() {
         super("pingpong");
     }
 
     init(data) {
+        this.dudePoints = "0";
+        this.bossPoints = "0"
         this.canvasWidth = data.canvasWidth
         this.canvasHeight = data.canvasHeight
         this.gameName = data.gameName
@@ -100,9 +102,13 @@ export class PingPong extends Phaser.Scene {
             .setCollideWorldBounds(true)
             .setVelocityX(-220)
 
-        this.physics.add.collider(this.dudeShip, this.ball, this.onBallCollided, null, this);
-        this.physics.add.collider(this.bossShip, this.ball, this.onBallCollided, null, this);
+        this.physics.add.collider(this.dudeShip, this.ball, () => {
+            this.onBallCollided(this.GAMEDIFFICULTY)
+        }, null, this);
 
+        this.physics.add.collider(this.dudeShip, this.ball, () => {
+            this.onBallCollided(this.GAMEDIFFICULTY)
+        }, null, this);
         this.scoreLine0 = this.add.rectangle(
             0,
             this.canvasHeight / 2,
@@ -171,38 +177,43 @@ export class PingPong extends Phaser.Scene {
         // let v = Math.random()
         // console.log(v)
 
-        if (difficulty === "EASY") {
-            this.bossInterceptingBall = true
-            this.bossShip.body.immovable = false;
-            // durante il tween viene spostato lo sprite ma non il suo body
-            // collisione success
-            // rimbalzo fail
-            if (this.canvasWidth - this.ball.x <= 400) {
-                console.log("palla abbastanza vicina - attivazione tween");
+        // if (difficulty === "EASY") {
+        this.bossInterceptingBall = true
+        this.bossShip.body.immovable = false;
+        // durante il tween viene spostato lo sprite ma non il suo body
+        // collisione success
+        // rimbalzo fail
+        if (this.canvasWidth - this.ball.x <= 400) {
+            console.log("palla abbastanza vicina - attivazione tween");
 
-                this.tweens.add({
-                    targets: this.bossShip,
-                    y: this.ball.body.y,
-                    duration: this.easyModeParams.tweensDuration,
-                    ease: "Linear",
-                    onUpdate: () => {
-                        this.bossShip.body.y = this.bossShip.y - this.bossShip.displayHeight / 2;
-                        if (this.checkCollision_general(this.ball, this.bossShip)) {
-                            this.invertBallVelocity()
-                        }
-                    },
-                    onComplete: () => {
-                        this.bossShip.setPosition(this.canvasWidth - 100, this.canvasHeight / 2);
-                        this.bossShip.body.reset(this.canvasWidth - 100, this.canvasHeight / 2);
-                        this.bossShip.body.immovable = true;
-                        this.bossInterceptingBall = false;
+            this.tweens.add({
+                targets: this.bossShip,
+                y: this.ball.body.y,
+                duration:
+                    difficulty === "EASY" && this.difficultyParams.tweenDuration.easy ||
+                    difficulty === "MEDIUM" && this.difficultyParams.tweenDuration.medium ||
+                    difficulty === 'HARD' && this.difficultyParams.tweenDuration.hard
+
+                ,
+                ease: "Linear",
+                onUpdate: () => {
+                    this.bossShip.body.y = this.bossShip.y - this.bossShip.displayHeight / 2;
+                    if (this.checkCollision_general(this.ball, this.bossShip)) {
+                        this.invertBallVelocity(difficulty)
                     }
-                });
-            }
+                },
+                onComplete: () => {
+                    this.bossShip.setPosition(this.canvasWidth - 100, this.canvasHeight / 2);
+                    this.bossShip.body.reset(this.canvasWidth - 100, this.canvasHeight / 2);
+                    this.bossShip.body.immovable = true;
+                    this.bossInterceptingBall = false;
+                }
+            });
+            // }
         }
     }
 
-    invertBallVelocity() {
+    invertBallVelocity(difficulty) {
         // Prendi la velocità attuale della palla
         let vx = this.ball.body.velocity.x;
         let vy = this.ball.body.velocity.y;
@@ -211,13 +222,26 @@ export class PingPong extends Phaser.Scene {
         vx = -vx;
 
         // Eventualmente aggiungi un po' di variazione verticale per rendere il gioco meno prevedibile
-        vy += (Math.random() - this.easyModeParams.yVariation) * 100; // piccolo scostamento casuale
+        vy += (Math.random() - this.returnYVariation(difficulty)) * 100; // piccolo scostamento casuale
 
         // Imposta la nuova velocità alla palla
         this.ball.body.setVelocity(
-            vx * this.easyModeParams.incrementVx,
-            vy * this.easyModeParams.incrementVy
+            this.returnIncrement(vx, difficulty),
+            this.returnIncrement(vy, difficulty)
         );
+    }
+
+    returnIncrement(ax, difficulty) {
+        return ax * (difficulty === "EASY" && this.difficultyParams.incrementV.easy ||
+            difficulty === "MEDIUM" && this.difficultyParams.incrementV.medium ||
+            difficulty === "HARD" && this.difficultyParams.incrementV.hard
+        )
+    }
+
+    returnYVariation(difficulty) {
+        return difficulty === "EASY" && this.difficultyParams.yVariation.easy ||
+            difficulty === "MEDIUM" && this.difficultyParams.yVariation.medium ||
+            difficulty === "HARD" && this.difficultyParams.yVariation.hard
     }
 
     easyMode(difficulty) {
@@ -240,6 +264,7 @@ export class PingPong extends Phaser.Scene {
             this.updateVisualScore(this.bossPoints_Ref, this.bossPoints)
             this.ball.body.moves = false;
             this.sound.add("crowd_gol").play()
+
 
             this.time.delayedCall(2000, () => {
                 this.resetBall()
@@ -283,13 +308,19 @@ export class PingPong extends Phaser.Scene {
         }
     }
 
-    onBallCollided() {
-        this.sound.play("boing0")
+    onBallCollided(difficulty) {
+
+        this.boingSound = this.sound.play("boing0")
         this.isFirstStart = false;
         this.ballSpin = Math.random()
 
-        this.ball.setVelocity(this.BALLVELOCITY)
+        let incrementV =
+            difficulty === "EASY" && this.difficultyParams.incrementV.easy ||
+            difficulty === "MEDIUM" && this.difficultyParams.incrementV.medium ||
+            difficulty === "HARD" && this.difficultyParams.incrementV.hard
 
+        this.ball.setVelocity(this.BALLVELOCITY * incrementV)
+        // this.ball.setVelocity(this.BALLVELOCITY)
     }
 
     ballRotateRight() {
