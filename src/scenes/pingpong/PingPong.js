@@ -28,6 +28,9 @@ export class PingPong extends Phaser.Scene {
         // incrementVy: {easy: 1, medium: 1.05, hard: 1.1}
     }
     boingSound = null;
+    isBorderDownReached = false;
+    isBorderUpReached = false;
+
 
     constructor() {
         super("pingpong");
@@ -333,20 +336,29 @@ export class PingPong extends Phaser.Scene {
 
 
     checkCursorInput() {
-        if (this.dudeShip.y <= 80) {
+
+        // dude is bottom Y
+        if (this.dudeShip.body.y >= this.canvasHeight - 90) {
+            this.isBorderDownReached = true;
             this.dudeShip.setVelocityY(0)
         }
 
-        if (this.dudeShip.y >= this.canvasHeight - 80) {
+        // dude is top Y
+        if (this.dudeShip.body.y <= 10) {
+            this.isBorderUpReached = true;
             this.dudeShip.setVelocityY(0)
         }
 
-        if (this.cursor.up.isDown) {
+        if (this.cursor.up.isDown && !this.isBorderUpReached) {
+            this.isBorderDownReached = false
+            this.isBorderUpReached = false
             this.dudeShip.setVelocityY(-200)
 
         }
 
-        if (this.cursor.down.isDown) {
+        if (this.cursor.down.isDown && !this.isBorderDownReached) {
+            this.isBorderDownReached = false
+            this.isBorderUpReached = false
             this.dudeShip.setVelocityY(200)
 
         }
