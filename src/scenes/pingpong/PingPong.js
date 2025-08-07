@@ -24,7 +24,7 @@ export class PingPong extends Phaser.Scene {
     difficultyParams = {
         tweenDuration: {easy: 500, medium: 400, hard: 300},
         yVariation: {easy: 0.5, medium: 0.7, hard: 1},
-        incrementV: {easy: 1, medium: 1.05, hard: 1.2},
+        incrementV: {easy: 1, medium: 1.05, hard: 1.10},
         // incrementVy: {easy: 1, medium: 1.05, hard: 1.1}
     }
     boingSound = null;
@@ -112,10 +112,11 @@ export class PingPong extends Phaser.Scene {
         this.physics.add.collider(this.dudeShip, this.ball, () => {
             this.onBallCollided(this.GAMEDIFFICULTY)
         }, null, this);
+
         this.scoreLine0 = this.add.rectangle(
             0,
             this.canvasHeight / 2,
-            10,
+            50,
             this.canvasHeight,
             0x00ff00)
             .setOrigin(0.5, 0.5)
@@ -123,7 +124,7 @@ export class PingPong extends Phaser.Scene {
         this.scoreLine1 = this.add.rectangle(
             this.canvasWidth,
             this.canvasHeight / 2,
-            10,
+            50,
             this.canvasHeight,
             0xFF0000)
             .setOrigin(0.5, 0.5)
@@ -301,8 +302,8 @@ export class PingPong extends Phaser.Scene {
         this.isFirstStart = true;
         this.ball.setPosition(this.canvasWidth / 2, this.canvasHeight / 2)
 
-        let direction = Math.random();
-        this.ball.setVelocity(direction <= 0.5 ? this.BALLVELOCITY : this.BALLVELOCITY - (this.BALLVELOCITY * 2))
+        // let direction = Math.random();
+        this.ball.setVelocity(this.BALLVELOCITY);
     }
 
     checkCollision_general(p1, p2) {
