@@ -32,8 +32,8 @@ export class PingPong extends Phaser.Scene {
     isBorderDownReached = false;
     isBorderUpReached = false;
     isAttractingBall = false
-    prevBallVelocityX = 0;
-    prevBallVelocityY = 0;
+    prevBallVelocityX = null;
+    prevBallVelocityY = null;
     keyA = null;
     keyS = null;
     attractActive = false
@@ -152,8 +152,12 @@ export class PingPong extends Phaser.Scene {
         if (distance <= 200 && this.isAttractingBall) {
             this.attractActive = true;
 
-            this.prevBallVelocityX = this.ball.body.x
-            this.prevBallVelocityY = this.ball.body.y
+            if (!this.prevBallVelocityX && !this.prevBallVelocityY) {
+                this.prevBallVelocityX = this.ball.body.velocity.x
+                this.prevBallVelocityY = this.ball.body.velocity.y
+            }
+
+            console.log(this.prevBallVelocityX + " X " + this.prevBallVelocityY + " Y ")
 
             this.ball.body.setVelocity(0)
             this.ball.body.enable = false;
@@ -175,7 +179,7 @@ export class PingPong extends Phaser.Scene {
         }
 
         if (!this.isAttractingBall && this.attractActive) {
-            this.ball.body.setVelocity(-300);
+            this.invertBallVelocity(this.GAMEDIFFICULTY, 250)
             this.attractActive = false;
         }
     }
@@ -250,7 +254,7 @@ export class PingPong extends Phaser.Scene {
                 onUpdate: () => {
                     this.bossShip.body.y = this.bossShip.y - this.bossShip.displayHeight / 2;
                     if (this.checkCollision_general(this.ball, this.bossShip)) {
-                        this.invertBallVelocity(difficulty)
+                        this.invertBallVelocity(difficulty, 250)
                     }
                 },
                 onComplete: () => {
@@ -278,10 +282,17 @@ export class PingPong extends Phaser.Scene {
         return {vx, vy}
     }
 
-    invertBallVelocity(difficulty) {
+    invertBallVelocity(difficulty, addedVelocity) {
         // Prendi la velocità attuale della palla
         let vx = this.ball.body.velocity.x;
         let vy = this.ball.body.velocity.y;
+
+        if (vx < 200) {
+            vx += addedVelocity
+        }
+        if (vy < 200) {
+            vy += addedVelocity
+        }
 
         // Inverti la direzione X (rimbalzo orizzontale)
         vx = -vx;
