@@ -1,7 +1,8 @@
 export class PingPong extends Phaser.Scene {
 
-    BALLVELOCITY = 280
+    BALLVELOCITY = 300
     GAMEDIFFICULTY = null
+    MAX_BALL_SPEED = 600;
     canvasWidth = null;
     canvasHeight = null;
     gameName = null;
@@ -30,7 +31,12 @@ export class PingPong extends Phaser.Scene {
     boingSound = null;
     isBorderDownReached = false;
     isBorderUpReached = false;
-
+    isAttractingBall = false
+    prevBallVelocityX = 0;
+    prevBallVelocityY = 0;
+    keyA = null;
+    keyS = null;
+    attractActive = false
 
     constructor() {
         super("pingpong");
@@ -76,6 +82,8 @@ export class PingPong extends Phaser.Scene {
         });
         this.backGroundMusic.play();
         this.cursor = this.input.keyboard.createCursorKeys();
+        this.keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
+        this.keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
         this.bg = this.add.image(this.canvasWidth / 2, this.canvasHeight / 2, "bg_space")
 
         this.dudePoints_Ref = this.add.text((this.canvasWidth / 2) - 80, 50, this.dudePoints)
@@ -133,6 +141,45 @@ export class PingPong extends Phaser.Scene {
         this.physics.add.existing(this.scoreLine1, true);
     }
 
+    attractBall() {
+
+        if (!this.dudeShip || !this.ball) return
+
+        const distance = Phaser.Math.Distance.Between(
+            this.ball.body.x, this.ball.body.y, this.dudeShip.body.x, this.dudeShip.body.y
+        )
+
+        if (distance <= 200 && this.isAttractingBall) {
+            this.attractActive = true;
+
+            this.prevBallVelocityX = this.ball.body.x
+            this.prevBallVelocityY = this.ball.body.y
+
+            this.ball.body.setVelocity(0)
+            this.ball.body.enable = false;
+
+            this.tweens.add({
+                targets: this.ball,
+                y: this.dudeShip.body.y,
+                x: this.dudeShip.body.x + 130,
+                duration: 300,
+                ease: "Linear",
+                onUpdate: () => {
+
+                },
+                onComplete: () => {
+                    this.ball.body.enable = true;
+
+                }
+            });
+        }
+
+        if (!this.isAttractingBall && this.attractActive) {
+            this.ball.body.setVelocity(-300);
+            this.attractActive = false;
+        }
+    }
+
     update(delta, time) {
 
         if (this.isFirstStart || this.ballSpin <= 0.5) {
@@ -144,6 +191,8 @@ export class PingPong extends Phaser.Scene {
         this.checkCursorInput()
         this.isScoreMade()
         this.isOpponentInterceptingBall()
+        this.attractBall()
+
     }
 
     isOpponentInterceptingBall() {
@@ -170,7 +219,6 @@ export class PingPong extends Phaser.Scene {
     interceptBall(difficulty) {
 
         if (this.isBallInBossSide()) {
-            console.log("start computing")
             this.startComputing(difficulty)
         }
 
@@ -188,7 +236,6 @@ export class PingPong extends Phaser.Scene {
         // collisione success
         // rimbalzo fail
         if (this.canvasWidth - this.ball.x <= 400) {
-            console.log("palla abbastanza vicina - attivazione tween");
 
             this.tweens.add({
                 targets: this.bossShip,
@@ -213,8 +260,22 @@ export class PingPong extends Phaser.Scene {
                     this.bossInterceptingBall = false;
                 }
             });
-            // }
+
         }
+    }
+
+
+    returnControlledVectorialSpeed(vx, vy) {
+        // teorema pitagora per calcolare spostamento diagonale data la velocità x e y della palla
+        const speed = Math.sqrt(vx * vx + vy * vy)
+
+        // controllo se la velocità è superiore a quella massima e in caso decremento
+        if (speed > this.MAX_BALL_SPEED) {
+            const factor = this.MAX_BALL_SPEED / speed
+            return {vx: vx * factor, vy: vy * factor}
+        }
+
+        return {vx, vy}
     }
 
     invertBallVelocity(difficulty) {
@@ -228,10 +289,11 @@ export class PingPong extends Phaser.Scene {
         // Eventualmente aggiungi un po' di variazione verticale per rendere il gioco meno prevedibile
         vy += (Math.random() - this.returnYVariation(difficulty)) * 100; // piccolo scostamento casuale
 
+        let obj = this.returnControlledVectorialSpeed(vx, vy)
         // Imposta la nuova velocità alla palla
         this.ball.body.setVelocity(
-            this.returnIncrement(vx, difficulty),
-            this.returnIncrement(vy, difficulty)
+            this.returnIncrement(obj.vx, difficulty),
+            this.returnIncrement(obj.vy, difficulty)
         );
     }
 
@@ -323,7 +385,12 @@ export class PingPong extends Phaser.Scene {
             difficulty === "MEDIUM" && this.difficultyParams.incrementV.medium ||
             difficulty === "HARD" && this.difficultyParams.incrementV.hard
 
-        this.ball.setVelocity(this.BALLVELOCITY * incrementV)
+        let vx = this.ball.body.velocity.x;
+        let vy = this.ball.body.velocity.y;
+
+        let obj = this.returnControlledVectorialSpeed(vx * incrementV, vy * incrementV)
+
+        this.ball.setVelocity(obj.vx, obj.vy)
         // this.ball.setVelocity(this.BALLVELOCITY)
     }
 
@@ -364,5 +431,14 @@ export class PingPong extends Phaser.Scene {
 
         }
 
+        if (this.keyA.isDown) {
+            this.isAttractingBall = true
+            console.log(this.isAttractingBall, "valore isAttractingBall")
+        }
+
+        if (this.keyS.isDown) {
+            this.isAttractingBall = false
+            console.log(this.isAttractingBall, "valore isAttractingBall")
+        }
     }
 }
