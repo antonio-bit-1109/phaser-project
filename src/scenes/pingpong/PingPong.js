@@ -164,7 +164,7 @@ export class PingPong extends Phaser.Scene {
 
             this.tweens.add({
                 targets: this.ball,
-                y: this.dudeShip.body.y,
+                y: this.dudeShip.body.y + 50,
                 x: this.dudeShip.body.x + 130,
                 duration: 300,
                 ease: "Linear",
@@ -173,7 +173,6 @@ export class PingPong extends Phaser.Scene {
                 },
                 onComplete: () => {
                     this.ball.body.enable = true;
-
                 }
             });
         }
