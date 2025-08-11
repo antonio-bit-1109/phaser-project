@@ -117,10 +117,6 @@ export class PingPong extends Phaser.Scene {
             this.onBallCollided(this.GAMEDIFFICULTY)
         }, null, this);
 
-        this.physics.add.collider(this.dudeShip, this.ball, () => {
-            this.onBallCollided(this.GAMEDIFFICULTY)
-        }, null, this);
-
         this.scoreLine0 = this.add.rectangle(
             0,
             this.canvasHeight / 2,
@@ -282,6 +278,7 @@ export class PingPong extends Phaser.Scene {
     }
 
     invertBallVelocity(difficulty, addedVelocity) {
+
         // Prendi la velocità attuale della palla
         let vx = this.ball.body.velocity.x;
         let vy = this.ball.body.velocity.y;
@@ -384,9 +381,13 @@ export class PingPong extends Phaser.Scene {
         }
     }
 
+    playSound(key) {
+        this.sound.play(key)
+    }
+
     onBallCollided(difficulty) {
 
-        this.boingSound = this.sound.play("boing0")
+        this.playSound("boing0")
         this.isFirstStart = false;
         this.ballSpin = Math.random()
 

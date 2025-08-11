@@ -14,3 +14,4 @@
 - [] imposta un destabilizzatore di gioco (onda d'urto per aumentare velocità palla repentinamente??)
 - oppure fare che ad ogni rimbalzo sulla navicella aumenta velocita palla ? restart peròvelocita quando fai punto
 - la duration del tweet puo impostare la difficoltà della cpu ???
+- [] sistema audio del boing con mappa centralizzata 
