@@ -98,13 +98,13 @@ export class StartMenu extends Phaser.Scene {
             .setOrigin(0.5, 0.5)
             .setInteractive({cursor: 'pointer'})
             .on("pointerdown", () => {
-                this.sound.stopAll()
-                this.scene.stop("startmenu");
-                this.scene.start("choosepongdifficulty", {
-                    canvasWidth: this.canvasWidth,
-                    canvasHeight: this.canvasHeight,
-                    gameName: this.pingPongGameName
-                })
+                // this.sound.stopAll()
+                // this.scene.stop("startmenu");
+                // this.scene.start("choosepongdifficulty", {
+                //     canvasWidth: this.canvasWidth,
+                //     canvasHeight: this.canvasHeight,
+                //     gameName: this.pingPongGameName
+                // })
             })
 
         this.add.text(this.canvasWidth / 2, this.canvasHeight / 1.8, "Classifica Punteggi", {
