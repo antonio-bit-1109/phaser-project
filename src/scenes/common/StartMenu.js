@@ -22,6 +22,7 @@ export class StartMenu extends Phaser.Scene {
     introMusicAuthor = `Menù music made by Fassounds - play time`
     bombBurnerGameName = "Bomb Burner"
     pingPongGameName = "Ping pong dude"
+    circleAvoid = "Dude Circle Avoid"
 
     convertToRadiant(gradi) {
         return Phaser.Math.DegToRad(gradi)
@@ -92,7 +93,21 @@ export class StartMenu extends Phaser.Scene {
                 })
             })
 
-        this.add.text(this.canvasWidth / 2, this.canvasHeight / 2.1, "Classifica Punteggi", {
+        this.add.text(this.canvasWidth / 2, this.canvasHeight / 2.1, this.circleAvoid, styleDefault)
+            .setDepth(6)
+            .setOrigin(0.5, 0.5)
+            .setInteractive({cursor: 'pointer'})
+            .on("pointerdown", () => {
+                this.sound.stopAll()
+                this.scene.stop("startmenu");
+                this.scene.start("choosepongdifficulty", {
+                    canvasWidth: this.canvasWidth,
+                    canvasHeight: this.canvasHeight,
+                    gameName: this.pingPongGameName
+                })
+            })
+
+        this.add.text(this.canvasWidth / 2, this.canvasHeight / 1.8, "Classifica Punteggi", {
             fontSize: '30px',
             color: '#1e1e1b',
             fontStyle: 'bold',
