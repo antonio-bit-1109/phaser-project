@@ -28,7 +28,11 @@ export class SaveScore extends Phaser.Scene {
     }
 
     preload() {
-        // 🔹 Nessun plugin qui: RexUI è già configurato in index.js
+        // Nessun plugin qui: RexUI è già configurato in index.js
+    }
+
+    checkIfNotNull(val) {
+        return val ? val : "Non disponibile"
     }
 
     create() {
@@ -40,15 +44,15 @@ export class SaveScore extends Phaser.Scene {
         var style = {
 
             val: {
-                punteggioFinale: this.punteggioFinale,
-                tempoDiGioco: this.tempoDiGioco,
-                livelloRaggiunto: this.livelloRaggiunto,
-                uniqueVal: this.uniqueVal,
-                gameName: this.gameName
+                punteggioFinale: this.checkIfNotNull(this.punteggioFinale),
+                tempoDiGioco: this.checkIfNotNull(this.tempoDiGioco),
+                livelloRaggiunto: this.checkIfNotNull(this.livelloRaggiunto),
+                uniqueVal: this.checkIfNotNull(this.uniqueVal),
+                gameName: this.checkIfNotNull(this.gameName)
             },
 
             x: this.canvasWidth / 2, y: this.canvasHeight / 2,
-            // width: 400,
+          
             space: {
                 left: 20, right: 20, top: 20, bottom: 20,
                 item: 20,
