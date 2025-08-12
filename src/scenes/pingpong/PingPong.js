@@ -19,7 +19,6 @@ export class PingPong extends Phaser.Scene {
     bossPoints = "0"
     scoreLine0 = null;
     scoreLine1 = null;
-    backGroundMusic = null;
     bossInterceptingBall = false;
     btnHome_Ref = null;
     difficultyParams = {
@@ -29,13 +28,8 @@ export class PingPong extends Phaser.Scene {
     }
     isBorderDownReached = false;
     isBorderUpReached = false;
-    isAttractingBall = false
-    prevBallVelocityX = null;
-    prevBallVelocityY = null;
-    keyA = null;
-    keyS = null;
-    attractActive = false
     soundsMap = new Map()
+    isBallTouchingScoreline = false;
 
 
     constructor() {
@@ -49,6 +43,7 @@ export class PingPong extends Phaser.Scene {
         this.canvasHeight = data.canvasHeight
         this.gameName = data.gameName
         this.GAMEDIFFICULTY = data.gameDifficulty
+        this.isBallTouchingScoreline = false;
     }
 
     preload() {
@@ -83,8 +78,6 @@ export class PingPong extends Phaser.Scene {
             })
 
         this.cursor = this.input.keyboard.createCursorKeys();
-        this.keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
-        this.keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
         this.bg = this.add.image(this.canvasWidth / 2, this.canvasHeight / 2, "bg_space")
 
         this.dudePoints_Ref = this.add.text((this.canvasWidth / 2) - 80, 50, this.dudePoints)
@@ -138,47 +131,6 @@ export class PingPong extends Phaser.Scene {
         this.physics.add.existing(this.scoreLine1, true);
     }
 
-    attractBall() {
-
-        if (!this.dudeShip || !this.ball) return
-
-        const distance = Phaser.Math.Distance.Between(
-            this.ball.body.x, this.ball.body.y, this.dudeShip.body.x, this.dudeShip.body.y
-        )
-
-        if (distance <= 200 && this.isAttractingBall) {
-            this.attractActive = true;
-
-            if (!this.prevBallVelocityX && !this.prevBallVelocityY) {
-                this.prevBallVelocityX = this.ball.body.velocity.x
-                this.prevBallVelocityY = this.ball.body.velocity.y
-            }
-
-            console.log(this.prevBallVelocityX + " X " + this.prevBallVelocityY + " Y ")
-
-            this.ball.body.setVelocity(0)
-            this.ball.body.enable = false;
-
-            this.tweens.add({
-                targets: this.ball,
-                y: this.dudeShip.body.y + 50,
-                x: this.dudeShip.body.x + 130,
-                duration: 300,
-                ease: "Linear",
-                onUpdate: () => {
-
-                },
-                onComplete: () => {
-                    this.ball.body.enable = true;
-                }
-            });
-        }
-
-        if (!this.isAttractingBall && this.attractActive) {
-            this.invertBallVelocity(this.GAMEDIFFICULTY, 250)
-            this.attractActive = false;
-        }
-    }
 
     update(delta, time) {
 
@@ -191,8 +143,23 @@ export class PingPong extends Phaser.Scene {
         this.checkCursorInput()
         this.isScoreMade()
         this.isOpponentInterceptingBall()
-        this.attractBall()
+        this.isGameEnded()
 
+    }
+
+    isGameEnded() {
+        if (parseInt(this.bossPoints) >= 5 || parseInt(this.dudePoints) >= 5) {
+            this.sound.stopAll()
+            this.scene.stop("pingpong")
+            this.scene.start("gameover", {
+                canvasWidth: this.canvasWidth,
+                canvasHeigth: this.canvasHeight,
+                isGameVictory: parseInt(this.dudePoints) >= 5,
+                gameName: this.gameName,
+                sceneName: this.scene.key
+            })
+
+        }
     }
 
     isOpponentInterceptingBall() {
@@ -225,16 +192,10 @@ export class PingPong extends Phaser.Scene {
     }
 
     startComputing(difficulty) {
-        //this.computing = true;
-        // let v = Math.random()
-        // console.log(v)
 
-        // if (difficulty === "EASY") {
         this.bossInterceptingBall = true
         this.bossShip.body.immovable = false;
-        // durante il tween viene spostato lo sprite ma non il suo body
-        // collisione success
-        // rimbalzo fail
+
         if (this.canvasWidth - this.ball.x <= 400) {
 
             this.tweens.add({
@@ -248,7 +209,7 @@ export class PingPong extends Phaser.Scene {
                 ease: "Linear",
                 onUpdate: () => {
                     this.bossShip.body.y = this.bossShip.y - this.bossShip.displayHeight / 2;
-                    if (this.checkCollision_general(this.ball, this.bossShip)) {
+                    if (this.checkCollision_general(this.ball, this.bossShip) && !this.isBallTouchingScoreline) {
                         this.playSoundIfNotAlreadyPlayed("boing0")
                         this.invertBallVelocity(difficulty, 250)
                     }
@@ -333,6 +294,7 @@ export class PingPong extends Phaser.Scene {
     isScoreMade() {
         // boss has made a point
         if (this.checkCollision_general(this.ball, this.scoreLine0)) {
+            this.isBallTouchingScoreline = true
             let numberFormat = parseInt(this.bossPoints) + 1
             this.bossPoints = numberFormat.toString()
             this.updateVisualScore(this.bossPoints_Ref, this.bossPoints)
@@ -350,6 +312,7 @@ export class PingPong extends Phaser.Scene {
 
         // dude has made a point
         if (this.checkCollision_general(this.ball, this.scoreLine1)) {
+            this.isBallTouchingScoreline = true
             let numberFormat = parseInt(this.dudePoints) + 1
             this.dudePoints = numberFormat.toString()
             this.updateVisualScore(this.dudePoints_Ref, this.dudePoints)
@@ -369,11 +332,15 @@ export class PingPong extends Phaser.Scene {
     }
 
     resetBall() {
+
         this.isFirstStart = true;
         this.ball.setPosition(this.canvasWidth / 2, this.canvasHeight / 2)
 
-        // let direction = Math.random();
-        this.ball.setVelocity(this.BALLVELOCITY);
+        let directionX = Math.random();
+        let directionY = Math.random();
+        this.ball.setVelocityY(directionY < 0.5 ? this.BALLVELOCITY : -this.BALLVELOCITY);
+        this.ball.setVelocityX(directionX < 0.5 ? this.BALLVELOCITY : -this.BALLVELOCITY);
+        this.isBallTouchingScoreline = false
     }
 
     checkCollision_general(p1, p2) {
@@ -436,25 +403,16 @@ export class PingPong extends Phaser.Scene {
         if (this.cursor.up.isDown && !this.isBorderUpReached) {
             this.isBorderDownReached = false
             this.isBorderUpReached = false
-            this.dudeShip.setVelocityY(-200)
+            this.dudeShip.setVelocityY(-250)
 
         }
 
         if (this.cursor.down.isDown && !this.isBorderDownReached) {
             this.isBorderDownReached = false
             this.isBorderUpReached = false
-            this.dudeShip.setVelocityY(200)
+            this.dudeShip.setVelocityY(250)
 
         }
 
-        if (this.keyA.isDown) {
-            this.isAttractingBall = true
-            console.log(this.isAttractingBall, "valore isAttractingBall")
-        }
-
-        if (this.keyS.isDown) {
-            this.isAttractingBall = false
-            console.log(this.isAttractingBall, "valore isAttractingBall")
-        }
     }
 }
