@@ -12,6 +12,8 @@ export class GameOver extends Phaser.Scene {
     finalTime = null
     gameName = null
     sceneName = null
+    gameDifficult = null;
+    fogMode = null
 
     constructor() {
         super('gameover');
@@ -27,6 +29,8 @@ export class GameOver extends Phaser.Scene {
         this.finalTime = data.gameTime
         this.gameName = data.gameName
         this.sceneName = data.sceneName
+        this.gameDifficult = data.gameDifficult
+        this.fogMode = data.fogMode
     }
 
     preload() {
@@ -203,6 +207,17 @@ export class GameOver extends Phaser.Scene {
     pressSpaceToRestart() {
         this.input.keyboard.once('keydown-SPACE', () => {
             this.sound.removeAll()
+
+            if (
+                this.sceneName.trim().toLowerCase().includes("pingpong")
+                && this.gameDifficult === "HARD"
+                && this.fogMode
+            ) {
+                this.scene.start(this.sceneName, {
+                    gameDifficulty: "HARD-F"
+                })
+            }
+
             this.scene.start(this.sceneName)
         })
     }
