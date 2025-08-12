@@ -26,9 +26,7 @@ export class PingPong extends Phaser.Scene {
         tweenDuration: {easy: 500, medium: 400, hard: 300},
         yVariation: {easy: 0.5, medium: 0.7, hard: 1},
         incrementV: {easy: 1, medium: 1.05, hard: 1.10},
-        // incrementVy: {easy: 1, medium: 1.05, hard: 1.1}
     }
-    boingSound = null;
     isBorderDownReached = false;
     isBorderUpReached = false;
     isAttractingBall = false
@@ -37,6 +35,8 @@ export class PingPong extends Phaser.Scene {
     keyA = null;
     keyS = null;
     attractActive = false
+    soundsMap = new Map()
+
 
     constructor() {
         super("pingpong");
@@ -66,6 +66,12 @@ export class PingPong extends Phaser.Scene {
 
     create() {
 
+        this.soundsMap.set("bg_music_pingPong", this.sound.add("bg_music_pingPong"))
+        this.soundsMap.set("crowd_gol", this.sound.add("crowd_gol"))
+        this.soundsMap.set("boing0", this.sound.add("boing0"))
+
+        this.soundsMap.get("bg_music_pingPong").play()
+
         this.btnHome_Ref = this.add.image(this.canvasWidth / 1.1, 50, "home_btn")
             .setDepth(3)
             .setScale(0.5)
@@ -76,11 +82,6 @@ export class PingPong extends Phaser.Scene {
                 this.scene.start("startmenu")
             })
 
-        this.backGroundMusic = this.sound.add("bg_music_pingPong", {
-            loop: true,
-            volume: 1
-        });
-        this.backGroundMusic.play();
         this.cursor = this.input.keyboard.createCursorKeys();
         this.keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
         this.keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
@@ -243,12 +244,12 @@ export class PingPong extends Phaser.Scene {
                     difficulty === "EASY" && this.difficultyParams.tweenDuration.easy ||
                     difficulty === "MEDIUM" && this.difficultyParams.tweenDuration.medium ||
                     difficulty === 'HARD' && this.difficultyParams.tweenDuration.hard
-
                 ,
                 ease: "Linear",
                 onUpdate: () => {
                     this.bossShip.body.y = this.bossShip.y - this.bossShip.displayHeight / 2;
                     if (this.checkCollision_general(this.ball, this.bossShip)) {
+                        this.playSoundIfNotAlreadyPlayed("boing0")
                         this.invertBallVelocity(difficulty, 250)
                     }
                 },
@@ -336,7 +337,7 @@ export class PingPong extends Phaser.Scene {
             this.bossPoints = numberFormat.toString()
             this.updateVisualScore(this.bossPoints_Ref, this.bossPoints)
             this.ball.body.moves = false;
-            this.sound.add("crowd_gol").play()
+            this.soundsMap.get("crowd_gol").play();
 
 
             this.time.delayedCall(2000, () => {
@@ -381,13 +382,18 @@ export class PingPong extends Phaser.Scene {
         }
     }
 
-    playSound(key) {
-        this.sound.play(key)
+    playSoundIfNotAlreadyPlayed(key) {
+
+        if (this.soundsMap.get(key) && !this.soundsMap.get(key).isPlaying) {
+            this.soundsMap.get(key).play();
+        }
+
     }
+
 
     onBallCollided(difficulty) {
 
-        this.playSound("boing0")
+        this.playSoundIfNotAlreadyPlayed("boing0")
         this.isFirstStart = false;
         this.ballSpin = Math.random()
 
@@ -402,7 +408,6 @@ export class PingPong extends Phaser.Scene {
         let obj = this.returnControlledVectorialSpeed(vx * incrementV, vy * incrementV)
 
         this.ball.setVelocity(obj.vx, obj.vy)
-        // this.ball.setVelocity(this.BALLVELOCITY)
     }
 
     ballRotateRight() {
