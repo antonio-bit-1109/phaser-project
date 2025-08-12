@@ -11,7 +11,7 @@ export class GameOver extends Phaser.Scene {
     image = null;
     finalTime = null
     gameName = null
-
+    sceneName = null
 
     constructor() {
         super('gameover');
@@ -26,7 +26,7 @@ export class GameOver extends Phaser.Scene {
         this.dudeIsPompato = data.isDudePompato
         this.finalTime = data.gameTime
         this.gameName = data.gameName
-
+        this.sceneName = data.sceneName
     }
 
     preload() {
@@ -36,6 +36,8 @@ export class GameOver extends Phaser.Scene {
         this.load.image("happy_dude_corazzato", "assets/bombburner/images/happy_cavaliere.png")
         this.load.image("sad_dude_corazzato", "assets/bombburner/images/sad_cavaliere.png")
         this.load.image("btn_home", "assets/bombburner/images/btn_sfondo.png")
+        this.load.image("dudeShip_triste", "assets/pingpong/images/dudeship_triste.png")
+        this.load.image("dude_ship_happy", "assets/pingpong/images/happy_dude_ship.png")
 
         this.load.audio('gameOver_loser', "assets/bombburner/sounds/gameOver.mp3")
         this.load.audio('gameOver_winner', "assets/bombburner/sounds/gameOver_victory.mp3")
@@ -43,6 +45,18 @@ export class GameOver extends Phaser.Scene {
     }
 
     create() {
+        console.log('canvasWidth:', this.canvasWidth);
+        console.log('canvasHeight:', this.canvasHeight);
+        console.log('punteggioFinale:', this.punteggioFinale);
+        console.log('livello:', this.livello);
+        console.log('happyDude:', this.happyDude);
+        console.log('sadDude:', this.sadDude);
+        console.log('isGameVictory:', this.isGameVictory);
+        console.log('dudeIsPompato:', this.dudeIsPompato);
+        console.log('image:', this.image);
+        console.log('finalTime:', this.finalTime);
+        console.log('gameName:', this.gameName);
+        console.log('sceneName:', this.sceneName);
 
         this.add.image(this.canvasWidth - 200, 100, "btn_home")
             .setDepth(5)
@@ -68,23 +82,31 @@ export class GameOver extends Phaser.Scene {
 
     choseImageToShow() {
 
-        if (this.isGameVictory && this.dudeIsPompato) {
-            return "happy_dude_corazzato"
+        if (this.isGameVictory && this.dudeIsPompato && this.gameName.toLowerCase().includes("bomb")) {
+            return "happy_dude_corazzato";
         }
 
-        if (this.isGameVictory && !this.dudeIsPompato) {
-            return "happyDude"
+        if (this.isGameVictory && !this.dudeIsPompato && this.gameName.toLowerCase().includes("bomb")) {
+            return "happyDude";
         }
 
-        if (!this.isGameVictory && !this.dudeIsPompato) {
-            return "sadDude"
+        if (!this.isGameVictory && !this.dudeIsPompato && this.gameName.toLowerCase().includes("bomb")) {
+            return "sadDude";
         }
 
-        if (!this.isGameVictory && this.dudeIsPompato) {
-            return "sad_dude_corazzato"
+        if (!this.isGameVictory && this.dudeIsPompato && this.gameName.toLowerCase().includes("bomb")) {
+            return "sad_dude_corazzato";
         }
 
+        if (!this.isGameVictory && this.gameName.replace(" ", "").toLowerCase().includes("pingpong")) {
+            return "dudeShip_triste";
+        }
+
+        if (this.isGameVictory && this.gameName.replace(" ", "").toLowerCase().includes("pingpong")) {
+            return "dude_ship_happy";
+        }
     }
+
 
     showGameOver() {
 
@@ -107,7 +129,7 @@ export class GameOver extends Phaser.Scene {
                 fontStyle: 'bold',
             }).setOrigin(0.5, 0.5)
 
-        this.add.text(
+        this.gameName.toLowerCase().includes("bomb") && this.add.text(
             this.canvasWidth / 2,
             this.canvasHeight / 1.8,
             `Punteggio finale: ${this.punteggioFinale}`,
@@ -117,7 +139,7 @@ export class GameOver extends Phaser.Scene {
                 fontStyle: 'bold'
             }).setOrigin(0.5, 0.5)
 
-        this.add.text(
+        this.gameName.toLowerCase().includes("bomb") && this.add.text(
             this.canvasWidth / 2,
             this.canvasHeight / 1.6,
             `Livello raggiunto: ${this.livello}`,
@@ -127,7 +149,7 @@ export class GameOver extends Phaser.Scene {
                 fontStyle: 'bold'
             }).setOrigin(0.5, 0.5)
 
-        this.add.text(
+        this.gameName.toLowerCase().includes("bomb") && this.add.text(
             this.canvasWidth / 2,
             this.canvasHeight / 1.4,
             `Tempo di gioco: ${this.finalTime}`,
@@ -158,7 +180,7 @@ export class GameOver extends Phaser.Scene {
             this.add.text(
                 this.canvasWidth / 2,
                 this.canvasHeight / 1.1,
-                'Puoi salvare il tuo punteggio solo battendo il boss.',
+                'PER SALVARE DEVI VINCERE LA PARTITA',
                 {
                     fontSize: '30px',
                     color: '#e05e0f',
@@ -181,7 +203,7 @@ export class GameOver extends Phaser.Scene {
     pressSpaceToRestart() {
         this.input.keyboard.once('keydown-SPACE', () => {
             this.sound.removeAll()
-            this.scene.start('gameplay')
+            this.scene.start(this.sceneName)
         })
     }
 
