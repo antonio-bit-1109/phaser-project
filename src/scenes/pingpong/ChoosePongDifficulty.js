@@ -13,7 +13,7 @@ export class ChoosePongDifficulty extends Phaser.Scene {
     init(data) {
         this.canvasWidth = data.canvasWidth;
         this.canvasHeight = data.canvasHeight;
-
+        this.gameName = data.gameName
     }
 
     preload() {
