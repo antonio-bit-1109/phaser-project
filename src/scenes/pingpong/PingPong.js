@@ -30,20 +30,36 @@ export class PingPong extends Phaser.Scene {
     isBorderUpReached = false;
     soundsMap = new Map()
     isBallTouchingScoreline = false;
-
+    fogMode = false
+    countFog = 0
 
     constructor() {
         super("pingpong");
     }
 
     init(data) {
+        this.fogMode = false;
+        this.countFog = 0
         this.dudePoints = "0";
         this.bossPoints = "0"
         this.canvasWidth = data.canvasWidth
         this.canvasHeight = data.canvasHeight
         this.gameName = data.gameName
-        this.GAMEDIFFICULTY = data.gameDifficulty
+        this.GAMEDIFFICULTY = this.checkIfFogMode(data.gameDifficulty)
         this.isBallTouchingScoreline = false;
+    }
+
+    checkIfFogMode(gameDifficultyString) {
+        console.log(gameDifficultyString)
+
+        if (gameDifficultyString.includes("-")) {
+            this.fogMode = true;
+            console.log("modalità fog of war")
+            let s = gameDifficultyString.indexOf("-")
+            return gameDifficultyString.substring(0, s)
+        }
+
+        return gameDifficultyString
     }
 
     preload() {
@@ -52,6 +68,7 @@ export class PingPong extends Phaser.Scene {
         this.load.image("bossShip", "assets/pingpong/images/boss_ping_pong.png")
         this.load.image("ball", "assets/pingpong/images/pingpongBall.png")
         this.load.image("home_btn", "assets/bombburner/images/btn_sfondo.png")
+        this.load.image("fog0", "assets/pingpong/images/fog0.png")
 
 
         this.load.audio("bg_music_pingPong", "assets/pingpong/sounds/bg_groove.mp3")
@@ -60,6 +77,8 @@ export class PingPong extends Phaser.Scene {
     }
 
     create() {
+        console.log(this.GAMEDIFFICULTY)
+        console.log(this.fogMode)
 
         this.soundsMap.set("bg_music_pingPong", this.sound.add("bg_music_pingPong"))
         this.soundsMap.set("crowd_gol", this.sound.add("crowd_gol"))
@@ -68,7 +87,7 @@ export class PingPong extends Phaser.Scene {
         this.soundsMap.get("bg_music_pingPong").play()
 
         this.btnHome_Ref = this.add.image(this.canvasWidth / 1.1, 50, "home_btn")
-            .setDepth(3)
+            .setDepth(12)
             .setScale(0.5)
             .setInteractive({cursor: "pointer"})
             .on("pointerdown", () => {
@@ -82,9 +101,11 @@ export class PingPong extends Phaser.Scene {
 
         this.dudePoints_Ref = this.add.text((this.canvasWidth / 2) - 80, 50, this.dudePoints)
             .setScale(4)
+            .setDepth(11)
 
         this.bossPoints_Ref = this.add.text((this.canvasWidth / 2) + 45, 50, this.bossPoints)
             .setScale(4)
+            .setDepth(11)
 
 
         this.dudeShip = this.physics.add.sprite(100, this.canvasHeight / 2, "dudeShip")
@@ -140,11 +161,25 @@ export class PingPong extends Phaser.Scene {
             this.ballRotateLeft()
         }
 
+        this.addFogOfWar("fog0")
+
+
         this.checkCursorInput()
         this.isScoreMade()
         this.isOpponentInterceptingBall()
         this.isGameEnded()
 
+    }
+
+    addFogOfWar(textureName) {
+        if (this.fogMode && this.countFog < 20) {
+            this.countFog++
+            this.add
+                .image(this.canvasWidth / 1.35, this.canvasHeight / 2, textureName)
+                .setDepth(10)
+                .setScale(2)
+                .setRotation(Phaser.Math.DegToRad(270))
+        }
     }
 
     isGameEnded() {
@@ -156,7 +191,9 @@ export class PingPong extends Phaser.Scene {
                 canvasHeigth: this.canvasHeight,
                 isGameVictory: parseInt(this.dudePoints) >= 5,
                 gameName: this.gameName,
-                sceneName: this.scene.key
+                sceneName: this.scene.key,
+                gameDifficult: this.GAMEDIFFICULTY,
+                fogModeOn: this.fogMode
             })
 
         }
