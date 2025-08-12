@@ -18,3 +18,4 @@
 - fog of war
 - texture fog
 - passa il final score anche da ping pong dude come stringa del punteggio : es --->    "3/5"
+- reset palla se si bugga 

@@ -21,6 +21,7 @@ export class PingPong extends Phaser.Scene {
     scoreLine1 = null;
     bossInterceptingBall = false;
     btnHome_Ref = null;
+    resetball_btn_ref = null;
     difficultyParams = {
         tweenDuration: {easy: 500, medium: 400, hard: 300},
         yVariation: {easy: 0.5, medium: 0.7, hard: 1},
@@ -69,6 +70,7 @@ export class PingPong extends Phaser.Scene {
         this.load.image("ball", "assets/pingpong/images/pingpongBall.png")
         this.load.image("home_btn", "assets/bombburner/images/btn_sfondo.png")
         this.load.image("fog0", "assets/pingpong/images/fog0.png")
+        this.load.image("reset_ball_btn", "assets/common/images/reset_btn.png")
 
 
         this.load.audio("bg_music_pingPong", "assets/pingpong/sounds/bg_groove.mp3")
@@ -85,6 +87,14 @@ export class PingPong extends Phaser.Scene {
         this.soundsMap.set("boing0", this.sound.add("boing0"))
 
         this.soundsMap.get("bg_music_pingPong").play()
+
+        this.resetball_btn_ref = this.add.image(this.canvasWidth / 1.2, 50, "reset_ball_btn")
+            .setDepth(12)
+            .setScale(0.5)
+            .setInteractive({cursor: "pointer"})
+            .on("pointerdown", () => {
+                this.resetBall()
+            })
 
         this.btnHome_Ref = this.add.image(this.canvasWidth / 1.1, 50, "home_btn")
             .setDepth(12)
@@ -192,6 +202,7 @@ export class PingPong extends Phaser.Scene {
                 isGameVictory: parseInt(this.dudePoints) >= 5,
                 gameName: this.gameName,
                 sceneName: this.scene.key,
+                punteggioFinale: `${this.dudePoints}/${this.bossPoints}`,
                 gameDifficult: this.GAMEDIFFICULTY,
                 fogModeOn: this.fogMode
             })
