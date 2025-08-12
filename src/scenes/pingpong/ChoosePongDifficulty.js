@@ -57,6 +57,16 @@ export class ChoosePongDifficulty extends Phaser.Scene {
                 this.stopSceneAndStartPingPong()
             })
 
+        this.add.text(this.canvasWidth / 2, (this.canvasHeight / 8) + 400, "FOG OF WAR", {fontStyle: 'bold'})
+            .setOrigin(0.5, 0.5)
+            .setFontSize(40)
+            .setColor("purple")
+            .setInteractive({useHandCursor: true})
+            .once("pointerdown", () => {
+                this.chooseDifficulty("HARD-F")
+                this.stopSceneAndStartPingPong()
+            })
+
     }
 
     chooseDifficulty(difficulty) {
