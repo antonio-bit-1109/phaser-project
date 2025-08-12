@@ -911,7 +911,8 @@ export class Gameplay extends Phaser.Scene {
                     livello: this.livello,
                     isGameVictory: true,
                     isDudePompato: this.dudePompato,
-                    gameTime: this.gameTimer
+                    gameTime: this.gameTimer,
+                    sceneName: this.scene.key
                 })
             })
 
@@ -1330,6 +1331,7 @@ export class Gameplay extends Phaser.Scene {
             isDudePompato: this.dudePompato,
             gameTime: this.gameTimer,
             gameName: this.gameName,
+            sceneName: this.scene.key
         })
     }
 
