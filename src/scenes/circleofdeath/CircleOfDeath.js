@@ -25,7 +25,10 @@ export class CircleOfDeath extends Phaser.Scene {
 
         this.load.image("moon_surface", "assets/circleofdeath/images/mars_land.jpg")
         this.load.image("circular_boss", "assets/circleofdeath/images/circular_boss.png")
+        this.load.image("circular_boss_funky_pose", "assets/circleofdeath/images/boss_funky_pose.png")
         this.load.image("dudeShip", "assets/pingpong/images/dude_ping_pong.png")
+
+
         this.load.audio("bg_funk", "assets/circleofdeath/sounds/funk.mp3")
 
     }
@@ -47,12 +50,34 @@ export class CircleOfDeath extends Phaser.Scene {
             .setScale(0.3)
 
         this.mapSounds.get("bg_funk").play()
+
+        // show funky boss every 10"
+        this.time.addEvent({
+            delay: 5000,
+            loop: true,
+            callback: () => {
+                this.boss.setTexture("circular_boss_funky_pose")
+                this.resetTexture(this.boss, "circular_boss")
+            }
+
+        });
+    }
+
+    resetTexture(sprite, texture) {
+        this.time.addEvent({
+            delay: 500,
+            loop: false,
+            callback: () => {
+                sprite.setTexture(texture)
+            }
+        })
+
     }
 
     update(time, delta) {
 
         this.rotateBoss()
-        this.rotateDude(delta)
+        // this.rotateDude(delta)
 
     }
 
@@ -60,14 +85,24 @@ export class CircleOfDeath extends Phaser.Scene {
         this.boss.body.rotation += 0.5
     }
 
-    rotateDude(delta) {
-        // Aggiorna l'angolo in base al tempo trascorso
-        this.angolo += this.velAngolare * (delta / 1000);
-
-        // Calcola la nuova posizione
-        let x = (this.canvasWidth / 2) + this.raggio * Math.cos(this.angolo);
-        let y = this.canvasHeight / 2 + this.raggio * Math.sin(this.angolo);
-        this.dudeShip.setPosition(x, y);
+    showFunkyPose() {
 
     }
+
+    rotateDudeRight() {
+    }
+
+    rotateDudeLeft() {
+    }
+
+    // rotateDude(delta) {
+    //     // Aggiorna l'angolo in base al tempo trascorso
+    //     this.angolo += this.velAngolare * (delta / 1000);
+    //
+    //     // Calcola la nuova posizione
+    //     let x = (this.canvasWidth / 2) + this.raggio * Math.cos(this.angolo);
+    //     let y = this.canvasHeight / 2 + this.raggio * Math.sin(this.angolo);
+    //     this.dudeShip.setPosition(x, y);
+    //
+    // }
 }
