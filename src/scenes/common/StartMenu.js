@@ -22,7 +22,7 @@ export class StartMenu extends Phaser.Scene {
     introMusicAuthor = `Menù music made by Fassounds - play time`
     bombBurnerGameName = "Bomb Burner"
     pingPongGameName = "Ping pong dude"
-    circleAvoid = "Dude Circle Avoid"
+    circleAvoid = "Circle of Death"
 
     convertToRadiant(gradi) {
         return Phaser.Math.DegToRad(gradi)
