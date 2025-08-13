@@ -9,7 +9,10 @@ export class CircleOfDeath  extends Phaser.Scene {
     }
 
     preload() {
-
+        this.load.spritesheet('dude', 'assets/bombburner/images/dude.png', {
+            frameHeight: 45,
+            frameWidth: 32
+        })
     }
 
 
