@@ -77,7 +77,6 @@ export class CircleOfDeath extends Phaser.Scene {
     }
 
     showFunkyPose() {
-// show funky boss every 10"
         this.time.addEvent({
             delay: 5000,
             loop: true,
