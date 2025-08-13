@@ -51,16 +51,7 @@ export class CircleOfDeath extends Phaser.Scene {
 
         this.mapSounds.get("bg_funk").play()
 
-        // show funky boss every 10"
-        this.time.addEvent({
-            delay: 5000,
-            loop: true,
-            callback: () => {
-                this.boss.setTexture("circular_boss_funky_pose")
-                this.resetTexture(this.boss, "circular_boss")
-            }
-
-        });
+        this.showFunkyPose()
     }
 
     resetTexture(sprite, texture) {
@@ -86,7 +77,16 @@ export class CircleOfDeath extends Phaser.Scene {
     }
 
     showFunkyPose() {
+// show funky boss every 10"
+        this.time.addEvent({
+            delay: 5000,
+            loop: true,
+            callback: () => {
+                this.boss.setTexture("circular_boss_funky_pose")
+                this.resetTexture(this.boss, "circular_boss")
+            }
 
+        });
     }
 
     rotateDudeRight() {
