@@ -10,6 +10,8 @@ export class CircleOfDeath extends Phaser.Scene {
     angolo = 0;
     velAngolare = Math.PI / 3; // 90° al secondo
     mapSounds = new Map()
+    cursor = null
+    circleTrace = null
 
     constructor() {
         super("circleofdeath");
@@ -36,6 +38,8 @@ export class CircleOfDeath extends Phaser.Scene {
 
     create() {
 
+        this.cursor = this.input.keyboard.createCursorKeys();
+
         this.mapSounds.set("bg_funk", this.sound.add("bg_funk", {
             volume: 2
         }))
@@ -48,6 +52,16 @@ export class CircleOfDeath extends Phaser.Scene {
 
         this.dudeShip = this.physics.add.sprite((this.canvasWidth / 2) + this.raggio, this.canvasHeight / 2, 'dudeShip')
             .setScale(0.3)
+            .setDepth(2)
+
+        this.circleTrace = this.add.graphics();
+        this.circleTrace.lineStyle(2, 0x000000);
+        this.circleTrace.strokeCircle(
+            this.canvasWidth / 2, // x centro
+            this.canvasHeight / 2, // y centro
+            this.raggio // raggio
+        );
+
 
         this.mapSounds.get("bg_funk").play()
 
@@ -68,7 +82,7 @@ export class CircleOfDeath extends Phaser.Scene {
     update(time, delta) {
 
         this.rotateBoss()
-        // this.rotateDude(delta)
+        this.checkCursorInput(delta)
 
     }
 
@@ -92,6 +106,25 @@ export class CircleOfDeath extends Phaser.Scene {
     }
 
     rotateDudeLeft() {
+    }
+
+
+    checkCursorInput(delta) {
+
+        if (this.cursor.up.isDown) {
+            this.angolo += this.velAngolare * (delta / 1000);
+            let x = (this.canvasWidth / 2) + this.raggio * Math.cos(this.angolo);
+            let y = this.canvasHeight / 2 + this.raggio * Math.sin(this.angolo);
+            this.dudeShip.setPosition(x, y);
+        }
+
+        if (this.cursor.down.isDown) {
+            this.angolo -= this.velAngolare * (delta / 1000);
+            let x = (this.canvasWidth / 2) + this.raggio * Math.cos(this.angolo);
+            let y = this.canvasHeight / 2 + this.raggio * Math.sin(this.angolo);
+            this.dudeShip.setPosition(x, y);
+        }
+
     }
 
     // rotateDude(delta) {
