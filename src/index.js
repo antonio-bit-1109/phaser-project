@@ -7,6 +7,7 @@ import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
 import {DisplayAllScores} from "./scenes/common/DisplayAllScores";
 import {PingPong} from "./scenes/pingpong/PingPong";
 import {ChoosePongDifficulty} from "./scenes/pingpong/ChoosePongDifficulty";
+import {CircleOfDeath} from "./scenes/circleofdeath/CircleOfDeath";
 
 const config = {
     type: Phaser.AUTO,
@@ -25,7 +26,9 @@ const config = {
         GameOver,
         SaveScore,
         DisplayAllScores,
-        PingPong, ChoosePongDifficulty
+        PingPong,
+        ChoosePongDifficulty,
+        CircleOfDeath
     ],
     plugins: {
         scene: [{
