@@ -145,7 +145,7 @@ export class CircleOfDeath extends Phaser.Scene {
     }
 
     addDamageToSelectedArea() {
-
+        console.log("sono nel complete ")
     }
 
     showDamagingArea() {
@@ -158,19 +158,25 @@ export class CircleOfDeath extends Phaser.Scene {
 
         this.showRed(circumferenceDamage, startingAngle, red)
 
+        let totalExec = 0
+
         this.time.addEvent({
             delay: 300,
             repeat: 3,
             callback: () => {
+                totalExec++
+                console.log("Callback eseguito"); // Aggiungi questo per vedere se viene chiamato
                 if (this.semicircleTrace === this.REDTRACE) {
                     this.showBlack(circumferenceDamage, startingAngle, black)
                 } else {
                     this.showRed(circumferenceDamage, startingAngle, red)
                 }
+
+                if (totalExec === 4) {
+                    this.addDamageToSelectedArea()
+                }
             },
-            onComplete: () => {
-                this.addDamageToSelectedArea()
-            }
+
         })
 
     }
