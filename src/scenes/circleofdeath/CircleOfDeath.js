@@ -12,6 +12,10 @@ export class CircleOfDeath extends Phaser.Scene {
     mapSounds = new Map()
     cursor = null
     circleTrace = null
+    keySpace = null
+    turbo = false
+    boostCloud_group = null
+
 
     constructor() {
         super("circleofdeath");
@@ -29,6 +33,9 @@ export class CircleOfDeath extends Phaser.Scene {
         this.load.image("circular_boss", "assets/circleofdeath/images/circular_boss.png")
         this.load.image("circular_boss_funky_pose", "assets/circleofdeath/images/boss_funky_pose.png")
         this.load.image("dudeShip", "assets/pingpong/images/dude_ping_pong.png")
+        this.load.spritesheet("boost_cloud", "assets/circleofdeath/images/boost_cloud.png", {
+            frameWidth: 64, frameHeight: 64
+        })
 
 
         this.load.audio("bg_funk", "assets/circleofdeath/sounds/funk.mp3")
@@ -38,7 +45,10 @@ export class CircleOfDeath extends Phaser.Scene {
 
     create() {
 
+        this.boostCloud_group = this.add.group()
         this.cursor = this.input.keyboard.createCursorKeys();
+        this.keySpace = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+        this.createAnimation("accelerationBoost", "boost_cloud", 0, 8, 25, 0)
 
         this.mapSounds.set("bg_funk", this.sound.add("bg_funk", {
             volume: 2
@@ -55,13 +65,15 @@ export class CircleOfDeath extends Phaser.Scene {
             .setDepth(2)
 
         this.circleTrace = this.add.graphics();
-        this.circleTrace.lineStyle(2, 0x000000);
+        this.innerShadow = this.add.graphics()
+        this.outerlight = this.add.graphics()
+
+        this.circleTrace.lineStyle(2, 0x293133);
         this.circleTrace.strokeCircle(
             this.canvasWidth / 2, // x centro
             this.canvasHeight / 2, // y centro
             this.raggio // raggio
         );
-
 
         this.mapSounds.get("bg_funk").play()
 
@@ -102,39 +114,64 @@ export class CircleOfDeath extends Phaser.Scene {
         });
     }
 
-    rotateDudeRight() {
-    }
-
-    rotateDudeLeft() {
-    }
-
 
     checkCursorInput(delta) {
 
-        if (this.cursor.up.isDown) {
+        if (this.cursor.right.isDown && !this.turbo) {
             this.angolo += this.velAngolare * (delta / 1000);
             let x = (this.canvasWidth / 2) + this.raggio * Math.cos(this.angolo);
             let y = this.canvasHeight / 2 + this.raggio * Math.sin(this.angolo);
             this.dudeShip.setPosition(x, y);
         }
 
-        if (this.cursor.down.isDown) {
+        if (this.cursor.left.isDown && !this.turbo) {
             this.angolo -= this.velAngolare * (delta / 1000);
             let x = (this.canvasWidth / 2) + this.raggio * Math.cos(this.angolo);
             let y = this.canvasHeight / 2 + this.raggio * Math.sin(this.angolo);
             this.dudeShip.setPosition(x, y);
         }
 
+        if (this.keySpace.isDown) {
+            this.turbo = true
+        }
+
+
+        if (this.turbo) {
+
+            this.angolo += (this.velAngolare * 3) * (delta / 1000);
+            let x = (this.canvasWidth / 2) + this.raggio * Math.cos(this.angolo);
+            let y = this.canvasHeight / 2 + this.raggio * Math.sin(this.angolo);
+            this.dudeShip.setPosition(x, y);
+
+            let cloud = this.add.sprite(x, y, "boost_cloud").play("accelerationBoost")
+
+            this.boostCloud_group.add(cloud, true)
+
+            this.boostCloud_group.children.iterate(boost => {
+                boost.on('animationcomplete', () => {
+                    boost.destroy();
+                });
+            })
+
+            this.time.addEvent({
+                delay: 800,
+                callback: () => {
+                    this.turbo = false
+                }
+            })
+
+
+        }
     }
 
-    // rotateDude(delta) {
-    //     // Aggiorna l'angolo in base al tempo trascorso
-    //     this.angolo += this.velAngolare * (delta / 1000);
-    //
-    //     // Calcola la nuova posizione
-    //     let x = (this.canvasWidth / 2) + this.raggio * Math.cos(this.angolo);
-    //     let y = this.canvasHeight / 2 + this.raggio * Math.sin(this.angolo);
-    //     this.dudeShip.setPosition(x, y);
-    //
-    // }
+
+    createAnimation(key, spritesheetName, start, end, frameRate, repeat) {
+        this.anims.create({
+            key: key,
+            frames: this.anims.generateFrameNumbers(spritesheetName, {start: start, end: end}),
+            frameRate: frameRate,
+            repeat: repeat
+        })
+    }
+
 }
