@@ -18,7 +18,7 @@ export class CircleOfDeath extends Phaser.Scene {
     isBossAttacking = false
     laserBean_group = null;
     passingTime = 0
-
+ 
 
     constructor() {
         super("circleofdeath");
@@ -83,6 +83,16 @@ export class CircleOfDeath extends Phaser.Scene {
         this.showFunkyPose()
     }
 
+    update(time, delta) {
+
+        this.rotateBoss()
+        this.checkCursorInput(delta)
+        this.bossAttacks(delta)
+
+        // check if one of the bullets hits the dudeship
+        this.checkCollisionDude_bean()
+    }
+
     resetTexture(sprite, texture) {
         this.time.addEvent({
             delay: 500,
@@ -92,16 +102,6 @@ export class CircleOfDeath extends Phaser.Scene {
             }
         })
 
-    }
-
-    update(time, delta) {
-
-        this.rotateBoss()
-        this.checkCursorInput(delta)
-        this.bossAttacks(delta)
-
-        // check if one of the bullets hits the dudeship
-        this.checkCollisionDude_bean()
     }
 
     checkCollisionDude_bean() {
