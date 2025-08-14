@@ -1,5 +1,8 @@
 export class CircleOfDeath extends Phaser.Scene {
 
+    REDTRACE = "red"
+    BLACKTRACE = "black"
+
     canvasWidth = null;
     canvasHeight = null;
     gameName = null;
@@ -17,8 +20,10 @@ export class CircleOfDeath extends Phaser.Scene {
     boostCloud_group = null
     isBossAttacking = false
     laserBean_group = null;
+    semicircle = null
     passingTime = 0
- 
+    semicircleTrace = null // traccia per tenere conto di che tipo di semicircle attualmente nella canva
+
 
     constructor() {
         super("circleofdeath");
@@ -79,8 +84,6 @@ export class CircleOfDeath extends Phaser.Scene {
         );
 
         this.mapSounds.get("bg_funk").play()
-
-        this.showFunkyPose()
     }
 
     update(time, delta) {
@@ -126,23 +129,92 @@ export class CircleOfDeath extends Phaser.Scene {
 
             console.log(n)
 
-            if (n >= 0) this.laserBeans()
+            // if (n > 0.5) this.laserBeans()
+            //   if (n <= 0.5) this.laserSemicircles()
 
 
+            this.laserSemicircles()
         }
     }
+
+    laserSemicircles() {
+
+        this.isBossAttacking = true;
+        this.showDamagingArea()
+
+    }
+
+    addDamageToSelectedArea() {
+
+    }
+
+    showDamagingArea() {
+
+        let circumferenceDamage = Math.random() * (2 - 1) + 1
+        let startingAngle = Math.floor(Math.random() * 340)
+
+        const red = 0xff0000
+        const black = 0x0a0a0a
+
+        this.showRed(circumferenceDamage, startingAngle, red)
+
+        this.time.addEvent({
+            delay: 300,
+            repeat: 3,
+            callback: () => {
+                if (this.semicircleTrace === this.REDTRACE) {
+                    this.showBlack(circumferenceDamage, startingAngle, black)
+                } else {
+                    this.showRed(circumferenceDamage, startingAngle, red)
+                }
+            },
+            onComplete: () => {
+                this.addDamageToSelectedArea()
+            }
+        })
+
+    }
+
+    showRed(circumferenceDamage, startingAngle, color) {
+        this.semicircleTrace = this.REDTRACE
+        this.createSemicircunference(circumferenceDamage, startingAngle, color)
+    }
+
+    showBlack(circumferenceDamage, startingAngle, color) {
+        this.semicircleTrace = this.BLACKTRACE
+        this.createSemicircunference(circumferenceDamage, startingAngle, color)
+    }
+
+    createSemicircunference(circumferenceDamage, startingAngle, color) {
+        this.semicircle = this.add.graphics()
+
+        this.semicircle.lineStyle(20, color) // red
+        this.semicircle.arc(
+            this.canvasWidth / 2,
+            this.canvasHeight / 2,
+            this.raggio,
+            startingAngle,
+            Math.PI * circumferenceDamage,
+            false
+        )
+
+        this.semicircle.strokePath();
+    }
+
 
     laserBeans() {
         this.isBossAttacking = true;
 
-        for (let i = 0; i < 10; i++) {
+        for (let i = 0; i < 25; i++) {
             let bean = this.physics.add.sprite(this.boss.x, this.boss.y, "redBean")
                 .setOrigin(0.5, 0.5);
 
             this.laserBean_group.add(bean);
 
+            let distributionBean = Math.floor(Math.random() * 3)
+
             // Calcola l'angolo per questo bean (distribuiti uniformemente)
-            let angle = (i / 10) * Math.PI * 2; // 360 gradi diviso 10
+            let angle = (i / 10) * Math.PI * distributionBean; // 360 gradi diviso 10
 
             // Calcola la velocità in base all'angolo
             let speed = 200; // pixel per secondo
@@ -152,6 +224,7 @@ export class CircleOfDeath extends Phaser.Scene {
             // Applica la velocità
             bean.setVelocity(velocityX, velocityY);
             bean.setRotation(Phaser.Math.DegToRad(velocityX))
+            this.boss.setTexture("circular_boss_funky_pose")
 
             // Distruggi il bean quando raggiunge la circonferenza
             this.time.addEvent({
@@ -160,6 +233,7 @@ export class CircleOfDeath extends Phaser.Scene {
                     if (bean.active) {
                         bean.destroy();
                     }
+                    this.resetTexture(this.boss, "circular_boss")
                 }
             });
 
@@ -184,19 +258,6 @@ export class CircleOfDeath extends Phaser.Scene {
         this.boss.body.rotation += 0.5
     }
 
-    showFunkyPose() {
-        this.time.addEvent({
-            delay: 5000,
-            loop: true,
-            callback: () => {
-                this.boss.setTexture("circular_boss_funky_pose")
-                this.resetTexture(this.boss, "circular_boss")
-            }
-
-        });
-    }
-
-
     checkCursorInput(delta) {
 
         if (this.cursor.right.isDown && !this.turbo) {
@@ -214,12 +275,7 @@ export class CircleOfDeath extends Phaser.Scene {
         }
 
         if (this.keySpace.isDown) {
-            this.turbo = true
-        }
-
-
-        if (this.turbo) {
-
+            // this.turbo = true
             this.angolo += (this.velAngolare * 3) * (delta / 1000);
             let x = (this.canvasWidth / 2) + this.raggio * Math.cos(this.angolo);
             let y = this.canvasHeight / 2 + this.raggio * Math.sin(this.angolo);
@@ -235,15 +291,8 @@ export class CircleOfDeath extends Phaser.Scene {
                 });
             })
 
-            this.time.addEvent({
-                delay: 800,
-                callback: () => {
-                    this.turbo = false
-                }
-            })
-
-
         }
+
     }
 
     createAnimation(key, spritesheetName, start, end, frameRate, repeat) {
