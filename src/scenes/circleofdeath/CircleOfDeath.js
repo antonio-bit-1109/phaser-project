@@ -15,6 +15,9 @@ export class CircleOfDeath extends Phaser.Scene {
     keySpace = null
     turbo = false
     boostCloud_group = null
+    isBossAttacking = false
+    laserBean_group = null;
+    passingTime = 0
 
 
     constructor() {
@@ -33,10 +36,11 @@ export class CircleOfDeath extends Phaser.Scene {
         this.load.image("circular_boss", "assets/circleofdeath/images/circular_boss.png")
         this.load.image("circular_boss_funky_pose", "assets/circleofdeath/images/boss_funky_pose.png")
         this.load.image("dudeShip", "assets/pingpong/images/dude_ping_pong.png")
+        this.load.image("redBean", "assets/circleofdeath/images/redBean.png")
+
         this.load.spritesheet("boost_cloud", "assets/circleofdeath/images/boost_cloud.png", {
             frameWidth: 64, frameHeight: 64
         })
-
 
         this.load.audio("bg_funk", "assets/circleofdeath/sounds/funk.mp3")
 
@@ -46,6 +50,7 @@ export class CircleOfDeath extends Phaser.Scene {
     create() {
 
         this.boostCloud_group = this.add.group()
+        this.laserBean_group = this.add.group()
         this.cursor = this.input.keyboard.createCursorKeys();
         this.keySpace = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
         this.createAnimation("accelerationBoost", "boost_cloud", 0, 8, 25, 0)
@@ -61,12 +66,10 @@ export class CircleOfDeath extends Phaser.Scene {
             .setScale(0.2)
 
         this.dudeShip = this.physics.add.sprite((this.canvasWidth / 2) + this.raggio, this.canvasHeight / 2, 'dudeShip')
-            .setScale(0.3)
+            .setScale(0.2)
             .setDepth(2)
 
         this.circleTrace = this.add.graphics();
-        this.innerShadow = this.add.graphics()
-        this.outerlight = this.add.graphics()
 
         this.circleTrace.lineStyle(2, 0x293133);
         this.circleTrace.strokeCircle(
@@ -95,7 +98,86 @@ export class CircleOfDeath extends Phaser.Scene {
 
         this.rotateBoss()
         this.checkCursorInput(delta)
+        this.bossAttacks(delta)
 
+        // check if one of the bullets hits the dudeship
+        this.checkCollisionDude_bean()
+    }
+
+    checkCollisionDude_bean() {
+        this.laserBean_group.children.iterate(bean => {
+            if (this.checkCollision_general(bean, this.dudeShip)) {
+                bean.destroy()
+            }
+        })
+    }
+
+    bossAttacks(delta) {
+
+        // accumulate delta (time passed between a frame and the next one)
+        this.passingTime += delta;
+
+        //
+        if (!this.isBossAttacking && this.passingTime >= 3000) {
+
+            this.passingTime = 0
+
+            let n = Math.random()
+
+            console.log(n)
+
+            if (n >= 0) this.laserBeans()
+
+
+        }
+    }
+
+    laserBeans() {
+        this.isBossAttacking = true;
+
+        for (let i = 0; i < 10; i++) {
+            let bean = this.physics.add.sprite(this.boss.x, this.boss.y, "redBean")
+                .setOrigin(0.5, 0.5);
+
+            this.laserBean_group.add(bean);
+
+            // Calcola l'angolo per questo bean (distribuiti uniformemente)
+            let angle = (i / 10) * Math.PI * 2; // 360 gradi diviso 10
+
+            // Calcola la velocità in base all'angolo
+            let speed = 200; // pixel per secondo
+            let velocityX = Math.cos(angle) * speed;
+            let velocityY = Math.sin(angle) * speed;
+
+            // Applica la velocità
+            bean.setVelocity(velocityX, velocityY);
+            bean.setRotation(Phaser.Math.DegToRad(velocityX))
+
+            // Distruggi il bean quando raggiunge la circonferenza
+            this.time.addEvent({
+                delay: (this.raggio / speed) * 1000, // tempo per raggiungere il bordo
+                callback: () => {
+                    if (bean.active) {
+                        bean.destroy();
+                    }
+                }
+            });
+
+        }
+
+        // Reset del flag dopo che tutti i bean sono partiti
+        this.time.addEvent({
+            delay: (this.raggio / 200) * 1000 + 500, // tempo movimento + buffer
+            callback: () => {
+                this.isBossAttacking = false;
+            }
+        });
+    }
+
+    checkCollision_general(p1, p2) {
+        if (p1 && p2 && this.physics.overlap(p1, p2)) {
+            return true;
+        }
     }
 
     rotateBoss() {
@@ -163,7 +245,6 @@ export class CircleOfDeath extends Phaser.Scene {
 
         }
     }
-
 
     createAnimation(key, spritesheetName, start, end, frameRate, repeat) {
         this.anims.create({
