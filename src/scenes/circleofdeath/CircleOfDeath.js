@@ -134,6 +134,7 @@ export class CircleOfDeath extends Phaser.Scene {
 
 
             this.laserSemicircles()
+            // this.laserBeans()
         }
     }
 
@@ -154,7 +155,7 @@ export class CircleOfDeath extends Phaser.Scene {
         let startingAngle = Math.floor(Math.random() * 340)
 
         const red = 0xff0000
-        const black = 0x0a0a0a
+        const orange = 0xfe4c10
 
         this.showRed(circumferenceDamage, startingAngle, red)
 
@@ -162,17 +163,17 @@ export class CircleOfDeath extends Phaser.Scene {
 
         this.time.addEvent({
             delay: 300,
-            repeat: 3,
+            repeat: 4,
             callback: () => {
                 totalExec++
                 console.log("Callback eseguito"); // Aggiungi questo per vedere se viene chiamato
                 if (this.semicircleTrace === this.REDTRACE) {
-                    this.showBlack(circumferenceDamage, startingAngle, black)
+                    this.showOrange(circumferenceDamage, startingAngle, orange)
                 } else {
                     this.showRed(circumferenceDamage, startingAngle, red)
                 }
 
-                if (totalExec === 4) {
+                if (totalExec === 5) {
                     this.addDamageToSelectedArea()
                 }
             },
@@ -186,7 +187,7 @@ export class CircleOfDeath extends Phaser.Scene {
         this.createSemicircunference(circumferenceDamage, startingAngle, color)
     }
 
-    showBlack(circumferenceDamage, startingAngle, color) {
+    showOrange(circumferenceDamage, startingAngle, color) {
         this.semicircleTrace = this.BLACKTRACE
         this.createSemicircunference(circumferenceDamage, startingAngle, color)
     }
