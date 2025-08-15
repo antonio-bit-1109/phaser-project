@@ -362,7 +362,7 @@ export class CircleOfDeath extends Phaser.Scene {
 
         if (this.keySpace.isDown && this.turboUpperBar.width >= 1) {
 
-            this.turboUpperBar.width -= 1
+            this.turboUpperBar.width -= 0.58
             this.HasTurboNeedRecharge = true
 
             this.angolo += (this.velAngolare * 3) * (delta / 1000);
