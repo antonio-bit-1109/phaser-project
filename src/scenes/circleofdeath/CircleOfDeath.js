@@ -174,12 +174,8 @@ export class CircleOfDeath extends Phaser.Scene {
         this.time.addEvent({
             delay: 1500,
             callback: () => {
-                this.semicircle.clear();
-                this.semicircle.destroy()
-                this.semicircle = null
 
                 this.flameGroup.clear(true, true)
-
                 this.isBossAttacking = false
             }
         })
@@ -241,12 +237,23 @@ export class CircleOfDeath extends Phaser.Scene {
             this.canvasWidth / 2,
             this.canvasHeight / 2,
             this.raggio,
-            /* startingAngle, */ startingAngle,
-            /* Math.PI * circumferenceDamage, */ endingAngle,
+            startingAngle,
+            endingAngle,
             false
         )
 
         this.semicircle.strokePath();
+
+        // after the semicircunference is created, cause it's a graphics must be deleted after each draw
+        // so after render every semicirc call a delayed event  to destroy the semicircle graphic
+        this.time.addEvent({
+            delay: 200,
+            callback: () => {
+                this.semicircle.clear();
+                this.semicircle.destroy()
+                this.semicircle = null
+            }
+        })
     }
 
 
