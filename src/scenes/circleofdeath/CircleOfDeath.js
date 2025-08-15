@@ -24,6 +24,10 @@ export class CircleOfDeath extends Phaser.Scene {
     passingTime = 0
     semicircleTrace = null // traccia per tenere conto di che tipo di semicircle attualmente nella canva
     flameGroup = null
+    turboLowBar = null;
+    turboUpperBar = null
+    HasTurboNeedRecharge = false
+    deltaRechargeTurbo = 0
 
     constructor() {
         super("circleofdeath");
@@ -57,6 +61,13 @@ export class CircleOfDeath extends Phaser.Scene {
 
 
     create() {
+
+        this.turboLowBar = this.add.rectangle(this.canvasWidth / 12, this.canvasHeight / 12, 50, 20, 0xff0000, 1)
+            .setDepth(3)
+
+        this.turboUpperBar = this.add.rectangle(this.canvasWidth / 12, this.canvasHeight / 12, 50, 20, 0x0000FF, 1)
+            .setDepth(3)
+
 
         this.flameGroup = this.add.group()
         this.boostCloud_group = this.add.group()
@@ -102,7 +113,25 @@ export class CircleOfDeath extends Phaser.Scene {
         // check if one of the bullets hits the dudeship
         this.checkCollisionDude_bean()
         this.checkCollisionDude_flames()
+        this.rechargeTurbo(delta)
     }
+
+    rechargeTurbo(delta) {
+
+        this.deltaRechargeTurbo += delta;
+
+        if (this.HasTurboNeedRecharge && this.deltaRechargeTurbo >= 200) {
+            this.turboUpperBar.width++
+            this.deltaRechargeTurbo = 0
+        }
+
+        if (this.turboUpperBar.width >= 50) {
+            this.turboUpperBar.width = 50
+            this.HasTurboNeedRecharge = false
+        }
+
+    }
+
 
     resetTexture(sprite, texture) {
         this.time.addEvent({
@@ -329,8 +358,11 @@ export class CircleOfDeath extends Phaser.Scene {
             this.dudeShip.setPosition(x, y);
         }
 
-        if (this.keySpace.isDown) {
-            // this.turbo = true
+        if (this.keySpace.isDown && this.turboUpperBar.width >= 1) {
+
+            this.turboUpperBar.width -= 1
+            this.HasTurboNeedRecharge = true
+
             this.angolo += (this.velAngolare * 3) * (delta / 1000);
             let x = (this.canvasWidth / 2) + this.raggio * Math.cos(this.angolo);
             let y = this.canvasHeight / 2 + this.raggio * Math.sin(this.angolo);
@@ -349,6 +381,7 @@ export class CircleOfDeath extends Phaser.Scene {
         }
 
     }
+
 
     createAnimation(key, spritesheetName, start, end, frameRate, repeat) {
         this.anims.create({
