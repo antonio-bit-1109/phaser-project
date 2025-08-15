@@ -120,7 +120,7 @@ export class CircleOfDeath extends Phaser.Scene {
 
         this.deltaRechargeTurbo += delta;
 
-        if (this.HasTurboNeedRecharge && this.deltaRechargeTurbo >= 200) {
+        if (this.HasTurboNeedRecharge && this.deltaRechargeTurbo >= 100) {
             this.turboUpperBar.width++
             this.deltaRechargeTurbo = 0
         }
@@ -213,11 +213,13 @@ export class CircleOfDeath extends Phaser.Scene {
 
     showDamagingArea() {
 
-        let n = Math.floor(Math.random() * 361)
-        let n1 = Math.floor(Math.random() * (250 - 50 + 1) + 50)
+        let dudeShipX = this.dudeShip.x - this.canvasWidth / 2;
+        let dudeShipY = this.dudeShip.y - this.canvasHeight / 2;
+        let angle = Math.atan2(dudeShipY, dudeShipX); // ordine corretto
+        let n1 = Math.floor(Math.random() * (250 - 50 + 1) + 50);
 
-        let circumferenceStartingAngle = Phaser.Math.DegToRad(n)
-        let circumferenceEndAngle = Phaser.Math.DegToRad(n + n1)
+        let circumferenceStartingAngle = angle - Phaser.Math.DegToRad(35);
+        let circumferenceEndAngle = angle + Phaser.Math.DegToRad(n1);
 
 
         const red = 0xff0000
