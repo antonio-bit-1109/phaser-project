@@ -23,7 +23,7 @@ export class CircleOfDeath extends Phaser.Scene {
     semicircle = null
     passingTime = 0
     semicircleTrace = null // traccia per tenere conto di che tipo di semicircle attualmente nella canva
-
+    flameGroup = null
 
     constructor() {
         super("circleofdeath");
@@ -47,6 +47,10 @@ export class CircleOfDeath extends Phaser.Scene {
             frameWidth: 64, frameHeight: 64
         })
 
+        this.load.spritesheet('flame_spriteSheet', "assets/bombburner/images/bullet_2.png", {
+            frameHeight: 151, frameWidth: 93
+        })
+
         this.load.audio("bg_funk", "assets/circleofdeath/sounds/funk.mp3")
 
     }
@@ -54,11 +58,14 @@ export class CircleOfDeath extends Phaser.Scene {
 
     create() {
 
+        this.flameGroup = this.add.group()
         this.boostCloud_group = this.add.group()
         this.laserBean_group = this.add.group()
         this.cursor = this.input.keyboard.createCursorKeys();
         this.keySpace = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+
         this.createAnimation("accelerationBoost", "boost_cloud", 0, 8, 25, 0)
+        this.createAnimation("flameBurning", "flame_spriteSheet", 0, 4, 20, -1)
 
         this.mapSounds.set("bg_funk", this.sound.add("bg_funk", {
             volume: 2
@@ -94,6 +101,7 @@ export class CircleOfDeath extends Phaser.Scene {
 
         // check if one of the bullets hits the dudeship
         this.checkCollisionDude_bean()
+        this.checkCollisionDude_flames()
     }
 
     resetTexture(sprite, texture) {
@@ -111,6 +119,16 @@ export class CircleOfDeath extends Phaser.Scene {
         this.laserBean_group.children.iterate(bean => {
             if (this.checkCollision_general(bean, this.dudeShip)) {
                 bean.destroy()
+                console.log("dude subisce danni dai bean proiettili!!")
+
+            }
+        })
+    }
+
+    checkCollisionDude_flames() {
+        this.flameGroup.children.iterate(flame => {
+            if (this.checkCollision_general(flame, this.dudeShip)) {
+                console.log("dude subisce danni dalla fiamma!!")
             }
         })
     }
@@ -129,12 +147,9 @@ export class CircleOfDeath extends Phaser.Scene {
 
             console.log(n)
 
-            // if (n > 0.5) this.laserBeans()
-            //   if (n <= 0.5) this.laserSemicircles()
+            if (n > 0.5) this.laserBeans()
+            if (n <= 0.5) this.laserSemicircles()
 
-
-            this.laserSemicircles()
-            // this.laserBeans()
         }
     }
 
@@ -145,19 +160,45 @@ export class CircleOfDeath extends Phaser.Scene {
 
     }
 
-    addDamageToSelectedArea() {
-        console.log("sono nel complete ")
+    addDamageToSelectedArea(startAngle, endAngle) {
+// fill the circumference portion with flames that damage the dudeship
+        for (let i = startAngle; i <= endAngle; i += Phaser.Math.DegToRad(3)) {
+            let x = this.canvasWidth / 2 + this.raggio * Math.cos(i);
+            let y = this.canvasHeight / 2 + this.raggio * Math.sin(i);
+
+            const flame = this.physics.add.sprite(x, y, "flame_spriteSheet").play("flameBurning")
+                .setScale(0.4)
+            this.flameGroup.add(flame, true)
+        }
+
+        this.time.addEvent({
+            delay: 1500,
+            callback: () => {
+                this.semicircle.clear();
+                this.semicircle.destroy()
+                this.semicircle = null
+
+                this.flameGroup.clear(true, true)
+
+                this.isBossAttacking = false
+            }
+        })
+
     }
 
     showDamagingArea() {
 
-        let circumferenceDamage = Math.random() * (2 - 1) + 1
-        let startingAngle = Math.floor(Math.random() * 340)
+        let n = Math.floor(Math.random() * 361)
+        let n1 = Math.floor(Math.random() * (250 - 50 + 1) + 50)
+
+        let circumferenceStartingAngle = Phaser.Math.DegToRad(n)
+        let circumferenceEndAngle = Phaser.Math.DegToRad(n + n1)
+
 
         const red = 0xff0000
         const orange = 0xfe4c10
 
-        this.showRed(circumferenceDamage, startingAngle, red)
+        this.showRed(circumferenceEndAngle, circumferenceStartingAngle, red)
 
         let totalExec = 0
 
@@ -168,13 +209,13 @@ export class CircleOfDeath extends Phaser.Scene {
                 totalExec++
                 console.log("Callback eseguito"); // Aggiungi questo per vedere se viene chiamato
                 if (this.semicircleTrace === this.REDTRACE) {
-                    this.showOrange(circumferenceDamage, startingAngle, orange)
+                    this.showOrange(circumferenceEndAngle, circumferenceStartingAngle, orange)
                 } else {
-                    this.showRed(circumferenceDamage, startingAngle, red)
+                    this.showRed(circumferenceEndAngle, circumferenceStartingAngle, red)
                 }
 
                 if (totalExec === 5) {
-                    this.addDamageToSelectedArea()
+                    this.addDamageToSelectedArea(circumferenceStartingAngle, circumferenceEndAngle)
                 }
             },
 
@@ -192,16 +233,16 @@ export class CircleOfDeath extends Phaser.Scene {
         this.createSemicircunference(circumferenceDamage, startingAngle, color)
     }
 
-    createSemicircunference(circumferenceDamage, startingAngle, color) {
-        this.semicircle = this.add.graphics()
+    createSemicircunference(endingAngle, startingAngle, color) {
 
+        this.semicircle = this.add.graphics()
         this.semicircle.lineStyle(20, color) // red
         this.semicircle.arc(
             this.canvasWidth / 2,
             this.canvasHeight / 2,
             this.raggio,
-            startingAngle,
-            Math.PI * circumferenceDamage,
+            /* startingAngle, */ startingAngle,
+            /* Math.PI * circumferenceDamage, */ endingAngle,
             false
         )
 
