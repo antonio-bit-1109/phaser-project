@@ -275,7 +275,7 @@ export class CircleOfDeath extends Phaser.Scene {
 
         this.semicircle.strokePath();
 
-        // after the semicircunference is created, cause it's a graphics must be deleted after each draw
+        // after the semicircunference is created, because it's a graphics must be deleted after each draw
         // so after render every semicirc call a delayed event  to destroy the semicircle graphic
         this.time.addEvent({
             delay: 200,
