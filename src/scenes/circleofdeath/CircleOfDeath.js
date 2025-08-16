@@ -14,7 +14,6 @@ export class CircleOfDeath extends Phaser.Scene {
     raggio = 270
     angolo = 0;
     velAngolare = Math.PI / 3; // 90° al secondo
-    // mapSounds = new Map()
     cursor = null
     circleTrace = null
     keySpace = null
@@ -30,6 +29,7 @@ export class CircleOfDeath extends Phaser.Scene {
     turboUpperBar = null
     HasTurboNeedRecharge = false
     deltaRechargeTurbo = 0
+
 
     constructor() {
         super("circleofdeath");
@@ -204,7 +204,7 @@ export class CircleOfDeath extends Phaser.Scene {
     }
 
     addDamageToSelectedArea(startAngle, endAngle) {
-// fill the circumference portion with flames that damage the dudeship
+        // fill the circumference portion with flames that damage the dudeship
         for (let i = startAngle; i <= endAngle; i += Phaser.Math.DegToRad(3)) {
             let x = this.canvasWidth / 2 + this.raggio * Math.cos(i);
             let y = this.canvasHeight / 2 + this.raggio * Math.sin(i);
