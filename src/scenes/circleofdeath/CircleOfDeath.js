@@ -2,9 +2,6 @@ import {SoundsManager} from "./managers/SoundsManager";
 
 export class CircleOfDeath extends Phaser.Scene {
 
-
-    SoundsManager = null
-
     REDTRACE = "red"
     BLACKTRACE = "black"
 
@@ -36,7 +33,7 @@ export class CircleOfDeath extends Phaser.Scene {
 
     constructor() {
         super("circleofdeath");
-        this.SoundsManager = new SoundsManager(this)
+        this.soundManager = new SoundsManager(this)
     }
 
     init(data) {
@@ -61,9 +58,9 @@ export class CircleOfDeath extends Phaser.Scene {
             frameHeight: 151, frameWidth: 93
         })
 
-        this.SoundsManager.loadAudio("bg_funk", "assets/circleofdeath/sounds/funk.mp3")
-        // this.load.audio("bg_funk", "assets/circleofdeath/sounds/funk.mp3")
-
+        this.soundManager.loadAudio("bg_funk", "assets/circleofdeath/sounds/funk.mp3")
+        this.soundManager.loadAudio("alarm", "assets/circleofdeath/sounds/alarm.mp3")
+        this.soundManager.loadAudio("fireBurning", "assets/circleofdeath/sounds/fireBurning.mp3")
     }
 
 
@@ -85,13 +82,17 @@ export class CircleOfDeath extends Phaser.Scene {
         this.createAnimation("accelerationBoost", "boost_cloud", 0, 8, 25, 0)
         this.createAnimation("flameBurning", "flame_spriteSheet", 0, 4, 20, -1)
 
-        // this.mapSounds.set("bg_funk", this.sound.add("bg_funk", {
-        //     volume: 2,
-        //     loop: true
-        // }))
-        this.SoundsManager.addAudio("bg_funk", {
+        this.soundManager.addAudio("bg_funk", {
             volume: 2,
             loop: true
+        })
+
+        this.soundManager.addAudio("alarm", {
+            volume: 1
+        })
+
+        this.soundManager.addAudio("fireBurning", {
+            volume: 2
         })
 
         this.moonSurface = this.add.image(this.canvasWidth / 2, this.canvasHeight / 2, "moon_surface")
@@ -114,7 +115,7 @@ export class CircleOfDeath extends Phaser.Scene {
         );
 
         // this.mapSounds.get("bg_funk").play()
-        this.SoundsManager.playSound("bg_funk")
+        this.soundManager.playSound("bg_funk")
     }
 
     update(time, delta) {
@@ -211,6 +212,7 @@ export class CircleOfDeath extends Phaser.Scene {
             const flame = this.physics.add.sprite(x, y, "flame_spriteSheet").play("flameBurning")
                 .setScale(0.4)
             this.flameGroup.add(flame, true)
+            this.soundManager.playSound("fireBurning")
         }
 
         this.time.addEvent({
@@ -265,11 +267,13 @@ export class CircleOfDeath extends Phaser.Scene {
 
     showRed(circumferenceDamage, startingAngle, color) {
         this.semicircleTrace = this.REDTRACE
+        !this.soundManager.isSoundAlreadyPlaying("alarm") && this.soundManager.playSound("alarm")
         this.createSemicircunference(circumferenceDamage, startingAngle, color)
     }
 
     showOrange(circumferenceDamage, startingAngle, color) {
         this.semicircleTrace = this.BLACKTRACE
+        !this.soundManager.isSoundAlreadyPlaying("alarm") && this.soundManager.playSound("alarm")
         this.createSemicircunference(circumferenceDamage, startingAngle, color)
     }
 
