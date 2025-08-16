@@ -1,4 +1,9 @@
+import {SoundsManager} from "./managers/SoundsManager";
+
 export class CircleOfDeath extends Phaser.Scene {
+
+
+    SoundsManager = null
 
     REDTRACE = "red"
     BLACKTRACE = "black"
@@ -12,7 +17,7 @@ export class CircleOfDeath extends Phaser.Scene {
     raggio = 270
     angolo = 0;
     velAngolare = Math.PI / 3; // 90° al secondo
-    mapSounds = new Map()
+    // mapSounds = new Map()
     cursor = null
     circleTrace = null
     keySpace = null
@@ -31,6 +36,7 @@ export class CircleOfDeath extends Phaser.Scene {
 
     constructor() {
         super("circleofdeath");
+        this.SoundsManager = new SoundsManager(this)
     }
 
     init(data) {
@@ -55,7 +61,8 @@ export class CircleOfDeath extends Phaser.Scene {
             frameHeight: 151, frameWidth: 93
         })
 
-        this.load.audio("bg_funk", "assets/circleofdeath/sounds/funk.mp3")
+        this.SoundsManager.loadAudio("bg_funk", "assets/circleofdeath/sounds/funk.mp3")
+        // this.load.audio("bg_funk", "assets/circleofdeath/sounds/funk.mp3")
 
     }
 
@@ -78,10 +85,14 @@ export class CircleOfDeath extends Phaser.Scene {
         this.createAnimation("accelerationBoost", "boost_cloud", 0, 8, 25, 0)
         this.createAnimation("flameBurning", "flame_spriteSheet", 0, 4, 20, -1)
 
-        this.mapSounds.set("bg_funk", this.sound.add("bg_funk", {
+        // this.mapSounds.set("bg_funk", this.sound.add("bg_funk", {
+        //     volume: 2,
+        //     loop: true
+        // }))
+        this.SoundsManager.addAudio("bg_funk", {
             volume: 2,
             loop: true
-        }))
+        })
 
         this.moonSurface = this.add.image(this.canvasWidth / 2, this.canvasHeight / 2, "moon_surface")
             .setScale(0.5)
@@ -90,7 +101,7 @@ export class CircleOfDeath extends Phaser.Scene {
             .setScale(0.2)
 
         this.dudeShip = this.physics.add.sprite((this.canvasWidth / 2) + this.raggio, this.canvasHeight / 2, 'dudeShip')
-            .setScale(0.2)
+            .setScale(0.18)
             .setDepth(2)
 
         this.circleTrace = this.add.graphics();
@@ -102,7 +113,8 @@ export class CircleOfDeath extends Phaser.Scene {
             this.raggio // raggio
         );
 
-        this.mapSounds.get("bg_funk").play()
+        // this.mapSounds.get("bg_funk").play()
+        this.SoundsManager.playSound("bg_funk")
     }
 
     update(time, delta) {
