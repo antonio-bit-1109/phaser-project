@@ -79,7 +79,8 @@ export class CircleOfDeath extends Phaser.Scene {
         this.createAnimation("flameBurning", "flame_spriteSheet", 0, 4, 20, -1)
 
         this.mapSounds.set("bg_funk", this.sound.add("bg_funk", {
-            volume: 2
+            volume: 2,
+            loop: true
         }))
 
         this.moonSurface = this.add.image(this.canvasWidth / 2, this.canvasHeight / 2, "moon_surface")
@@ -344,31 +345,39 @@ export class CircleOfDeath extends Phaser.Scene {
         this.boss.body.rotation += 0.5
     }
 
+    calculateX() {
+        return (this.canvasWidth / 2) + this.raggio * Math.cos(this.angolo);
+
+    }
+
+    calculateY() {
+        return this.canvasHeight / 2 + this.raggio * Math.sin(this.angolo);
+    }
+
     checkCursorInput(delta) {
 
-        if (this.cursor.right.isDown && !this.turbo) {
-            this.angolo += this.velAngolare * (delta / 1000);
-            let x = (this.canvasWidth / 2) + this.raggio * Math.cos(this.angolo);
-            let y = this.canvasHeight / 2 + this.raggio * Math.sin(this.angolo);
+        let x;
+        let y;
+
+        if (this.cursor.right.isDown) {
+            this.angolo += this.velAngolare * (this.turbo ? 3 : 1) * (delta / 1000);
+            x = this.calculateX()
+            y = this.calculateY()
             this.dudeShip.setPosition(x, y);
         }
 
-        if (this.cursor.left.isDown && !this.turbo) {
-            this.angolo -= this.velAngolare * (delta / 1000);
-            let x = (this.canvasWidth / 2) + this.raggio * Math.cos(this.angolo);
-            let y = this.canvasHeight / 2 + this.raggio * Math.sin(this.angolo);
+        if (this.cursor.left.isDown) {
+            this.angolo -= this.velAngolare * (this.turbo ? 3 : 1) * (delta / 1000);
+            x = this.calculateX()
+            y = this.calculateY()
             this.dudeShip.setPosition(x, y);
         }
 
         if (this.keySpace.isDown && this.turboUpperBar.width >= 1) {
 
+            this.turbo = true
             this.turboUpperBar.width -= 0.58
             this.HasTurboNeedRecharge = true
-
-            this.angolo += (this.velAngolare * 3) * (delta / 1000);
-            let x = (this.canvasWidth / 2) + this.raggio * Math.cos(this.angolo);
-            let y = this.canvasHeight / 2 + this.raggio * Math.sin(this.angolo);
-            this.dudeShip.setPosition(x, y);
 
             let cloud = this.add.sprite(x, y, "boost_cloud").play("accelerationBoost")
 
@@ -380,7 +389,10 @@ export class CircleOfDeath extends Phaser.Scene {
                 });
             })
 
+        } else {
+            this.turbo = false
         }
+
 
     }
 
