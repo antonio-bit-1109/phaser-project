@@ -18,4 +18,8 @@ export class SoundsManager {
     playSound(key) {
         this.mapSounds.get(key).play()
     }
+
+    isSoundAlreadyPlaying(key) {
+        return this.mapSounds.get(key).isPlaying
+    }
 }
