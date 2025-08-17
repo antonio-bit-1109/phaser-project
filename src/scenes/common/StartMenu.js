@@ -141,8 +141,6 @@ export class StartMenu extends Phaser.Scene {
             .setDepth(10)
             .setScale(0.5)
             .setOrigin(0.5, 0.5)
-        // .setRotation(this.convertToRadiant(90))
-
 
         this.moveMezzoBusto(this.mezzoBusto1)
         this.moveMezzoBustoStraigth(this.mezzoBusto_boss)
