@@ -184,6 +184,8 @@ export class BossManager {
 
     laserBeans() {
         this.isBossAttacking = true;
+        this.boss.setTexture("circular_boss_funky_pose")
+        this.soundsManager.playSound("laserBeanRelease")
 
         for (let i = 0; i < 25; i++) {
             // let bean = this.scene.physics.add.sprite(this.boss.x, this.boss.y, "redBean")
@@ -206,7 +208,7 @@ export class BossManager {
             // Applica la velocità
             bean.setVelocity(velocityX, velocityY);
             bean.setRotation(Phaser.Math.DegToRad(velocityX))
-            this.boss.setTexture("circular_boss_funky_pose")
+
 
             // Distruggi il bean quando raggiunge la circonferenza
             this.scene.time.addEvent({
