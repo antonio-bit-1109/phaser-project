@@ -1,31 +1,28 @@
 import {SoundsManager} from "./managers/SoundsManager";
 import {BossManager} from "./entity/BossManager";
 import {costanti} from "./constants/costanti";
+import {DudeShipManager} from "./entity/DudeShipManager";
 
 export class CircleOfDeath extends Phaser.Scene {
-    
+
     canvasWidth = null;
     canvasHeight = null;
     gameName = null;
     moonSurface = null;
-    dudeShip = null
+    // dudeShip = null
     angolo = 0;
     velAngolare = Math.PI / 3; // 90° al secondo
     cursor = null
     circleTrace = null
     keySpace = null
-    turbo = false
-    boostCloud_group = null
-    turboLowBar = null;
-    turboUpperBar = null
-    HasTurboNeedRecharge = false
-    deltaRechargeTurbo = 0
+    firstCollisionHappened = false
 
 
     constructor() {
         super("circleofdeath");
         this.soundManager = new SoundsManager(this)
         this.bossManager = new BossManager(this, this.soundManager)
+        this.dudeShipManager = new DudeShipManager(this)
     }
 
     init(data) {
@@ -60,14 +57,8 @@ export class CircleOfDeath extends Phaser.Scene {
     create() {
 
         this.bossManager.create(this.canvasWidth, this.canvasHeight)
+        this.dudeShipManager.create(this.canvasWidth, this.canvasHeight)
 
-        this.turboLowBar = this.add.rectangle(this.canvasWidth / 12, this.canvasHeight / 12, 50, 20, 0xff0000, 1)
-            .setDepth(3)
-
-        this.turboUpperBar = this.add.rectangle(this.canvasWidth / 12, this.canvasHeight / 12, 50, 20, 0x0000FF, 1)
-            .setDepth(3)
-
-        this.boostCloud_group = this.add.group()
 
         this.cursor = this.input.keyboard.createCursorKeys();
         this.keySpace = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
@@ -92,9 +83,6 @@ export class CircleOfDeath extends Phaser.Scene {
             .setScale(0.5)
             .setDepth(-1)
 
-        this.dudeShip = this.physics.add.sprite((this.canvasWidth / 2) + costanti.raggio, this.canvasHeight / 2, 'dudeShip')
-            .setScale(0.18)
-            .setDepth(2)
 
         this.circleTrace = this.add.graphics();
 
@@ -107,62 +95,55 @@ export class CircleOfDeath extends Phaser.Scene {
 
         // this.mapSounds.get("bg_funk").play()
         this.soundManager.playSound("bg_funk")
+
+
+        this.physics.add.overlap(this.dudeShipManager.getDudeShip(), this.bossManager.getFlameGroup(), this.handleCollisionDudeFlame, this.canDudeTakeDamage, this)
+        this.physics.add.overlap(this.dudeShipManager.getDudeShip(), this.bossManager.getLaserBeanGroup(), this.handleCollisionDudeBean, this.canDudeTakeDamage, this)
     }
 
     update(time, delta) {
 
-        // this.rotateBoss()
-        this.bossManager.update(delta, this.dudeShip)
-
+        this.bossManager.update(delta, this.dudeShipManager.getDudeShip())
+        this.dudeShipManager.update(delta)
         this.checkCursorInput(delta)
-        // this.bossAttacks(delta)
 
-        // check if one of the bullets hits the dudeship
-        this.checkCollisionDude_bean()
-        this.checkCollisionDude_flames()
-        this.rechargeTurbo(delta)
     }
 
-    rechargeTurbo(delta) {
-
-        this.deltaRechargeTurbo += delta;
-
-        if (this.HasTurboNeedRecharge && this.deltaRechargeTurbo >= 100) {
-            this.turboUpperBar.width++
-            this.deltaRechargeTurbo = 0
-        }
-
-        if (this.turboUpperBar.width >= 50) {
-            this.turboUpperBar.width = 50
-            this.HasTurboNeedRecharge = false
+    canDudeTakeDamage() {
+        if (this.dudeShipManager.getInvincible()) {
+            return false // la collide callback non può essere chiamata - dude è invincibile per 2.2"
+        } else {
+            return true// la collide callback può essere chiamata - dude non è invincibile
         }
 
     }
 
+    // to handle the collision between dudeship and a flame
+    handleCollisionDudeFlame(dudeShip, flame) {
+        if (!this.firstCollisionHappened) {
+            console.log("dude subisce danni dalla fiamma!!")
+            this.firstCollisionHappened = true
+            this.dudeShipManager.setInvincible(true)
+            // logica per arrecare danno al dude da aggiungere
+            this.time.delayedCall(2200, () => {
+                this.firstCollisionHappened = false
+                this.dudeShipManager.setInvincible(false)
+            })
 
-    checkCollisionDude_bean() {
-
-
-        this.bossManager.getLaserBeanGroup().children.iterate(bean => {
-            if (this.checkCollision_general(bean, this.dudeShip)) {
-                bean.destroy()
-                console.log("dude subisce danni dai bean proiettili!!")
-
-            }
-        })
+        }
     }
 
-    checkCollisionDude_flames() {
-        this.bossManager.getFlameGroup().children.iterate(flame => {
-            if (this.checkCollision_general(flame, this.dudeShip)) {
-                console.log("dude subisce danni dalla fiamma!!")
-            }
-        })
-    }
+    handleCollisionDudeBean(dudeShip, bean) {
+        if (!this.firstCollisionHappened) {
+            console.log("dude subisce danni dai bean proiettili!!")
+            this.firstCollisionHappened = true
+            this.dudeShipManager.setInvincible(true)
+            // logica per arrecare danno al dude da aggiungere
+            this.time.delayedCall(2200, () => {
+                this.firstCollisionHappened = false
+                this.dudeShipManager.setInvincible(false)
+            })
 
-    checkCollision_general(p1, p2) {
-        if (p1 && p2 && this.physics.overlap(p1, p2)) {
-            return true;
         }
     }
 
@@ -182,37 +163,37 @@ export class CircleOfDeath extends Phaser.Scene {
         let y;
 
         if (this.cursor.right.isDown) {
-            this.angolo += this.velAngolare * (this.turbo ? 3 : 1) * (delta / 1000);
+            this.angolo += this.velAngolare * (this.dudeShipManager.getTurbo() ? 3 : 1) * (delta / 1000);
             x = this.calculateX()
             y = this.calculateY()
-            this.dudeShip.setPosition(x, y);
+            this.dudeShipManager.getDudeShip().setPosition(x, y);
         }
 
         if (this.cursor.left.isDown) {
-            this.angolo -= this.velAngolare * (this.turbo ? 3 : 1) * (delta / 1000);
+            this.angolo -= this.velAngolare * (this.dudeShipManager.getTurbo() ? 3 : 1) * (delta / 1000);
             x = this.calculateX()
             y = this.calculateY()
-            this.dudeShip.setPosition(x, y);
+            this.dudeShipManager.getDudeShip().setPosition(x, y);
         }
 
-        if (this.keySpace.isDown && this.turboUpperBar.width >= 1) {
+        if (this.keySpace.isDown && this.dudeShipManager.getTurboUpperBar().width >= 1) {
 
-            this.turbo = true
-            this.turboUpperBar.width -= 0.58
-            this.HasTurboNeedRecharge = true
+            this.dudeShipManager.setTurbo(true)
+            this.dudeShipManager.getTurboUpperBar().width -= 0.58
+            this.dudeShipManager.setHasTurboNeedRecharge(true)
 
             let cloud = this.add.sprite(x, y, "boost_cloud").play("accelerationBoost")
 
-            this.boostCloud_group.add(cloud, true)
+            this.dudeShipManager.getBoostCloudGroup().add(cloud, true)
 
-            this.boostCloud_group.children.iterate(boost => {
+            this.dudeShipManager.getBoostCloudGroup().children.iterate(boost => {
                 boost.on('animationcomplete', () => {
                     boost.destroy();
                 });
             })
 
         } else {
-            this.turbo = false
+            this.dudeShipManager.setTurbo(false)
         }
 
 
