@@ -1,17 +1,14 @@
 import {SoundsManager} from "./managers/SoundsManager";
+import {BossManager} from "./entity/BossManager";
+import {costanti} from "./constants/costanti";
 
 export class CircleOfDeath extends Phaser.Scene {
-
-    REDTRACE = "red"
-    BLACKTRACE = "black"
-
+    
     canvasWidth = null;
     canvasHeight = null;
     gameName = null;
     moonSurface = null;
-    boss = null;
     dudeShip = null
-    raggio = 270
     angolo = 0;
     velAngolare = Math.PI / 3; // 90° al secondo
     cursor = null
@@ -19,12 +16,6 @@ export class CircleOfDeath extends Phaser.Scene {
     keySpace = null
     turbo = false
     boostCloud_group = null
-    isBossAttacking = false
-    laserBean_group = null;
-    semicircle = null
-    passingTime = 0
-    semicircleTrace = null // traccia per tenere conto di che tipo di semicircle attualmente nella canva
-    flameGroup = null
     turboLowBar = null;
     turboUpperBar = null
     HasTurboNeedRecharge = false
@@ -34,6 +25,7 @@ export class CircleOfDeath extends Phaser.Scene {
     constructor() {
         super("circleofdeath");
         this.soundManager = new SoundsManager(this)
+        this.bossManager = new BossManager(this, this.soundManager)
     }
 
     init(data) {
@@ -47,8 +39,9 @@ export class CircleOfDeath extends Phaser.Scene {
         this.load.image("moon_surface", "assets/circleofdeath/images/mars_land.jpg")
         this.load.image("circular_boss", "assets/circleofdeath/images/circular_boss.png")
         this.load.image("circular_boss_funky_pose", "assets/circleofdeath/images/boss_funky_pose.png")
-        this.load.image("dudeShip", "assets/pingpong/images/dude_ping_pong.png")
         this.load.image("redBean", "assets/circleofdeath/images/redBean.png")
+
+        this.load.image("dudeShip", "assets/pingpong/images/dude_ping_pong.png")
 
         this.load.spritesheet("boost_cloud", "assets/circleofdeath/images/boost_cloud.png", {
             frameWidth: 64, frameHeight: 64
@@ -66,16 +59,16 @@ export class CircleOfDeath extends Phaser.Scene {
 
     create() {
 
+        this.bossManager.create(this.canvasWidth, this.canvasHeight)
+
         this.turboLowBar = this.add.rectangle(this.canvasWidth / 12, this.canvasHeight / 12, 50, 20, 0xff0000, 1)
             .setDepth(3)
 
         this.turboUpperBar = this.add.rectangle(this.canvasWidth / 12, this.canvasHeight / 12, 50, 20, 0x0000FF, 1)
             .setDepth(3)
 
-
-        this.flameGroup = this.add.group()
         this.boostCloud_group = this.add.group()
-        this.laserBean_group = this.add.group()
+
         this.cursor = this.input.keyboard.createCursorKeys();
         this.keySpace = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
@@ -97,11 +90,9 @@ export class CircleOfDeath extends Phaser.Scene {
 
         this.moonSurface = this.add.image(this.canvasWidth / 2, this.canvasHeight / 2, "moon_surface")
             .setScale(0.5)
+            .setDepth(-1)
 
-        this.boss = this.physics.add.sprite(this.canvasWidth / 2, this.canvasHeight / 2, "circular_boss")
-            .setScale(0.2)
-
-        this.dudeShip = this.physics.add.sprite((this.canvasWidth / 2) + this.raggio, this.canvasHeight / 2, 'dudeShip')
+        this.dudeShip = this.physics.add.sprite((this.canvasWidth / 2) + costanti.raggio, this.canvasHeight / 2, 'dudeShip')
             .setScale(0.18)
             .setDepth(2)
 
@@ -111,7 +102,7 @@ export class CircleOfDeath extends Phaser.Scene {
         this.circleTrace.strokeCircle(
             this.canvasWidth / 2, // x centro
             this.canvasHeight / 2, // y centro
-            this.raggio // raggio
+            costanti.raggio // raggio
         );
 
         // this.mapSounds.get("bg_funk").play()
@@ -120,9 +111,11 @@ export class CircleOfDeath extends Phaser.Scene {
 
     update(time, delta) {
 
-        this.rotateBoss()
+        // this.rotateBoss()
+        this.bossManager.update(delta, this.dudeShip)
+
         this.checkCursorInput(delta)
-        this.bossAttacks(delta)
+        // this.bossAttacks(delta)
 
         // check if one of the bullets hits the dudeship
         this.checkCollisionDude_bean()
@@ -147,19 +140,10 @@ export class CircleOfDeath extends Phaser.Scene {
     }
 
 
-    resetTexture(sprite, texture) {
-        this.time.addEvent({
-            delay: 500,
-            loop: false,
-            callback: () => {
-                sprite.setTexture(texture)
-            }
-        })
-
-    }
-
     checkCollisionDude_bean() {
-        this.laserBean_group.children.iterate(bean => {
+
+
+        this.bossManager.getLaserBeanGroup().children.iterate(bean => {
             if (this.checkCollision_general(bean, this.dudeShip)) {
                 bean.destroy()
                 console.log("dude subisce danni dai bean proiettili!!")
@@ -169,186 +153,11 @@ export class CircleOfDeath extends Phaser.Scene {
     }
 
     checkCollisionDude_flames() {
-        this.flameGroup.children.iterate(flame => {
+        this.bossManager.getFlameGroup().children.iterate(flame => {
             if (this.checkCollision_general(flame, this.dudeShip)) {
                 console.log("dude subisce danni dalla fiamma!!")
             }
         })
-    }
-
-    bossAttacks(delta) {
-
-        // accumulate delta (time passed between a frame and the next one)
-        this.passingTime += delta;
-
-        //
-        if (!this.isBossAttacking && this.passingTime >= 3000) {
-
-            this.passingTime = 0
-
-            let n = Math.random()
-
-            console.log(n)
-
-            if (n > 0.5) this.laserBeans()
-            if (n <= 0.5) this.laserSemicircles()
-
-        }
-    }
-
-    laserSemicircles() {
-
-        this.isBossAttacking = true;
-        this.showDamagingArea()
-
-    }
-
-    addDamageToSelectedArea(startAngle, endAngle) {
-        // fill the circumference portion with flames that damage the dudeship
-        for (let i = startAngle; i <= endAngle; i += Phaser.Math.DegToRad(3)) {
-            let x = this.canvasWidth / 2 + this.raggio * Math.cos(i);
-            let y = this.canvasHeight / 2 + this.raggio * Math.sin(i);
-
-            const flame = this.physics.add.sprite(x, y, "flame_spriteSheet").play("flameBurning")
-                .setScale(0.4)
-            this.flameGroup.add(flame, true)
-            this.soundManager.playSound("fireBurning")
-        }
-
-        this.time.addEvent({
-            delay: 1500,
-            callback: () => {
-
-                this.flameGroup.clear(true, true)
-                this.isBossAttacking = false
-            }
-        })
-
-    }
-
-    showDamagingArea() {
-
-        let dudeShipX = this.dudeShip.x - this.canvasWidth / 2;
-        let dudeShipY = this.dudeShip.y - this.canvasHeight / 2;
-        let angle = Math.atan2(dudeShipY, dudeShipX); // ordine corretto
-        let n1 = Math.floor(Math.random() * (250 - 50 + 1) + 50);
-
-        let circumferenceStartingAngle = angle - Phaser.Math.DegToRad(35);
-        let circumferenceEndAngle = angle + Phaser.Math.DegToRad(n1);
-
-
-        const red = 0xff0000
-        const orange = 0xfe4c10
-
-        this.showRed(circumferenceEndAngle, circumferenceStartingAngle, red)
-
-        let totalExec = 0
-
-        this.time.addEvent({
-            delay: 300,
-            repeat: 4,
-            callback: () => {
-                totalExec++
-                console.log("Callback eseguito"); // Aggiungi questo per vedere se viene chiamato
-                if (this.semicircleTrace === this.REDTRACE) {
-                    this.showOrange(circumferenceEndAngle, circumferenceStartingAngle, orange)
-                } else {
-                    this.showRed(circumferenceEndAngle, circumferenceStartingAngle, red)
-                }
-
-                if (totalExec === 5) {
-                    this.addDamageToSelectedArea(circumferenceStartingAngle, circumferenceEndAngle)
-                }
-            },
-
-        })
-
-    }
-
-    showRed(circumferenceDamage, startingAngle, color) {
-        this.semicircleTrace = this.REDTRACE
-        !this.soundManager.isSoundAlreadyPlaying("alarm") && this.soundManager.playSound("alarm")
-        this.createSemicircunference(circumferenceDamage, startingAngle, color)
-    }
-
-    showOrange(circumferenceDamage, startingAngle, color) {
-        this.semicircleTrace = this.BLACKTRACE
-        !this.soundManager.isSoundAlreadyPlaying("alarm") && this.soundManager.playSound("alarm")
-        this.createSemicircunference(circumferenceDamage, startingAngle, color)
-    }
-
-    createSemicircunference(endingAngle, startingAngle, color) {
-
-        this.semicircle = this.add.graphics()
-        this.semicircle.lineStyle(20, color) // red
-        this.semicircle.arc(
-            this.canvasWidth / 2,
-            this.canvasHeight / 2,
-            this.raggio,
-            startingAngle,
-            endingAngle,
-            false
-        )
-
-        this.semicircle.strokePath();
-
-        // after the semicircunference is created, because it's a graphics must be deleted after each draw
-        // so after render every semicirc call a delayed event  to destroy the semicircle graphic
-        this.time.addEvent({
-            delay: 200,
-            callback: () => {
-                this.semicircle.clear();
-                this.semicircle.destroy()
-                this.semicircle = null
-            }
-        })
-    }
-
-
-    laserBeans() {
-        this.isBossAttacking = true;
-
-        for (let i = 0; i < 25; i++) {
-            let bean = this.physics.add.sprite(this.boss.x, this.boss.y, "redBean")
-                .setOrigin(0.5, 0.5);
-
-            this.laserBean_group.add(bean);
-
-            let distributionBean = Math.floor(Math.random() * 3)
-
-            // Calcola l'angolo per questo bean (distribuiti uniformemente)
-            let angle = (i / 10) * Math.PI * distributionBean; // 360 gradi diviso 10
-
-            // Calcola la velocità in base all'angolo
-            let speed = 200; // pixel per secondo
-            let velocityX = Math.cos(angle) * speed;
-            let velocityY = Math.sin(angle) * speed;
-
-            // Applica la velocità
-            bean.setVelocity(velocityX, velocityY);
-            bean.setRotation(Phaser.Math.DegToRad(velocityX))
-            this.boss.setTexture("circular_boss_funky_pose")
-
-            // Distruggi il bean quando raggiunge la circonferenza
-            this.time.addEvent({
-                delay: (this.raggio / speed) * 1000, // tempo per raggiungere il bordo
-                callback: () => {
-                    if (bean.active) {
-                        bean.destroy();
-                    }
-                    this.resetTexture(this.boss, "circular_boss")
-                }
-            });
-
-        }
-
-        // Reset del flag dopo che tutti i bean sono partiti
-        this.time.addEvent({
-            delay: (this.raggio / 200) * 1000 + 500, // tempo movimento + buffer
-            callback: () => {
-                this.isBossAttacking = false;
-            }
-        });
     }
 
     checkCollision_general(p1, p2) {
@@ -357,17 +166,14 @@ export class CircleOfDeath extends Phaser.Scene {
         }
     }
 
-    rotateBoss() {
-        this.boss.body.rotation += 0.5
-    }
 
     calculateX() {
-        return (this.canvasWidth / 2) + this.raggio * Math.cos(this.angolo);
+        return (this.canvasWidth / 2) + costanti.raggio * Math.cos(this.angolo);
 
     }
 
     calculateY() {
-        return this.canvasHeight / 2 + this.raggio * Math.sin(this.angolo);
+        return this.canvasHeight / 2 + costanti.raggio * Math.sin(this.angolo);
     }
 
     checkCursorInput(delta) {

@@ -18,4 +18,6 @@
 - fog of war
 - texture fog
 - passa il final score anche da ping pong dude come stringa del punteggio : es --->    "3/5"
-- reset palla se si bugga 
+- reset palla se si bugga
+- modifica del metodo overlap, non va piu chiamato nel update
+  ma va dichiarato solo una volta dentro al metodo create quali oggetti devono essere controllati se collidono
