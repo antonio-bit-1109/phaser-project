@@ -48,9 +48,14 @@ export class CircleOfDeath extends Phaser.Scene {
             frameHeight: 151, frameWidth: 93
         })
 
-        this.soundManager.loadAudio("bg_funk", "assets/circleofdeath/sounds/funk.mp3")
-        this.soundManager.loadAudio("alarm", "assets/circleofdeath/sounds/alarm.mp3")
-        this.soundManager.loadAudio("fireBurning", "assets/circleofdeath/sounds/fireBurning.mp3")
+        this.load.spritesheet("heartsSpriteSheet", "assets/circleofdeath/images/heart_animated_2.png", {
+            frameHeight: 17, frameWidth: 17
+        })
+
+        this.load.audio("bg_funk", "assets/circleofdeath/sounds/funk.mp3")
+        this.load.audio("alarm", "assets/circleofdeath/sounds/alarm.mp3")
+        this.load.audio("fireBurning", "assets/circleofdeath/sounds/fireBurning.mp3")
+        this.load.audio("laserBeanRelease", "assets/circleofdeath/sounds/laserBeansSound.mp3")
     }
 
 
@@ -66,6 +71,12 @@ export class CircleOfDeath extends Phaser.Scene {
         this.createAnimation("accelerationBoost", "boost_cloud", 0, 8, 25, 0)
         this.createAnimation("flameBurning", "flame_spriteSheet", 0, 4, 20, -1)
 
+        this.createAnimation("hFull", "heartsSpriteSheet", 0, 0, 20, 0);
+        this.createAnimation("h3/4", "heartsSpriteSheet", 1, 1, 20, 0);
+        this.createAnimation("h2/4", "heartsSpriteSheet", 2, 2, 20, 0);
+        this.createAnimation("h1/4", "heartsSpriteSheet", 3, 3, 20, 0);
+        this.createAnimation("h0", "heartsSpriteSheet", 4, 4, 20, 0);
+
         this.soundManager.addAudio("bg_funk", {
             volume: 2,
             loop: true
@@ -77,6 +88,10 @@ export class CircleOfDeath extends Phaser.Scene {
 
         this.soundManager.addAudio("fireBurning", {
             volume: 2
+        })
+
+        this.soundManager.addAudio("laserBeanRelease", {
+            volume: 1
         })
 
         this.moonSurface = this.add.image(this.canvasWidth / 2, this.canvasHeight / 2, "moon_surface")
@@ -124,6 +139,7 @@ export class CircleOfDeath extends Phaser.Scene {
             console.log("dude subisce danni dalla fiamma!!")
             this.firstCollisionHappened = true
             this.dudeShipManager.setInvincible(true)
+            this.dudeShipManager.setHpBasedOnHpPiece()
             // logica per arrecare danno al dude da aggiungere
             this.time.delayedCall(2200, () => {
                 this.firstCollisionHappened = false
@@ -138,7 +154,7 @@ export class CircleOfDeath extends Phaser.Scene {
             console.log("dude subisce danni dai bean proiettili!!")
             this.firstCollisionHappened = true
             this.dudeShipManager.setInvincible(true)
-            // logica per arrecare danno al dude da aggiungere
+            this.dudeShipManager.setHpBasedOnHpPiece()
             this.time.delayedCall(2200, () => {
                 this.firstCollisionHappened = false
                 this.dudeShipManager.setInvincible(false)
@@ -200,9 +216,9 @@ export class CircleOfDeath extends Phaser.Scene {
     }
 
 
-    createAnimation(key, spritesheetName, start, end, frameRate, repeat) {
+    createAnimation(animName, spritesheetName, start, end, frameRate, repeat) {
         this.anims.create({
-            key: key,
+            key: animName,
             frames: this.anims.generateFrameNumbers(spritesheetName, {start: start, end: end}),
             frameRate: frameRate,
             repeat: repeat
