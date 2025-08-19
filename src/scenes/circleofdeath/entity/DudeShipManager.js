@@ -83,7 +83,6 @@ export class DudeShipManager {
                 break;
             case 3:
                 this.hp_sprite.play("h3/4")
-
                 break;
             case 2:
                 this.hp_sprite.play("h2/4")
