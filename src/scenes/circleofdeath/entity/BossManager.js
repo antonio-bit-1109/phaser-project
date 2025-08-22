@@ -1,15 +1,24 @@
-import {costanti} from "../constants/costanti";
+import {
+    calculatePointCircumference_X,
+    calculatePointCircumference_Y,
+    costanti, findNotUsedRandomAngle
+} from "../constants/costanti";
 
 export class BossManager {
 
     passingTime = 0
     isBossAttacking = false
     laserBean_group = null;
+    rifleAims_Group = null
     flameGroup = null
     semicircle = null
     semicircleTrace = null
     canvasW = null
     canvasH = null
+    countDown = "2"
+    countDown_text = null
+    explosion_group = null
+    countDownFunction = null
 
     constructor(scene, soundsManager) {
         this.boss = null;
@@ -26,13 +35,22 @@ export class BossManager {
         return this.flameGroup
     }
 
+    getExplosionsGroup() {
+        return this.explosion_group
+    }
+
     create(w, h) {
         this.canvasW = w
         this.canvasH = h
         this.flameGroup = this.scene.add.group()
         this.laserBean_group = this.scene.add.group()
+        this.rifleAims_Group = this.scene.add.group()
+        this.explosion_group = this.scene.add.group()
         this.boss = this.scene.physics.add.sprite(this.canvasW / 2, this.canvasH / 2, "circular_boss")
             .setScale(0.2)
+        this.countDown_text = this.scene.add.text(this.canvasW / 18, this.canvasH / 2, this.countDown)
+            .setScale(10)
+            .setVisible(false)
     }
 
 
@@ -66,10 +84,113 @@ export class BossManager {
 
             console.log(n)
 
-            if (n > 0.5) this.laserBeans()
-            if (n <= 0.5) this.laserSemicircles(dudeship)
+            if (n < 0.33) this.laserBeans()
+            if (n >= 0.33 && n < 0.66) this.laserSemicircles(dudeship)
+            if (n >= 0.66) this.detonateBombs()
+            
+        }
+    }
+
+    detonateBombs() {
+        this.isBossAttacking = true;
+        const arrPositionsAim = this.showRifleAims()
+        this.showCountDownBeforeExplosions(arrPositionsAim)
+        this.resetCountDown()
+
+    }
+
+    showRifleAims() {
+        let min = costanti.minNumRifleAim;
+        let max = costanti.maxNumRifleAim;
+        let nAims = Math.floor(Math.random() * (max - min + 1)) + min;
+
+        // // mettere un array per tenere traccia delle posizioni gia presenti prese sulla circonferenza e non creare troppe sovrapposizioni
+        const arrPositionsXYAims = []
+        const arrAngles = []
+
+        for (let i = 0; i < nAims; i++) {
+
+            let safeRandomAngleRad = findNotUsedRandomAngle(arrAngles)
+            arrAngles.push(safeRandomAngleRad)
+
+            let config = {
+                x: calculatePointCircumference_X(this.canvasW, safeRandomAngleRad),
+                y: calculatePointCircumference_Y(this.canvasH, safeRandomAngleRad),
+                texture: "rifleAim"
+            }
+            let aim = this.scene.add.sprite(
+                config.x,
+                config.y,
+                config.texture,
+                true
+            ).setScale(0.5)
+
+
+            this.rifleAims_Group.add(aim)
+            arrPositionsXYAims.push({x: config.x, y: config.y})
 
         }
+
+        console.log(arrPositionsXYAims)
+        console.log(arrAngles)
+
+        return arrPositionsXYAims
+    }
+
+    addExplosions(arrPositionAims) {
+
+        // put an explosion in every position where there is an aim
+        // (remove the aim and put an explosion)
+        for (let obj of arrPositionAims) {
+            let explosion = this.scene.physics.add.sprite(obj.x, obj.y, "explosion")
+                .setOrigin(0.5, 0.5)
+                .setScale(0.6)
+                .play("f0")
+
+            this.explosion_group.add(explosion)
+        }
+
+        this.scene.time.delayedCall(300, () => {
+            this.explosion_group.children.iterate(exp => {
+                exp.play("f1")
+            })
+
+            this.rifleAims_Group.clear(true, true)
+        })
+
+        this.scene.time.delayedCall(1000, () => {
+            this.explosion_group.clear(true, true)
+            this.isBossAttacking = false
+        })
+
+    }
+
+    showCountDownBeforeExplosions(arrPositionsAims) {
+        //  this.countDown_text.setVisible(true)
+        this.countDownFunction = this.scene.time.addEvent({
+            delay: 1000,
+            repeat: 1,
+            callback: () => {
+
+                let count = parseInt(this.countDown)
+                count--
+                this.countDown = count.toString()
+                this.countDown_text.setText(count.toString())
+
+                if (this.countDown === "1") {
+                    this.addExplosions(arrPositionsAims)
+                }
+
+            },
+
+        })
+    }
+
+
+    resetCountDown() {
+        this.scene.time.delayedCall(200, () => {
+            this.countDown = "2"
+        })
     }
 
     laserSemicircles(dudeship) {
