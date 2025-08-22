@@ -145,7 +145,7 @@ export class BossManager {
         // put an explosion in every position where there is an aim
         // (remove the aim and put an explosion)
         for (let obj of arrPositionAims) {
-            let explosion = this.scene.physics.add.sprite(obj.x, obj.y, "explosion")
+            let explosion = this.scene.physics.add.sprite(obj.x, obj.y, "explosion_2")
                 .setOrigin(0.5, 0.5)
                 .setScale(0.6)
                 .play("f0")

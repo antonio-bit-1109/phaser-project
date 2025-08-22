@@ -52,7 +52,7 @@ export class CircleOfDeath extends Phaser.Scene {
             frameHeight: 17, frameWidth: 17
         })
 
-        this.load.spritesheet("explosion", "assets/circleofdeath/images/explosion.png", {
+        this.load.spritesheet("explosion_2", "assets/circleofdeath/images/explosion.png", {
             frameWidth: 128, frameHeight: 128
         })
 
@@ -84,8 +84,8 @@ export class CircleOfDeath extends Phaser.Scene {
         this.createAnimation("h1/4", "heartsSpriteSheet", 3, 3, 20, 0);
         this.createAnimation("h0", "heartsSpriteSheet", 4, 4, 20, 0);
 
-        this.createAnimation("f0", "explosion", 0, 0, 20, 0)
-        this.createAnimation("f1", "explosion", 1, 11, 15, 0)
+        this.createAnimation("f0", "explosion_2", 0, 0, 20, 0)
+        this.createAnimation("f1", "explosion_2", 1, 11, 15, 0)
 
 
         this.soundManager.addAudio("bg_funk", {
