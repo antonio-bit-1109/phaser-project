@@ -61,6 +61,8 @@ export class CircleOfDeath extends Phaser.Scene {
         this.load.audio("fireBurning", "assets/circleofdeath/sounds/fireBurning.mp3")
         this.load.audio("laserBeanRelease", "assets/circleofdeath/sounds/laserBeansSound.mp3")
         this.load.audio("dudeShipDamaged", "assets/circleofdeath/sounds/dudeShipDamaged.mp3")
+        this.load.audio("teleportSound", "assets/circleofdeath/sounds/teleport.mp3")
+        this.load.audio("bombExplosion", "assets/circleofdeath/sounds/bombExplosion.mp3")
     }
 
 
@@ -104,6 +106,14 @@ export class CircleOfDeath extends Phaser.Scene {
         })
 
         this.soundManager.addAudio("dudeShipDamaged", {
+            volume: 1
+        })
+
+        this.soundManager.addAudio("teleportSound", {
+            volume: 1
+        })
+
+        this.soundManager.addAudio("bombExplosion", {
             volume: 1
         })
 
