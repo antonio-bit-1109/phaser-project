@@ -1,3 +1,5 @@
+import {updateGameTimer} from "../circleofdeath/constants/costanti";
+
 export class Gameplay extends Phaser.Scene {
 
 // CONSTS
@@ -1489,33 +1491,33 @@ export class Gameplay extends Phaser.Scene {
         this.hpBoss_bar.fillRect(this.canvasWidth - 250, 20, 200 * hpPercent, 20);
     }
 
-    updateGameTimer() {
-        if (this.d === 9) {
-            this.c++;
-            this.d = 0
-            this.refreshTime()
-            return
-        }
-
-        if (this.c === 5) {
-            this.b++
-            this.c = 0
-            this.d = 0;
-            this.refreshTime()
-            return
-        }
-
-        this.d++
-        this.refreshTime()
-        console.log(this.gameTimer)
-
-    }
-
-    refreshTime() {
-        this.gameTimer = `${this.b}:${this.c}${this.d}`;
-        this.timerRef.setText(this.gameTimer)
-
-    }
+    // updateGameTimer() {
+    //     if (this.d === 9) {
+    //         this.c++;
+    //         this.d = 0
+    //         this.refreshTime()
+    //         return
+    //     }
+    //
+    //     if (this.c === 5) {
+    //         this.b++
+    //         this.c = 0
+    //         this.d = 0;
+    //         this.refreshTime()
+    //         return
+    //     }
+    //
+    //     this.d++
+    //     this.refreshTime()
+    //     console.log(this.gameTimer)
+    //
+    // }
+    //
+    // refreshTime() {
+    //     this.gameTimer = `${this.b}:${this.c}${this.d}`;
+    //     this.timerRef.setText(this.gameTimer)
+    //
+    // }
 
     // aggiorno il valore del punteggio allo scorrere del tempo
     updatePunteggio(time) {
@@ -1527,7 +1529,7 @@ export class Gameplay extends Phaser.Scene {
 
         // keep trace only when it changes
         if (this.timer !== roundedTimer) {
-            this.updateGameTimer(roundedTimer)
+            updateGameTimer(this.b, this.c, this.d, this.gameTimer, this.timerRef)
         }
 
         this.timer = roundedTimer
