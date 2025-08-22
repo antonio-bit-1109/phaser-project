@@ -88,8 +88,6 @@ export class BossManager {
             if (n >= 0.33 && n < 0.66) this.laserSemicircles(dudeship)
             if (n >= 0.66) this.detonateBombs()
 
-
-            // this.detonateBombs()
         }
     }
 
