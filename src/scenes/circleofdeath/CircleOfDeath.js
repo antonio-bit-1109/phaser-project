@@ -1,6 +1,6 @@
 import {SoundsManager} from "./managers/SoundsManager";
 import {BossManager} from "./entity/BossManager";
-import {costanti} from "./constants/costanti";
+import {calculatePointCircumference_X, calculatePointCircumference_Y, costanti} from "./constants/costanti";
 import {DudeShipManager} from "./entity/DudeShipManager";
 
 export class CircleOfDeath extends Phaser.Scene {
@@ -9,7 +9,6 @@ export class CircleOfDeath extends Phaser.Scene {
     canvasHeight = null;
     gameName = null;
     moonSurface = null;
-    // dudeShip = null
     angolo = 0;
     velAngolare = Math.PI / 3; // 90° al secondo
     cursor = null
@@ -39,6 +38,7 @@ export class CircleOfDeath extends Phaser.Scene {
         this.load.image("redBean", "assets/circleofdeath/images/redBean.png")
 
         this.load.image("dudeShip", "assets/pingpong/images/dude_ping_pong.png")
+        this.load.image("rifleAim", "assets/circleofdeath/images/rifleAim_0.png")
 
         this.load.spritesheet("boost_cloud", "assets/circleofdeath/images/boost_cloud.png", {
             frameWidth: 64, frameHeight: 64
@@ -52,10 +52,15 @@ export class CircleOfDeath extends Phaser.Scene {
             frameHeight: 17, frameWidth: 17
         })
 
+        this.load.spritesheet("explosion", "assets/circleofdeath/images/explosion.png", {
+            frameWidth: 128, frameHeight: 128
+        })
+
         this.load.audio("bg_funk", "assets/circleofdeath/sounds/funk.mp3")
         this.load.audio("alarm", "assets/circleofdeath/sounds/alarm.mp3")
         this.load.audio("fireBurning", "assets/circleofdeath/sounds/fireBurning.mp3")
         this.load.audio("laserBeanRelease", "assets/circleofdeath/sounds/laserBeansSound.mp3")
+        this.load.audio("dudeShipDamaged", "assets/circleofdeath/sounds/dudeShipDamaged.mp3")
     }
 
 
@@ -77,6 +82,10 @@ export class CircleOfDeath extends Phaser.Scene {
         this.createAnimation("h1/4", "heartsSpriteSheet", 3, 3, 20, 0);
         this.createAnimation("h0", "heartsSpriteSheet", 4, 4, 20, 0);
 
+        this.createAnimation("f0", "explosion", 0, 0, 20, 0)
+        this.createAnimation("f1", "explosion", 1, 11, 15, 0)
+
+
         this.soundManager.addAudio("bg_funk", {
             volume: 2,
             loop: true
@@ -91,6 +100,10 @@ export class CircleOfDeath extends Phaser.Scene {
         })
 
         this.soundManager.addAudio("laserBeanRelease", {
+            volume: 1
+        })
+
+        this.soundManager.addAudio("dudeShipDamaged", {
             volume: 1
         })
 
@@ -114,6 +127,8 @@ export class CircleOfDeath extends Phaser.Scene {
 
         this.physics.add.overlap(this.dudeShipManager.getDudeShip(), this.bossManager.getFlameGroup(), this.handleCollisionDudeFlame, this.canDudeTakeDamage, this)
         this.physics.add.overlap(this.dudeShipManager.getDudeShip(), this.bossManager.getLaserBeanGroup(), this.handleCollisionDudeBean, this.canDudeTakeDamage, this)
+        this.physics.add.overlap(this.dudeShipManager.getDudeShip(), this.bossManager.getExplosionsGroup(), this.handleCollisionDudeExplosion, this.canDudeTakeDamage, this)
+
     }
 
     update(time, delta) {
@@ -140,6 +155,25 @@ export class CircleOfDeath extends Phaser.Scene {
             this.firstCollisionHappened = true
             this.dudeShipManager.setInvincible(true)
             this.dudeShipManager.setHpBasedOnHpPiece()
+            this.soundManager.playSound("dudeShipDamaged")
+            // logica per arrecare danno al dude da aggiungere
+            this.time.delayedCall(2200, () => {
+                this.firstCollisionHappened = false
+                this.dudeShipManager.setInvincible(false)
+            })
+
+        }
+    }
+
+    handleCollisionDudeExplosion(dudeship, expl) {
+
+        // damage from explosion is only taken when the explosion animation start, the "f1" animation
+        if (!this.firstCollisionHappened && expl.anims.currentAnim.key !== "f0") {
+            console.log("dude subisce danni dall esplosione!!")
+            this.firstCollisionHappened = true
+            this.dudeShipManager.setInvincible(true)
+            this.dudeShipManager.setHpBasedOnHpPiece()
+            this.soundManager.playSound("dudeShipDamaged")
             // logica per arrecare danno al dude da aggiungere
             this.time.delayedCall(2200, () => {
                 this.firstCollisionHappened = false
@@ -155,22 +189,13 @@ export class CircleOfDeath extends Phaser.Scene {
             this.firstCollisionHappened = true
             this.dudeShipManager.setInvincible(true)
             this.dudeShipManager.setHpBasedOnHpPiece()
+            this.soundManager.playSound("dudeShipDamaged")
             this.time.delayedCall(2200, () => {
                 this.firstCollisionHappened = false
                 this.dudeShipManager.setInvincible(false)
             })
 
         }
-    }
-
-
-    calculateX() {
-        return (this.canvasWidth / 2) + costanti.raggio * Math.cos(this.angolo);
-
-    }
-
-    calculateY() {
-        return this.canvasHeight / 2 + costanti.raggio * Math.sin(this.angolo);
     }
 
     checkCursorInput(delta) {
@@ -180,15 +205,15 @@ export class CircleOfDeath extends Phaser.Scene {
 
         if (this.cursor.right.isDown) {
             this.angolo += this.velAngolare * (this.dudeShipManager.getTurbo() ? 3 : 1) * (delta / 1000);
-            x = this.calculateX()
-            y = this.calculateY()
+            x = calculatePointCircumference_X(this.canvasWidth, this.angolo)
+            y = calculatePointCircumference_Y(this.canvasHeight, this.angolo)
             this.dudeShipManager.getDudeShip().setPosition(x, y);
         }
 
         if (this.cursor.left.isDown) {
             this.angolo -= this.velAngolare * (this.dudeShipManager.getTurbo() ? 3 : 1) * (delta / 1000);
-            x = this.calculateX()
-            y = this.calculateY()
+            x = calculatePointCircumference_X(this.canvasWidth, this.angolo)
+            y = calculatePointCircumference_Y(this.canvasHeight, this.angolo)
             this.dudeShipManager.getDudeShip().setPosition(x, y);
         }
 
