@@ -87,7 +87,9 @@ export class BossManager {
             if (n < 0.33) this.laserBeans()
             if (n >= 0.33 && n < 0.66) this.laserSemicircles(dudeship)
             if (n >= 0.66) this.detonateBombs()
-            
+
+
+            // this.detonateBombs()
         }
     }
 
@@ -107,6 +109,9 @@ export class BossManager {
         // // mettere un array per tenere traccia delle posizioni gia presenti prese sulla circonferenza e non creare troppe sovrapposizioni
         const arrPositionsXYAims = []
         const arrAngles = []
+
+        // play sound teleport
+        this.soundsManager.playSound("teleportSound")
 
         for (let i = 0; i < nAims; i++) {
 
@@ -153,6 +158,7 @@ export class BossManager {
         this.scene.time.delayedCall(300, () => {
             this.explosion_group.children.iterate(exp => {
                 exp.play("f1")
+                this.soundsManager.playSound("bombExplosion")
             })
 
             this.rifleAims_Group.clear(true, true)
