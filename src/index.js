@@ -1,6 +1,5 @@
 import Phaser from "phaser";
 import {Gameplay} from "./scenes/bombburner/Gameplay";
-import {GameOver} from "./scenes/bombburner/GameOver";
 import {StartMenu} from "./scenes/common/StartMenu";
 import {SaveScore} from "./scenes/common/SaveScore";
 import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
@@ -8,6 +7,7 @@ import {DisplayAllScores} from "./scenes/common/DisplayAllScores";
 import {PingPong} from "./scenes/pingpong/PingPong";
 import {ChoosePongDifficulty} from "./scenes/pingpong/ChoosePongDifficulty";
 import {CircleOfDeath} from "./scenes/circleofdeath/CircleOfDeath";
+import {GameOver} from "./scenes/common/GameOver";
 
 const config = {
     type: Phaser.AUTO,
