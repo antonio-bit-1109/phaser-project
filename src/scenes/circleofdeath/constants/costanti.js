@@ -4,6 +4,7 @@ export const costanti = {
     BLACKTRACE: "black",
     minNumRifleAim: 15,
     maxNumRifleAim: 22,
+    velAngolare: Math.PI / 3,
     MIN_DIST_BETWEEN_AIMS: 3
 }
 
