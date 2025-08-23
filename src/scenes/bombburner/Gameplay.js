@@ -1502,7 +1502,7 @@ export class Gameplay extends Phaser.Scene {
 
         // keep trace only when it changes
         if (this.timer !== roundedTimer) {
-            updateGameTimer(this.b, this.c, this.d, this.gameTimer, this.timerRef)
+            this.updateGameTimer()
         }
 
         this.timer = roundedTimer
@@ -1511,6 +1511,34 @@ export class Gameplay extends Phaser.Scene {
             this.punteggioRef.setText(`Punteggio: ${this.punteggio}`)
         }
 
+
+    }
+
+    updateGameTimer() {
+        if (this.d === 9) {
+            this.c++;
+            this.d = 0
+            this.refreshTime()
+            return
+        }
+
+        if (this.c === 5) {
+            this.b++
+            this.c = 0
+            this.d = 0;
+            this.refreshTime()
+            return
+        }
+
+        this.d++
+        this.refreshTime()
+        console.log(this.gameTimer)
+
+    }
+
+    refreshTime() {
+        this.gameTimer = `${this.b}:${this.c}${this.d}`;
+        this.timerRef.setText(this.gameTimer)
 
     }
 
