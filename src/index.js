@@ -7,7 +7,7 @@ import {DisplayAllScores} from "./scenes/common/DisplayAllScores";
 import {PingPong} from "./scenes/pingpong/PingPong";
 import {ChoosePongDifficulty} from "./scenes/pingpong/ChoosePongDifficulty";
 import {CircleOfDeath} from "./scenes/circleofdeath/CircleOfDeath";
-import {GameOver} from "./scenes/common/GameOver";
+import {GameOver} from "./scenes/common/gameover/GameOver";
 
 const config = {
     type: Phaser.AUTO,
