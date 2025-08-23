@@ -200,6 +200,7 @@ export class CircleOfDeath extends Phaser.Scene {
             this.dudeShipManager.setInvincible(true)
             this.dudeShipManager.setHpBasedOnHpPiece()
             this.soundManager.playSound("dudeShipDamaged")
+            bean.destroy()
             this.time.delayedCall(2200, () => {
                 this.firstCollisionHappened = false
                 this.dudeShipManager.setInvincible(false)
