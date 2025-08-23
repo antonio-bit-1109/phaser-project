@@ -2,18 +2,14 @@ import {SoundsManager} from "./managers/SoundsManager";
 import {BossManager} from "./entity/BossManager";
 import {calculatePointCircumference_X, calculatePointCircumference_Y, costanti} from "./constants/costanti";
 import {DudeShipManager} from "./entity/DudeShipManager";
+import {AmbientManager} from "./entity/AmbientManager";
 
 export class CircleOfDeath extends Phaser.Scene {
 
     canvasWidth = null;
     canvasHeight = null;
     gameName = null;
-    moonSurface = null;
-    angolo = 0;
-    velAngolare = Math.PI / 3; // 90° al secondo
-    cursor = null
     circleTrace = null
-    keySpace = null
     firstCollisionHappened = false
 
 
@@ -22,6 +18,7 @@ export class CircleOfDeath extends Phaser.Scene {
         this.soundManager = new SoundsManager(this)
         this.bossManager = new BossManager(this, this.soundManager)
         this.dudeShipManager = new DudeShipManager(this)
+        this.ambientManager = new AmbientManager(this, this.dudeShipManager)
     }
 
     init(data) {
@@ -70,10 +67,16 @@ export class CircleOfDeath extends Phaser.Scene {
 
         this.bossManager.create(this.canvasWidth, this.canvasHeight)
         this.dudeShipManager.create(this.canvasWidth, this.canvasHeight)
+        this.ambientManager.create(this.canvasWidth, this.canvasHeight)
+        this.ambientManager.addImage(
+            this.canvasWidth,
+            this.canvasHeight,
+            "moon_surface",
+            -1,
+            0.5,
+            this.ambientManager.getMoonSurface()
+        )
 
-
-        this.cursor = this.input.keyboard.createCursorKeys();
-        this.keySpace = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
         this.createAnimation("accelerationBoost", "boost_cloud", 0, 8, 25, 0)
         this.createAnimation("flameBurning", "flame_spriteSheet", 0, 4, 20, -1)
@@ -117,10 +120,6 @@ export class CircleOfDeath extends Phaser.Scene {
             volume: 1
         })
 
-        this.moonSurface = this.add.image(this.canvasWidth / 2, this.canvasHeight / 2, "moon_surface")
-            .setScale(0.5)
-            .setDepth(-1)
-
 
         this.circleTrace = this.add.graphics();
 
@@ -131,7 +130,6 @@ export class CircleOfDeath extends Phaser.Scene {
             costanti.raggio // raggio
         );
 
-        // this.mapSounds.get("bg_funk").play()
         this.soundManager.playSound("bg_funk")
 
 
@@ -145,7 +143,7 @@ export class CircleOfDeath extends Phaser.Scene {
 
         this.bossManager.update(delta, this.dudeShipManager.getDudeShip())
         this.dudeShipManager.update(delta)
-        this.checkCursorInput(delta)
+        this.ambientManager.update(delta)
 
     }
 
@@ -208,50 +206,7 @@ export class CircleOfDeath extends Phaser.Scene {
 
         }
     }
-
-    checkCursorInput(delta) {
-
-        let x;
-        let y;
-
-        if (this.cursor.right.isDown) {
-            this.angolo += this.velAngolare * (this.dudeShipManager.getTurbo() ? 3 : 1) * (delta / 1000);
-            x = calculatePointCircumference_X(this.canvasWidth, this.angolo)
-            y = calculatePointCircumference_Y(this.canvasHeight, this.angolo)
-            this.dudeShipManager.getDudeShip().setPosition(x, y);
-        }
-
-        if (this.cursor.left.isDown) {
-            this.angolo -= this.velAngolare * (this.dudeShipManager.getTurbo() ? 3 : 1) * (delta / 1000);
-            x = calculatePointCircumference_X(this.canvasWidth, this.angolo)
-            y = calculatePointCircumference_Y(this.canvasHeight, this.angolo)
-            this.dudeShipManager.getDudeShip().setPosition(x, y);
-        }
-
-        if (this.keySpace.isDown && this.dudeShipManager.getTurboUpperBar().width >= 1) {
-
-            this.dudeShipManager.setTurbo(true)
-            this.dudeShipManager.getTurboUpperBar().width -= 0.58
-            this.dudeShipManager.setHasTurboNeedRecharge(true)
-
-            let cloud = this.add.sprite(x, y, "boost_cloud").play("accelerationBoost")
-
-            this.dudeShipManager.getBoostCloudGroup().add(cloud, true)
-
-            this.dudeShipManager.getBoostCloudGroup().children.iterate(boost => {
-                boost.on('animationcomplete', () => {
-                    boost.destroy();
-                });
-            })
-
-        } else {
-            this.dudeShipManager.setTurbo(false)
-        }
-
-
-    }
-
-
+    
     createAnimation(animName, spritesheetName, start, end, frameRate, repeat) {
         this.anims.create({
             key: animName,
