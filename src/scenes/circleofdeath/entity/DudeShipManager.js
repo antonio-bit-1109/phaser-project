@@ -19,6 +19,19 @@ export class DudeShipManager {
         this.canvasH = null
     }
 
+
+    resetDefault() {
+        this.boostCloud_group = null
+        this.deltaRechargeTurbo = 0
+        this.turboLowBar = null;
+        this.turboUpperBar = null
+        this.HasTurboNeedRecharge = false
+        this.turbo = false
+        this.invincible = false
+        this.hp_sprite = null
+        this.hpPiece = 4
+    }
+
     //getter
 
     getHpSprite() {
