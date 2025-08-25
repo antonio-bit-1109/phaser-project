@@ -54,6 +54,10 @@ export class DudeShipManager {
         return this.HasTurboNeedRecharge;
     }
 
+    isDudeDeath() {
+        return this.hpPiece === 0
+    }
+
     //setter
 
     setHpPiece(num) {
