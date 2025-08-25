@@ -22,3 +22,5 @@
 - modifica del metodo overlap, non va piu chiamato nel update
   ma va dichiarato solo una volta dentro al metodo create quali oggetti devono essere controllati se collidono
 - sistemare la classe di gameover per gestire dinamicamente il gioco che che la chiama
+- quando avvi circleofdeath resetta i valori salvati nelle classe e chiamali dentro il metodo di init (resetta dati a
+  default dentro circleofdeath)
