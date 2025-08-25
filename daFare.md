@@ -21,3 +21,4 @@
 - reset palla se si bugga
 - modifica del metodo overlap, non va piu chiamato nel update
   ma va dichiarato solo una volta dentro al metodo create quali oggetti devono essere controllati se collidono
+- sistemare la classe di gameover per gestire dinamicamente il gioco che che la chiama
