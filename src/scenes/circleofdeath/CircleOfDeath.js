@@ -15,6 +15,7 @@ export class CircleOfDeath extends Phaser.Scene {
 
     constructor() {
         super("circleofdeath");
+        this.sceneName = "circleofdeath"
         this.soundManager = new SoundsManager(this)
         this.bossManager = new BossManager(this, this.soundManager)
         this.dudeShipManager = new DudeShipManager(this)
@@ -144,7 +145,43 @@ export class CircleOfDeath extends Phaser.Scene {
         this.bossManager.update(delta, this.dudeShipManager.getDudeShip())
         this.dudeShipManager.update(delta)
         this.ambientManager.update(delta)
+        this.isGameFinished()
+    }
 
+    isGameFinished() {
+        if (
+            this.isValueZero(this.ambientManager.getTimerMinutes()) &&
+            this.isValueZero(this.ambientManager.getTimerDecine()) &&
+            this.isValueZero(this.ambientManager.getTimerUnit())
+        ) {
+            this.soundManager.stopAllSounds()
+            this.scene.stop("circleofdeath")
+            this.scene.start("gameover", {
+                canvasWidth: this.canvasWidth,
+                canvasHeight: this.canvasHeight,
+                gameName: this.gameName,
+                sceneName: this.scene.key,
+                gameTime: this.ambientManager.getTimerFormatted()
+            })
+        }
+
+        if (
+            this.dudeShipManager.isDudeDeath()
+        ) {
+            this.soundManager.stopAllSounds()
+            this.scene.stop("circleofdeath")
+            this.scene.start("gameover", {
+                canvasWidth: this.canvasWidth,
+                canvasHeight: this.canvasHeight,
+                gameName: this.gameName,
+                sceneName: this.scene.key,
+                gameTime: this.ambientManager.getTimerFormatted()
+            })
+        }
+    }
+
+    isValueZero(num) {
+        return num === 0
     }
 
     canDudeTakeDamage() {
@@ -206,7 +243,7 @@ export class CircleOfDeath extends Phaser.Scene {
 
         }
     }
-    
+
     createAnimation(animName, spritesheetName, start, end, frameRate, repeat) {
         this.anims.create({
             key: animName,
