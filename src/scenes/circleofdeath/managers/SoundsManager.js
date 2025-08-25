@@ -6,6 +6,10 @@ export class SoundsManager {
         this.mapSounds = new Map()
     }
 
+    resetDefault() {
+        this.mapSounds = new Map()
+    }
+
     addAudio(key, config) {
         const sound = this.scene.sound.add(key, config)
         this.mapSounds.set(key, sound)
