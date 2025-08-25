@@ -18,4 +18,10 @@ export class SoundsManager {
     isSoundAlreadyPlaying(key) {
         return this.mapSounds.get(key).isPlaying
     }
+
+    stopAllSounds() {
+        for (let sound of this.mapSounds.values()) {
+            sound.stop()
+        }
+    }
 }
