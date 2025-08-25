@@ -20,17 +20,22 @@ export class GameOver extends Phaser.Scene {
     }
 
     init(data) {
-        this.canvasWidth = data.canvasWidth;
-        this.canvasHeight = data.canvasHeigth;
-        this.punteggioFinale = data.punteggioFinale;
-        this.livello = data.livello;
-        this.isGameVictory = data.isGameVictory
-        this.dudeIsPompato = data.isDudePompato
-        this.finalTime = data.gameTime
-        this.gameName = data.gameName
-        this.sceneName = data.sceneName
-        this.gameDifficult = data.gameDifficult
-        this.fogMode = data.fogMode
+        // Applichiamo il controllo a ogni singola proprietà
+        this.canvasWidth = this.checkValue(data.canvasWidth);
+        this.canvasHeight = this.checkValue(data.canvasHeight); // Corretto il refuso da 'Heigth'
+        this.punteggioFinale = this.checkValue(data.punteggioFinale);
+        this.livello = this.checkValue(data.livello);
+        this.isGameVictory = this.checkValue(data.isGameVictory);
+        this.dudeIsPompato = this.checkValue(data.dudeIsPompato); // Corretto il refuso da 'isDudePompato'
+        this.finalTime = this.checkValue(data.gameTime);
+        this.gameName = this.checkValue(data.gameName);
+        this.sceneName = this.checkValue(data.sceneName);
+        this.gameDifficult = this.checkValue(data.gameDifficult);
+        this.fogMode = this.checkValue(data.fogMode);
+    }
+
+    checkValue(value) {
+        return value ? value : null
     }
 
     preload() {
