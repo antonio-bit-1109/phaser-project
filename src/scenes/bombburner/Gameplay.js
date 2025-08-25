@@ -906,15 +906,15 @@ export class Gameplay extends Phaser.Scene {
                 this.scene.stop('gameplay')
                 this.sound.stopAll();
                 this.scene.start('gameover', {
-                    gameName: this.gameName,
                     canvasWidth: this.canvasWidth,
-                    canvasHeigth: this.canvasHeight,
+                    canvasHeight: this.canvasHeight,
+                    gameName: this.gameName,
+                    sceneName: this.scene.key,
                     punteggioFinale: this.punteggio,
                     livello: this.livello,
                     isGameVictory: true,
                     isDudePompato: this.dudePompato,
-                    gameTime: this.gameTimer,
-                    sceneName: this.scene.key
+                    gameTime: this.gameTimer
                 })
             })
 
@@ -1326,7 +1326,7 @@ export class Gameplay extends Phaser.Scene {
         this.sound.stopAll();
         this.scene.start('gameover', {
             canvasWidth: this.canvasWidth,
-            canvasHeigth: this.canvasHeight,
+            canvasHeight: this.canvasHeight,
             punteggioFinale: this.punteggio,
             livello: this.livello,
             isGameVictory: false,
