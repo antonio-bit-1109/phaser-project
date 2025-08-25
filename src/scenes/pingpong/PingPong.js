@@ -198,10 +198,10 @@ export class PingPong extends Phaser.Scene {
             this.scene.stop("pingpong")
             this.scene.start("gameover", {
                 canvasWidth: this.canvasWidth,
-                canvasHeigth: this.canvasHeight,
-                isGameVictory: parseInt(this.dudePoints) >= 5,
+                canvasHeight: this.canvasHeight,
                 gameName: this.gameName,
                 sceneName: this.scene.key,
+                isGameVictory: parseInt(this.dudePoints) >= 5,
                 punteggioFinale: `${this.dudePoints}/${this.bossPoints}`,
                 gameDifficult: this.GAMEDIFFICULTY,
                 fogModeOn: this.fogMode
