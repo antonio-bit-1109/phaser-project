@@ -26,6 +26,22 @@ export class BossManager {
         this.soundsManager = soundsManager
     }
 
+    resetDefault() {
+        this.passingTime = 0;
+        this.isBossAttacking = false;
+        this.laserBean_group = null;
+        this.rifleAims_Group = null;
+        this.flameGroup = null;
+        this.semicircle = null;
+        this.semicircleTrace = null;
+        this.canvasW = null;
+        this.canvasH = null;
+        this.countDown = "2";
+        this.countDown_text = null;
+        this.explosion_group = null;
+        this.countDownFunction = null;
+    }
+
     // getter
     getLaserBeanGroup() {
         return this.laserBean_group
