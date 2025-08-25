@@ -15,7 +15,21 @@ export class AmbientManager {
     timerRef = null
     deltaSum = 0
 
-    // velAngolare = Math.PI / 3; // 90° al secondo
+
+    resetDefault() {
+        this.moonSurface = null;
+        this.canvasW = null
+        this.canvasH = null;
+        this.cursor = null
+        this.angolo = 0;
+        this.keySpace = null
+        this.m = 2
+        this.d = 0
+        this.u = 7
+        this.timer = `${this.m}:${this.d}${this.u}`
+        this.timerRef = null
+        this.deltaSum = 0
+    }
 
     constructor(scene, dudeshipManager) {
         this.scene = scene
