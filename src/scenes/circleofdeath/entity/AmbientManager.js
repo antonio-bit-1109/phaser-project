@@ -8,6 +8,12 @@ export class AmbientManager {
     cursor = null
     angolo = 0;
     keySpace = null
+    m = 2
+    d = 0
+    u = 7
+    timer = `${this.m}:${this.d}${this.u}`
+    timerRef = null
+    deltaSum = 0
 
     // velAngolare = Math.PI / 3; // 90° al secondo
 
@@ -20,20 +26,33 @@ export class AmbientManager {
         return this.moonSurface
     }
 
-    setMoonSurface(val) {
-        this.moonSurface = val
+    getTimerMinutes() {
+        return this.m
     }
 
+    getTimerDecine() {
+        return this.d
+    }
+
+    getTimerUnit() {
+        return this.u
+    }
+
+    getTimerFormatted() {
+        return this.timer
+    }
 
     create(w, h) {
         this.canvasH = h
         this.canvasW = w
         this.cursor = this.scene.input.keyboard.createCursorKeys();
         this.keySpace = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+        this.createTimer()
     }
 
     update(delta) {
         this.checkCursorInput(delta)
+        this.updateTimer(delta)
     }
 
 
@@ -41,6 +60,52 @@ export class AmbientManager {
         prop = this.scene.add.image(x, y, texture)
             .setScale(scale)
             .setDepth(depth)
+    }
+
+    createTimer() {
+        this.timerRef = this.scene.add.text(this.canvasW / 1.30, this.canvasH / 12, this.timer)
+            .setDepth(4)
+            .setScale(5)
+    }
+
+
+    updateTimer(delta) {
+        this.deltaSum += delta;
+        if (this.deltaSum >= 1000) {
+
+            this.deltaSum -= 1000;
+
+            //2:07
+            if (this.d === 0 && this.m === 0 && this.u === 0) return
+
+            if (this.u === 0) {
+
+
+                if (this.d !== 0) {
+                    this.d--;
+                    this.u = 9
+                }
+
+                if (this.d === 0 && this.u === 0) {
+                    this.m--
+                    this.d = 5
+                    this.u = 9
+                }
+
+            } else {
+
+                this.u--
+            }
+
+
+            // final association
+            this.updateTimerVisual()
+        }
+    }
+
+    updateTimerVisual() {
+        this.timer = `${this.m}:${this.d}${this.u}`
+        this.timerRef.setText(this.timer)
     }
 
     checkCursorInput(delta) {
