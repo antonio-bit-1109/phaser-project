@@ -26,6 +26,12 @@ export class CircleOfDeath extends Phaser.Scene {
         this.canvasWidth = data.canvasWidth;
         this.canvasHeight = data.canvasHeight;
         this.gameName = data.gameName
+        this.circleTrace = null
+        this.firstCollisionHappened = false
+        this.ambientManager.resetDefault()
+        this.dudeShipManager.resetDefault()
+        this.bossManager.resetDefault()
+        this.soundManager.resetDefault()
     }
 
     preload() {
