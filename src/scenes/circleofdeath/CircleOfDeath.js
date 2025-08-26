@@ -61,6 +61,10 @@ export class CircleOfDeath extends Phaser.Scene {
             frameWidth: 128, frameHeight: 128
         })
 
+        this.load.spritesheet("alienPiranha", "assets/circleofdeath/images/piranha.png", {
+            frameWidth: 250, frameHeight: 250
+        })
+
         this.load.audio("bg_funk", "assets/circleofdeath/sounds/funk.mp3")
         this.load.audio("alarm", "assets/circleofdeath/sounds/alarm.mp3")
         this.load.audio("fireBurning", "assets/circleofdeath/sounds/fireBurning.mp3")
@@ -73,19 +77,6 @@ export class CircleOfDeath extends Phaser.Scene {
 
     create() {
 
-        this.bossManager.create(this.canvasWidth, this.canvasHeight)
-        this.dudeShipManager.create(this.canvasWidth, this.canvasHeight)
-        this.ambientManager.create(this.canvasWidth, this.canvasHeight)
-        this.ambientManager.addImage(
-            this.canvasWidth,
-            this.canvasHeight,
-            "moon_surface",
-            -1,
-            0.5,
-            this.ambientManager.getMoonSurface()
-        )
-
-
         this.createAnimation("accelerationBoost", "boost_cloud", 0, 8, 25, 0)
         this.createAnimation("flameBurning", "flame_spriteSheet", 0, 4, 20, -1)
 
@@ -97,6 +88,20 @@ export class CircleOfDeath extends Phaser.Scene {
 
         this.createAnimation("f0", "explosion_2", 0, 0, 20, 0)
         this.createAnimation("f1", "explosion_2", 1, 11, 15, 0)
+        this.createAnimation("piranha1", "alienPiranha", 0, 3, 10, -1)
+
+
+        this.bossManager.create(this.canvasWidth, this.canvasHeight)
+        this.dudeShipManager.create(this.canvasWidth, this.canvasHeight)
+        this.ambientManager.create(this.canvasWidth, this.canvasHeight)
+        this.ambientManager.addImage(
+            this.canvasWidth,
+            this.canvasHeight,
+            "moon_surface",
+            -1,
+            0.5,
+            this.ambientManager.getMoonSurface()
+        )
 
 
         this.soundManager.addAudio("bg_funk", {
