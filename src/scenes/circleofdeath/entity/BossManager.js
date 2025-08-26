@@ -70,7 +70,7 @@ export class BossManager {
             .setVisible(false)
 
         this.alienPiranha = this.scene.physics.add.sprite(0, 0, "alienPiranha")
-            .setScale(0.5)
+            .setScale(0.3)
             .setVisible(false)
             .play("piranha1")
     }
@@ -80,7 +80,6 @@ export class BossManager {
     update(delta, dudeship) {
         this.rotateBoss()
         this.bossAttacks(delta, dudeship)
-
     }
 
 
@@ -107,46 +106,71 @@ export class BossManager {
 
             console.log(n)
 
-            // if (n < 0.33) this.laserBeans()
-            // if (n >= 0.33 && n < 0.66) this.laserSemicircles(dudeship)
-            // if (n >= 0.66) this.detonateBombs()
-            this.spawnAlienPiranha()
+            if (n < 0.25) this.laserBeans()
+            if (n >= 0.25 && n < 0.50) this.laserSemicircles(dudeship)
+            if (n >= 0.50 && n < 0.75) this.detonateBombs()
+            if (n >= 0.75) this.spawnAlienPiranha(delta)
+
         }
     }
 
     spawnAlienPiranha() {
-
-        if (this.isBossAttacking) return
-
+        if (this.isBossAttacking) return;
         this.isBossAttacking = true;
-        console.log("spawn piranha")
 
-        let randomAngle = Math.floor(Math.random() * 366)
-        console.log(randomAngle)
+        // 1. Angolo di partenza (in radianti per coerenza)
+        let startAngleRadians = Phaser.Math.DegToRad(Math.floor(Math.random() * 361));
 
-        let x_start = calculatePointCircumference_X(this.canvasW, Phaser.Math.DegToRad(randomAngle))
-        let y_start = calculatePointCircumference_Y(this.canvasH, Phaser.Math.DegToRad(randomAngle))
-
-        let currAngle = randomAngle
-        let endAngle = randomAngle + Math.PI
-
+        // 2. Posiziona lo sprite all'inizio
         this.alienPiranha
-            .setPosition(x_start, y_start)
-            .setVisible(true)
+            .setPosition(
+                calculatePointCircumference_X(this.canvasW, startAngleRadians),
+                calculatePointCircumference_Y(this.canvasH, startAngleRadians)
+            )
+            .setVisible(true);
+
+        // 3. Oggetto proxy che il tween animerà e modificherà linearmente
+        let angleProxy = {value: startAngleRadians};
+
+        // 4. Angolo finale (mezzo giro dopo)
+        let endAngleRadians = startAngleRadians + Math.PI;
+
+        // 5. Crea il tween che gestirà l'animazione su più frame
+        this.scene.tweens.add({
+            targets: angleProxy,
+            value: endAngleRadians,
+            duration: 2500, // Il movimento durerà 2.5 secondi
+            ease: 'Linear',
+            onUpdate: (tween, target, key, current, previous, param) => {
+                // Questa funzione viene chiamata AD OGNI FRAME dell'animazione
+
+                // posso prendere dei parametri dall update tween,target,key,current,previous,param
+                // tween, getValue mi prende il valore attuale che il tweens sta modificando ( il target che sta venendo modificato)
+                // NB il tweens modifica DIRETTAMENTE il valore passato come target quindi avrei potuto prendere anche direttamente
+                //angleProxy.value e sarebbe stato lo stesso
+                let currAngleDeg = Phaser.Math.RadToDeg(tween.getValue())
+
+                // flippare, cioè specchiare il piranha,
+                // in base a se si trova a destra o a sinistra della schermo
+                if (this.alienPiranha.x <= this.canvasW / 2) {
+                    this.alienPiranha.flipX = true
+                } else {
+                    this.alienPiranha.flipX = false
+                }
 
 
-        // this.scene.tweens.add({
-        //     targets: this.alienPiranha,
-        //     ease: "Linear",
-        //     duration: 1500,
-        //     onUpdate: () => {
-        //         let x_mid = calculatePointCircumference_X(this.canvasW, Phaser.Math.DegToRad(currAngle + 100))
-        //         let y_mid = calculatePointCircumference_X(this.canvasW, Phaser.Math.DegToRad(currAngle + 100))
-        //
-        //         this.alienPiranha.setPosition(x_mid, y_mid)
-        //         currAngle = x_mid
-        //     }
-        // })
+                this.alienPiranha.setPosition(
+                    calculatePointCircumference_X(this.canvasW, tween.getValue()),
+                    calculatePointCircumference_Y(this.canvasH, tween.getValue())
+                );
+
+            },
+            onComplete: () => {
+                console.log("Movimento completato!");
+                this.isBossAttacking = false;
+                this.alienPiranha.setVisible(false)
+            }
+        });
     }
 
     detonateBombs() {
