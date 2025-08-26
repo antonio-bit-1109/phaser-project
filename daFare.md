@@ -24,3 +24,5 @@
 - sistemare la classe di gameover per gestire dinamicamente il gioco che che la chiama
 - quando avvi circleofdeath resetta i valori salvati nelle classe e chiamali dentro il metodo di init (resetta dati a
   default dentro circleofdeath)
+- finisci il piranha attack del boss
+- [] aggiungi un alert per preavvisare dove spawna il piranha 
