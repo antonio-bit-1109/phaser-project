@@ -205,8 +205,7 @@ export class BossManager {
 
         })
     }
-
-
+    
     resetCountDown() {
         this.scene.time.delayedCall(200, () => {
             this.countDown = "2"
