@@ -1,17 +1,20 @@
 export class GameOver extends Phaser.Scene {
 
+    // always presents data
     canvasWidth = null;
     canvasHeight = null
+    isGameVictory = null;
+    gameName = null
+    sceneName = null
+
+    // nulllable data
     punteggioFinale = null;
     livello = null;
     happyDude = null;
     sadDude = null;
-    isGameVictory = null;
     dudeIsPompato = null
     image = null;
     finalTime = null
-    gameName = null
-    sceneName = null
     gameDifficult = null;
     fogMode = null
 
@@ -22,11 +25,11 @@ export class GameOver extends Phaser.Scene {
     init(data) {
         // Applichiamo il controllo a ogni singola proprietà
         this.canvasWidth = this.checkValue(data.canvasWidth);
-        this.canvasHeight = this.checkValue(data.canvasHeight); // Corretto il refuso da 'Heigth'
+        this.canvasHeight = this.checkValue(data.canvasHeight);
         this.punteggioFinale = this.checkValue(data.punteggioFinale);
         this.livello = this.checkValue(data.livello);
         this.isGameVictory = this.checkValue(data.isGameVictory);
-        this.dudeIsPompato = this.checkValue(data.dudeIsPompato); // Corretto il refuso da 'isDudePompato'
+        this.dudeIsPompato = this.checkValue(data.dudeIsPompato);
         this.finalTime = this.checkValue(data.gameTime);
         this.gameName = this.checkValue(data.gameName);
         this.sceneName = this.checkValue(data.sceneName);
@@ -67,11 +70,16 @@ export class GameOver extends Phaser.Scene {
         console.log('gameName:', this.gameName);
         console.log('sceneName:', this.sceneName);
 
-        this.add.image(this.canvasWidth - 200, 100, "btn_home")
-            .setDepth(5)
-            .setScale(0.7)
-            .setInteractive({cursor: "pointer"}) // cursore manina
-            .once("pointerdown", () => {
+
+        this.addImage(this.canvasWidth - 200,
+            100,
+            "btn_home",
+            null,
+            5,
+            0.7,
+            {cursor: "pointer"},
+            "pointerdown",
+            () => {
                 this.sound.removeAll();
                 this.scene.stop("gameover")
                 this.scene.start("startmenu", {
@@ -80,9 +88,11 @@ export class GameOver extends Phaser.Scene {
                 })
             })
 
-        this.add.image(this.canvasWidth / 2, this.canvasHeight / 2, "sky").setOrigin(0.5, 0.5).setDepth(0)
+        this.addImage(this.canvasWidth / 2, this.canvasHeight / 2, "sky", {x: 0.5, y: 0.5}, 0)
+
         !this.isGameVictory && this.sound.play('gameOver_loser')
         this.isGameVictory && this.sound.play('gameOver_winner')
+
         this.showGameOver();
         this.pressSpaceToRestart();
 
@@ -107,13 +117,21 @@ export class GameOver extends Phaser.Scene {
             return "sad_dude_corazzato";
         }
 
-        if (!this.isGameVictory && this.gameName.replace(" ", "").toLowerCase().includes("pingpong")) {
+        if (
+            !this.isGameVictory && this.gameName.replace(" ", "").toLowerCase().includes("pingpong") ||
+            !this.isGameVictory && this.gameName.replace(" ", "").toLowerCase().includes("circle")
+        ) {
             return "dudeShip_triste";
         }
 
-        if (this.isGameVictory && this.gameName.replace(" ", "").toLowerCase().includes("pingpong")) {
+        if (
+            this.isGameVictory && this.gameName.replace(" ", "").toLowerCase().includes("pingpong") ||
+            this.isGameVictory && this.gameName.replace(" ", "").toLowerCase().includes("circle")
+        ) {
             return "dude_ship_happy";
         }
+
+
     }
 
 
@@ -128,27 +146,33 @@ export class GameOver extends Phaser.Scene {
             this.image.setScale(0.3)
         }
 
-        this.add.text(
-            this.canvasWidth / 2,
+
+        this.addText(this.canvasWidth / 2,
             this.canvasHeight / 2,
-            'Game Over.',
+            "Game Over",
             {
                 fontSize: '30px',
                 color: '#ff0000',
                 fontStyle: 'bold',
-            }).setOrigin(0.5, 0.5)
+            },
+            {x: 0.5, y: 0.5}
+        )
 
-        this.gameName.toLowerCase().includes("bomb") && this.add.text(
-            this.canvasWidth / 2,
+        this.gameName.toLowerCase().includes("bomb") &&
+        this.addText(this.canvasWidth / 2,
             this.canvasHeight / 1.8,
             `Punteggio finale: ${this.punteggioFinale}`,
             {
                 fontSize: '30px',
                 color: '#ff0000',
                 fontStyle: 'bold'
-            }).setOrigin(0.5, 0.5)
+            },
+            {x: 0.5, y: 0.5}
+        )
 
-        this.gameName.toLowerCase().includes("bomb") && this.add.text(
+
+        this.gameName.toLowerCase().includes("bomb") &&
+        this.addText(
             this.canvasWidth / 2,
             this.canvasHeight / 1.6,
             `Livello raggiunto: ${this.livello}`,
@@ -156,9 +180,12 @@ export class GameOver extends Phaser.Scene {
                 fontSize: '30px',
                 color: '#ff0000',
                 fontStyle: 'bold'
-            }).setOrigin(0.5, 0.5)
+            },
+            {x: 0.5, y: 0.5}
+        )
 
-        this.gameName.toLowerCase().includes("bomb") && this.add.text(
+        this.gameName.toLowerCase().includes("bomb") &&
+        this.addText(
             this.canvasWidth / 2,
             this.canvasHeight / 1.4,
             `Tempo di gioco: ${this.finalTime}`,
@@ -166,14 +193,15 @@ export class GameOver extends Phaser.Scene {
                 fontSize: '30px',
                 color: '#ff0000',
                 fontStyle: 'bold'
-            }).setOrigin(0.5, 0.5)
-
+            },
+            {x: 0.5, y: 0.5}
+        )
 
         if (this.isGameVictory) {
 
             //
             this.pressEnterToSavePunteggio();
-            this.add.text(
+            this.addText(
                 this.canvasWidth / 2,
                 this.canvasHeight / 1.1,
                 'premi Invio per salvare il tuo punteggio.',
@@ -181,12 +209,15 @@ export class GameOver extends Phaser.Scene {
                     fontSize: '30px',
                     color: '#f1bb09',
                     fontStyle: 'bold'
-                }).setOrigin(0.5, 0.5)
-            //
+                },
+                {x: 0.5, y: 0.5}
+            )
+
         } else {
 
             //
-            this.add.text(
+
+            this.addText(
                 this.canvasWidth / 2,
                 this.canvasHeight / 1.1,
                 'PER SALVARE DEVI VINCERE LA PARTITA',
@@ -194,10 +225,12 @@ export class GameOver extends Phaser.Scene {
                     fontSize: '30px',
                     color: '#e05e0f',
                     fontStyle: 'bold'
-                }).setOrigin(0.5, 0.5)
+                },
+                {x: 0.5, y: 0.5}
+            )
         }
 
-        this.add.text(
+        this.addText(
             this.canvasWidth / 2,
             this.canvasHeight / 1.2,
             'premi spazio per ricominciare.',
@@ -205,7 +238,9 @@ export class GameOver extends Phaser.Scene {
                 fontSize: '30px',
                 color: '#ff0000',
                 fontStyle: 'bold'
-            }).setOrigin(0.5, 0.5)
+            },
+            {x: 0.5, y: 0.5}
+        )
 
     }
 
@@ -240,6 +275,21 @@ export class GameOver extends Phaser.Scene {
                 canvasHeight: this.canvasHeight
             })
         })
+    }
+
+
+    addImage(x, y, texture, origin, depth, scale, hitArea, event, fn) {
+        const img = this.add.image(x, y, texture)
+        origin && origin.x && origin.y && img.setOrigin(origin.x, origin.y)
+        depth && img.setDepth(depth)
+        scale && img.setScale(scale)
+        hitArea && img.setInteractive(hitArea)
+        event && fn && img.once(event, fn)
+    }
+
+    addText(x, y, text, style, origin) {
+        const tx = this.add.text(x, y, text, style)
+        origin && origin.x && origin.y && tx.setOrigin(origin.x, origin.y)
     }
 
     update() {
