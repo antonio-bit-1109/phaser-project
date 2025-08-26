@@ -11,6 +11,7 @@ export class CircleOfDeath extends Phaser.Scene {
     gameName = null;
     circleTrace = null
     firstCollisionHappened = false
+    isGameVictory = false
 
 
     constructor() {
@@ -167,7 +168,8 @@ export class CircleOfDeath extends Phaser.Scene {
                 canvasHeight: this.canvasHeight,
                 gameName: this.gameName,
                 sceneName: this.scene.key,
-                gameTime: this.ambientManager.getTimerFormatted()
+                gameTime: this.ambientManager.getTimerFormatted(),
+                isGameVictory: true
             })
         }
 
@@ -181,7 +183,8 @@ export class CircleOfDeath extends Phaser.Scene {
                 canvasHeight: this.canvasHeight,
                 gameName: this.gameName,
                 sceneName: this.scene.key,
-                gameTime: this.ambientManager.getTimerFormatted()
+                gameTime: this.ambientManager.getTimerFormatted(),
+                isGameVictory: false
             })
         }
     }
