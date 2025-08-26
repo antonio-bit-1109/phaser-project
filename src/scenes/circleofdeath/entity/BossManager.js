@@ -19,6 +19,7 @@ export class BossManager {
     countDown_text = null
     explosion_group = null
     countDownFunction = null
+    alienPiranha = null
 
     constructor(scene, soundsManager) {
         this.boss = null;
@@ -67,6 +68,11 @@ export class BossManager {
         this.countDown_text = this.scene.add.text(this.canvasW / 18, this.canvasH / 2, this.countDown)
             .setScale(10)
             .setVisible(false)
+
+        this.alienPiranha = this.scene.physics.add.sprite(0, 0, "alienPiranha")
+            .setScale(0.5)
+            .setVisible(false)
+            .play("piranha1")
     }
 
 
@@ -74,6 +80,7 @@ export class BossManager {
     update(delta, dudeship) {
         this.rotateBoss()
         this.bossAttacks(delta, dudeship)
+
     }
 
 
@@ -100,11 +107,46 @@ export class BossManager {
 
             console.log(n)
 
-            if (n < 0.33) this.laserBeans()
-            if (n >= 0.33 && n < 0.66) this.laserSemicircles(dudeship)
-            if (n >= 0.66) this.detonateBombs()
-
+            // if (n < 0.33) this.laserBeans()
+            // if (n >= 0.33 && n < 0.66) this.laserSemicircles(dudeship)
+            // if (n >= 0.66) this.detonateBombs()
+            this.spawnAlienPiranha()
         }
+    }
+
+    spawnAlienPiranha() {
+
+        if (this.isBossAttacking) return
+
+        this.isBossAttacking = true;
+        console.log("spawn piranha")
+
+        let randomAngle = Math.floor(Math.random() * 366)
+        console.log(randomAngle)
+
+        let x_start = calculatePointCircumference_X(this.canvasW, Phaser.Math.DegToRad(randomAngle))
+        let y_start = calculatePointCircumference_Y(this.canvasH, Phaser.Math.DegToRad(randomAngle))
+
+        let currAngle = randomAngle
+        let endAngle = randomAngle + Math.PI
+
+        this.alienPiranha
+            .setPosition(x_start, y_start)
+            .setVisible(true)
+
+
+        // this.scene.tweens.add({
+        //     targets: this.alienPiranha,
+        //     ease: "Linear",
+        //     duration: 1500,
+        //     onUpdate: () => {
+        //         let x_mid = calculatePointCircumference_X(this.canvasW, Phaser.Math.DegToRad(currAngle + 100))
+        //         let y_mid = calculatePointCircumference_X(this.canvasW, Phaser.Math.DegToRad(currAngle + 100))
+        //
+        //         this.alienPiranha.setPosition(x_mid, y_mid)
+        //         currAngle = x_mid
+        //     }
+        // })
     }
 
     detonateBombs() {
@@ -205,7 +247,7 @@ export class BossManager {
 
         })
     }
-    
+
     resetCountDown() {
         this.scene.time.delayedCall(200, () => {
             this.countDown = "2"
