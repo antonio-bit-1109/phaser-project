@@ -76,6 +76,8 @@ export class CircleOfDeath extends Phaser.Scene {
         this.load.audio("dudeShipDamaged", "assets/circleofdeath/sounds/dudeShipDamaged.mp3")
         this.load.audio("teleportSound", "assets/circleofdeath/sounds/teleport.mp3")
         this.load.audio("bombExplosion", "assets/circleofdeath/sounds/bombExplosion.mp3")
+        this.load.audio("splashSound", "assets/circleofdeath/sounds/splash.mp3")
+        this.load.audio("biteSound", "assets/circleofdeath/sounds/biteSound.mp3")
     }
 
 
@@ -108,6 +110,15 @@ export class CircleOfDeath extends Phaser.Scene {
             this.ambientManager.getMoonSurface()
         )
 
+
+        this.soundManager.addAudio("splashSound", {
+            volume: 1
+        })
+
+        this.soundManager.addAudio("biteSound", {
+            volume: 1,
+            loop: true
+        })
 
         this.soundManager.addAudio("bg_funk", {
             volume: 2,
