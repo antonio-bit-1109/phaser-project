@@ -23,6 +23,7 @@ export class StartMenu extends Phaser.Scene {
     bombBurnerGameName = "Bomb Burner"
     pingPongGameName = "Ping pong dude"
     circleOfDeathName = "Circle of Death"
+    pigsName = "Pigs"
 
     convertToRadiant(gradi) {
         return Phaser.Math.DegToRad(gradi)
@@ -107,7 +108,21 @@ export class StartMenu extends Phaser.Scene {
                 })
             })
 
-        this.add.text(this.canvasWidth / 2, this.canvasHeight / 1.8, "Classifica Punteggi", {
+        this.add.text(this.canvasWidth / 2, this.canvasHeight / 1.8, this.pigsName, styleDefault)
+            .setDepth(6)
+            .setOrigin(0.5, 0.5)
+            .setInteractive({cursor: 'pointer'})
+            .on("pointerdown", () => {
+                this.sound.stopAll()
+                this.scene.stop("startmenu");
+                this.scene.start("pigs", {
+                    canvasWidth: this.canvasWidth,
+                    canvasHeight: this.canvasHeight,
+                    gameName: this.pigsName
+                })
+            })
+
+        this.add.text(this.canvasWidth / 2, this.canvasHeight / 1.6, "Classifica Punteggi", {
             fontSize: '30px',
             color: '#1e1e1b',
             fontStyle: 'bold',
