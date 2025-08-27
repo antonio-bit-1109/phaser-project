@@ -65,6 +65,10 @@ export class CircleOfDeath extends Phaser.Scene {
             frameWidth: 250, frameHeight: 250
         })
 
+        this.load.spritesheet("splash", "assets/circleofdeath/images/water_splash.png", {
+            frameHeight: 166.66, frameWidth: 166.66
+        })
+
         this.load.audio("bg_funk", "assets/circleofdeath/sounds/funk.mp3")
         this.load.audio("alarm", "assets/circleofdeath/sounds/alarm.mp3")
         this.load.audio("fireBurning", "assets/circleofdeath/sounds/fireBurning.mp3")
@@ -89,6 +93,7 @@ export class CircleOfDeath extends Phaser.Scene {
         this.createAnimation("f0", "explosion_2", 0, 0, 20, 0)
         this.createAnimation("f1", "explosion_2", 1, 11, 15, 0)
         this.createAnimation("piranha1", "alienPiranha", 0, 3, 10, -1)
+        this.createAnimation("splashAnim", "splash", 0, 8, 20, 0)
 
 
         this.bossManager.create(this.canvasWidth, this.canvasHeight)
@@ -149,7 +154,7 @@ export class CircleOfDeath extends Phaser.Scene {
         this.physics.add.overlap(this.dudeShipManager.getDudeShip(), this.bossManager.getFlameGroup(), this.handleCollisionDudeFlame, this.canDudeTakeDamage, this)
         this.physics.add.overlap(this.dudeShipManager.getDudeShip(), this.bossManager.getLaserBeanGroup(), this.handleCollisionDudeBean, this.canDudeTakeDamage, this)
         this.physics.add.overlap(this.dudeShipManager.getDudeShip(), this.bossManager.getExplosionsGroup(), this.handleCollisionDudeExplosion, this.canDudeTakeDamage, this)
-
+        
     }
 
     update(time, delta) {
