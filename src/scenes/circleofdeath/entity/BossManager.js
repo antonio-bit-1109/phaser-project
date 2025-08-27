@@ -20,6 +20,7 @@ export class BossManager {
     explosion_group = null
     countDownFunction = null
     alienPiranha = null
+    splashSprite = null
 
     constructor(scene, soundsManager) {
         this.boss = null;
@@ -73,6 +74,9 @@ export class BossManager {
             .setScale(0.3)
             .setVisible(false)
             .play("piranha1")
+
+        this.splashSprite = this.scene.add.sprite(0, 0, "splash")
+            .setVisible(false)
     }
 
 
@@ -109,68 +113,100 @@ export class BossManager {
             if (n < 0.25) this.laserBeans()
             if (n >= 0.25 && n < 0.50) this.laserSemicircles(dudeship)
             if (n >= 0.50 && n < 0.75) this.detonateBombs()
-            if (n >= 0.75) this.spawnAlienPiranha(delta)
+            if (n >= 0.75) this.spawnAlienPiranha()
 
         }
     }
 
+    showPiranhaSplash(startPointX, startPointY) {
+        // mostro lo splash come punto di partenza dal quale poi si muoverà il piranha
+        this.splashSprite.setPosition(startPointX, startPointY)
+            .setVisible(true)
+            .play("splashAnim")
+            .once("animationcomplete", () => {
+                this.scene.time.delayedCall(300, () => {
+                    this.splashSprite.setVisible(false)
+                })
+            })
+    }
+
+    showPiranha(startPointX, startPointY, startAngleRadians) {
+
+        // ritardo la comparsa del piranha di qualche milliseconod per dare tempo al giocatore di accorgersi della minaccia
+        this.scene.time.delayedCall(500, () => {
+            // 2. Posiziona lo sprite all'inizio
+            this.alienPiranha
+                .setPosition(
+                    startPointX,
+                    startPointY
+                )
+                .setVisible(true);
+
+            // 3. Oggetto proxy che il tween animerà e modificherà linearmente
+            let angleProxy = {value: startAngleRadians};
+
+            // 4. Angolo finale (mezzo giro dopo)
+            let endAngleRadians = startAngleRadians + Math.PI;
+
+            // 5. Crea il tween che gestirà l'animazione su più frame
+            this.scene.tweens.add({
+                targets: angleProxy,
+                value: endAngleRadians,
+                duration: 2500, // Il movimento durerà 2.5 secondi
+                ease: 'Linear',
+                onUpdate: (tween, target, key, current, previous, param) => {
+                    // Questa funzione viene chiamata AD OGNI FRAME dell'animazione
+
+                    // posso prendere dei parametri dall update tween,target,key,current,previous,param
+                    // tween, getValue mi prende il valore attuale che il tweens sta modificando ( il target che sta venendo modificato)
+                    // NB il tweens modifica DIRETTAMENTE il valore passato come target quindi avrei potuto prendere anche direttamente
+                    //angleProxy.value e sarebbe stato lo stesso
+                    let currAngleDeg = tween.getValue();
+
+                    // flippare, cioè specchiare il piranha,
+                    // in base a se si trova a destra o a sinistra della schermo
+                    if (this.alienPiranha.x <= this.canvasW / 2) {
+                        this.alienPiranha.flipX = true
+                    } else {
+                        this.alienPiranha.flipX = false
+                    }
+
+                    this.alienPiranha.setPosition(
+                        calculatePointCircumference_X(this.canvasW, currAngleDeg),
+                        calculatePointCircumference_Y(this.canvasH, currAngleDeg)
+                    );
+
+                },
+                onComplete: () => {
+                    console.log("Movimento completato!");
+                    this.isBossAttacking = false;
+                    this.alienPiranha.setVisible(false)
+                    this.showPiranhaSplash(
+                        calculatePointCircumference_X(this.canvasW, endAngleRadians),
+                        calculatePointCircumference_Y(this.canvasH, endAngleRadians)
+                    )
+                }
+            });
+        })
+
+    }
+
     spawnAlienPiranha() {
         if (this.isBossAttacking) return;
+
         this.isBossAttacking = true;
+
 
         // 1. Angolo di partenza (in radianti per coerenza)
         let startAngleRadians = Phaser.Math.DegToRad(Math.floor(Math.random() * 361));
 
-        // 2. Posiziona lo sprite all'inizio
-        this.alienPiranha
-            .setPosition(
-                calculatePointCircumference_X(this.canvasW, startAngleRadians),
-                calculatePointCircumference_Y(this.canvasH, startAngleRadians)
-            )
-            .setVisible(true);
+        // calcolo gli starting points
+        let startPointX = calculatePointCircumference_X(this.canvasW, startAngleRadians)
+        let startPointY = calculatePointCircumference_Y(this.canvasH, startAngleRadians)
 
-        // 3. Oggetto proxy che il tween animerà e modificherà linearmente
-        let angleProxy = {value: startAngleRadians};
+        this.showPiranhaSplash(startPointX, startPointY)
+        this.showPiranha(startPointX, startPointY, startAngleRadians)
 
-        // 4. Angolo finale (mezzo giro dopo)
-        let endAngleRadians = startAngleRadians + Math.PI;
-
-        // 5. Crea il tween che gestirà l'animazione su più frame
-        this.scene.tweens.add({
-            targets: angleProxy,
-            value: endAngleRadians,
-            duration: 2500, // Il movimento durerà 2.5 secondi
-            ease: 'Linear',
-            onUpdate: (tween, target, key, current, previous, param) => {
-                // Questa funzione viene chiamata AD OGNI FRAME dell'animazione
-
-                // posso prendere dei parametri dall update tween,target,key,current,previous,param
-                // tween, getValue mi prende il valore attuale che il tweens sta modificando ( il target che sta venendo modificato)
-                // NB il tweens modifica DIRETTAMENTE il valore passato come target quindi avrei potuto prendere anche direttamente
-                //angleProxy.value e sarebbe stato lo stesso
-                let currAngleDeg = Phaser.Math.RadToDeg(tween.getValue())
-
-                // flippare, cioè specchiare il piranha,
-                // in base a se si trova a destra o a sinistra della schermo
-                if (this.alienPiranha.x <= this.canvasW / 2) {
-                    this.alienPiranha.flipX = true
-                } else {
-                    this.alienPiranha.flipX = false
-                }
-
-
-                this.alienPiranha.setPosition(
-                    calculatePointCircumference_X(this.canvasW, tween.getValue()),
-                    calculatePointCircumference_Y(this.canvasH, tween.getValue())
-                );
-
-            },
-            onComplete: () => {
-                console.log("Movimento completato!");
-                this.isBossAttacking = false;
-                this.alienPiranha.setVisible(false)
-            }
-        });
     }
 
     detonateBombs() {
