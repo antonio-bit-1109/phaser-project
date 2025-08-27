@@ -123,9 +123,14 @@ export class BossManager {
     }
 
     showPiranhaSplash(startPointX, startPointY) {
+
+        //suono dello splash
+        this.soundsManager.playSound("splashSound");
+
         // mostro lo splash come punto di partenza dal quale poi si muoverà il piranha
         this.splashSprite.setPosition(startPointX, startPointY)
             .setVisible(true)
+            .setDepth(5)
             .play("splashAnim")
             .once("animationcomplete", () => {
                 this.scene.time.delayedCall(300, () => {
@@ -141,6 +146,7 @@ export class BossManager {
 
             // enable piranha body
             this.alienPiranha.body.enable = true
+            this.soundsManager.playSound("biteSound")
 
             // 2. Posiziona lo sprite all'inizio
             this.alienPiranha
@@ -148,7 +154,8 @@ export class BossManager {
                     startPointX,
                     startPointY
                 )
-                .setVisible(true);
+                .setVisible(true)
+                .setDepth(5)
 
             // 3. Oggetto proxy che il tween animerà e modificherà linearmente
             let angleProxy = {value: startAngleRadians};
@@ -190,6 +197,7 @@ export class BossManager {
                     this.isBossAttacking = false;
                     this.alienPiranha.setVisible(false)
                     this.alienPiranha.body.enable = false
+                    this.soundsManager.isSoundAlreadyPlaying("biteSound") && this.soundsManager.stopSound("biteSound")
                     this.showPiranhaSplash(
                         calculatePointCircumference_X(this.canvasW, endAngleRadians),
                         calculatePointCircumference_Y(this.canvasH, endAngleRadians)
