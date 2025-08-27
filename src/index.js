@@ -8,6 +8,7 @@ import {PingPong} from "./scenes/pingpong/PingPong";
 import {ChoosePongDifficulty} from "./scenes/pingpong/ChoosePongDifficulty";
 import {CircleOfDeath} from "./scenes/circleofdeath/CircleOfDeath";
 import {GameOver} from "./scenes/common/gameover/GameOver";
+import {Pigs} from "./scenes/pigs/Pigs";
 
 const config = {
     type: Phaser.AUTO,
@@ -28,7 +29,8 @@ const config = {
         DisplayAllScores,
         PingPong,
         ChoosePongDifficulty,
-        CircleOfDeath
+        CircleOfDeath,
+        Pigs
     ],
     plugins: {
         scene: [{
