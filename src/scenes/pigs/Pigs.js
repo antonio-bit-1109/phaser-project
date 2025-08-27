@@ -31,9 +31,10 @@ export class Pigs extends Phaser.Scene {
             .setDepth(0)
             .setScale(0.4)
 
-        this.add.image(this.canvasWidth / 1.1, this.canvasHeight / 1.2, "bossPoker")
+        this.add.image(this.canvasWidth / 1.15, this.canvasHeight / 1.2, "bossPoker")
             .setDepth(0)
             .setScale(0.5)
+
 
     }
 
