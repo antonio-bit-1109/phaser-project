@@ -57,6 +57,10 @@ export class BossManager {
         return this.explosion_group
     }
 
+    getAlienPiranha() {
+        return this.alienPiranha
+    }
+
     create(w, h) {
         this.canvasW = w
         this.canvasH = h
@@ -134,6 +138,10 @@ export class BossManager {
 
         // ritardo la comparsa del piranha di qualche milliseconod per dare tempo al giocatore di accorgersi della minaccia
         this.scene.time.delayedCall(500, () => {
+
+            // enable piranha body
+            this.alienPiranha.body.enable = true
+
             // 2. Posiziona lo sprite all'inizio
             this.alienPiranha
                 .setPosition(
@@ -181,6 +189,7 @@ export class BossManager {
                     console.log("Movimento completato!");
                     this.isBossAttacking = false;
                     this.alienPiranha.setVisible(false)
+                    this.alienPiranha.body.enable = false
                     this.showPiranhaSplash(
                         calculatePointCircumference_X(this.canvasW, endAngleRadians),
                         calculatePointCircumference_Y(this.canvasH, endAngleRadians)
