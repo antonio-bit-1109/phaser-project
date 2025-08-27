@@ -154,7 +154,7 @@ export class CircleOfDeath extends Phaser.Scene {
         this.physics.add.overlap(this.dudeShipManager.getDudeShip(), this.bossManager.getFlameGroup(), this.handleCollisionDudeFlame, this.canDudeTakeDamage, this)
         this.physics.add.overlap(this.dudeShipManager.getDudeShip(), this.bossManager.getLaserBeanGroup(), this.handleCollisionDudeBean, this.canDudeTakeDamage, this)
         this.physics.add.overlap(this.dudeShipManager.getDudeShip(), this.bossManager.getExplosionsGroup(), this.handleCollisionDudeExplosion, this.canDudeTakeDamage, this)
-        
+        this.physics.add.overlap(this.dudeShipManager.getDudeShip(), this.bossManager.getAlienPiranha(), this.handleCollisionDudePiranha, this.canDudeTakeDamage, this)
     }
 
     update(time, delta) {
@@ -255,6 +255,21 @@ export class CircleOfDeath extends Phaser.Scene {
             this.dudeShipManager.setHpBasedOnHpPiece()
             this.soundManager.playSound("dudeShipDamaged")
             bean.destroy()
+            this.time.delayedCall(2200, () => {
+                this.firstCollisionHappened = false
+                this.dudeShipManager.setInvincible(false)
+            })
+
+        }
+    }
+
+    handleCollisionDudePiranha(dudeShip, piranha) {
+        if (!this.firstCollisionHappened) {
+            console.log("dude subisce danni dal piranha!!")
+            this.firstCollisionHappened = true
+            this.dudeShipManager.setInvincible(true)
+            this.dudeShipManager.setHpBasedOnHpPiece()
+            this.soundManager.playSound("dudeShipDamaged")
             this.time.delayedCall(2200, () => {
                 this.firstCollisionHappened = false
                 this.dudeShipManager.setInvincible(false)
