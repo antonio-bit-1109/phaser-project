@@ -1,4 +1,5 @@
 import {AmbientManager} from "./managers/AmbientManager";
+import {DicesManager} from "./managers/DicesManager";
 
 export class Pigs extends Phaser.Scene {
 
@@ -17,6 +18,7 @@ export class Pigs extends Phaser.Scene {
     constructor() {
         super("pigs");
         this.ambientManager = new AmbientManager(this)
+        this.dicesmanager = new DicesManager(this)
     }
 
     init(data) {
@@ -30,12 +32,13 @@ export class Pigs extends Phaser.Scene {
         this.load.image("table_poker_bg", "assets/pigs/images/poker_table_green_fabric.png")
         this.load.image("dudePoker", "assets/bombburner/images/mezzoBustoDude.png")
         this.load.image("bossPoker", "assets/bombburner/images/boss_silly.png")
+        this.load.image("launchDices", "assets/pigs/images/lancia_dadi.jpg")
     }
 
     create() {
 
         this.ambientManager.create(this.canvasWidth, this.canvasHeight)
-        
+        this.dicesmanager.create(this.canvasWidth, this.canvasHeight)
     }
 
     update() {
