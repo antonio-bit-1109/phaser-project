@@ -16,8 +16,30 @@ export class AmbientManager {
     bossContainerVolume = null
     bossVolumeValue = 0
 
+
+    notificationRef = null
+
+
     constructor(scene) {
         this.scene = scene
+    }
+
+    // getter
+
+    getTotalContainerHeight() {
+        return this.TOTAL_OUTERCONTAINERHEIGTH
+    }
+
+    getPointsGoal() {
+        return this.POINTSGOAL
+    }
+
+    getDudeContainerVolume() {
+        return this.dudeContainerVolume
+    }
+
+    getBossContainerVolume() {
+        return this.bossContainerVolume
     }
 
     create(canvasW, canvasH) {
@@ -104,14 +126,26 @@ export class AmbientManager {
         this.addNumerationDent(this.canvasW / 11, this.canvasH / 18 + 130, "-30")
         this.addNumerationDent(this.canvasW / 11, this.canvasH / 18 + 280, "-0")
 
-
+        this.createNotificationWhoIsTurn()
         // this.updateVolume(this.dudeContainerVolume, 200)
         // this.updateVolume(this.dudeContainerVolume, 50)
         // this.updateVolume(this.bossContainerVolume, 150)
         // this.updateVolume(this.dudeContainerVolume, 150)
     }
 
+
+    update(time, delta) {
+
+    }
+
     //METHODS
+
+    createNotificationWhoIsTurn() {
+        this.notificationRef = this.scene.add.text(this.canvasW / 7.5, this.canvasH / 10, "È il tuo turno")
+            .setDepth(2)
+            .setScale(2.2)
+    }
+    
 
     addNumerationDent(x, y, val) {
         this.scene.add.text(x, y, val)
@@ -132,15 +166,26 @@ export class AmbientManager {
                 x: x,
                 y: y,
                 width: width,
-                height: height
+                height: height,
+                prevVal: 0
             })
     }
 
     // aggiungere riempimento al contenitore interno partendo dal basso (effetto riempimento)
     updateVolume(containerVolumeObj, newValue) {
 
+
         // prendo i dati dal data impostato sull oggetto
         const data = containerVolumeObj.data.values
+
+        if (newValue !== 0) {
+            data.prevVal += newValue
+
+        } else {
+            data.prevVal = 0
+        }
+
+        console.log(data.prevVal, "prevval della grafica ")
 
         // // pulisco la canvas eliminando l elem grafico
         containerVolumeObj
@@ -153,13 +198,15 @@ export class AmbientManager {
         const baseY = this.canvasH / 18 + this.TOTAL_OUTERCONTAINERHEIGTH;
 
         // 4. Calcola la Y di partenza per il nuovo rettangolo. QUESTA È LA FORMULA CHIAVE.
-        const fillY = baseY - newValue;
+        const fillY = baseY - (data.prevVal === 0 ? newValue : data.prevVal);
 
         // ricalcolo la posizione del nuovo elemento grafico sulla base dei dati salvati sull elemento grafico stesso
         // grazie al setData scritto in precedenza
         containerVolumeObj
             .fillStyle(this.COLOR_RIEMPIMENTO)
-            .fillRect(data.x, fillY, data.width, newValue)
+            .fillRect(data.x, fillY, data.width, data.prevVal === 0 ? newValue : data.prevVal)
         containerVolumeObj.strokePath()
+
+        console.log("valore passato al container volume", newValue)
     }
 }
