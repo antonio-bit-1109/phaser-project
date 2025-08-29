@@ -32,7 +32,12 @@ export class DicesManager {
     }
 
     createDiceRef(x, y, text) {
-        return this.scene.add.text(x, y, text)
+        return this.scene.add.text(x, y, text, {
+            fontSize: '16px',
+            fill: '#ffffff', // <-- Colore bianco, il più importante!
+            stroke: '#000000', // Aggiunge un bordo nero per maggiore leggibilità
+            strokeThickness: 2
+        })
             .setDepth(4)
             .setScale(10)
     }
@@ -45,6 +50,15 @@ export class DicesManager {
 
     updateDiceRef(num, prop) {
         prop.setText(num.toString())
+    }
+
+    updateD1Position(x, y) {
+        this.d1Ref.setPosition(x, y)
+    }
+
+    updateD2Position(x, y) {
+        this.d2Ref.setPosition(x, y)
+
     }
 
     setIconLaunchDicesInteractive() {
