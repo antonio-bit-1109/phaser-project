@@ -13,6 +13,15 @@ export class DicesManager {
         this.scene = scene
     }
 
+    //getter
+    getD1Value() {
+        return this.d1
+    }
+
+    getD2Value() {
+        return this.d2
+    }
+
     create(w, h) {
         this.canvasW = w
         this.canvasH = h
