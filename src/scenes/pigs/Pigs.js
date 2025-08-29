@@ -61,6 +61,22 @@ export class Pigs extends Phaser.Scene {
 
     update(time, delta) {
 
+
+        // in base a chi sta effettuando il turno
+        // cambiano la posizione dei dadi e del testo sullo schermo
+        if (this.turnManager.getIsDudeTurn()) {
+            this.ambientManager.updateNotificationPosition(this.canvasWidth / 7.5, this.canvasHeight / 10)
+            this.dicesmanager.updateD1Position(this.canvasWidth / 4, this.canvasHeight / 4)
+            this.dicesmanager.updateD2Position(this.canvasWidth / 4, this.canvasHeight / 2)
+        }
+
+        if (!this.turnManager.getIsDudeTurn()) {
+            this.ambientManager.updateNotificationPosition(this.canvasWidth / 1.9, this.canvasHeight / 10)
+            this.dicesmanager.updateD1Position(this.canvasWidth / 1.5, this.canvasHeight / 4)
+            this.dicesmanager.updateD2Position(this.canvasWidth / 1.5, this.canvasHeight / 2)
+        }
+
+
         // se il valore dei dadi nella classe principale è uguale al valore dei dati in diceManager,
         // non c'è stato alcun nuovo lancio.
         // tutto fermo
@@ -76,8 +92,11 @@ export class Pigs extends Phaser.Scene {
         // se uno dei valori lanciati dal dado è 1 il turno del player attuale finisce e resetta a zero la propria barra del punteggio
         if (this.IsAnyDiceValueOne(this.d1_currVal, this.d2_currVal)) {
 
-            this.turnManager.getIsDudeTurn() && this.ambientManager.updateVolume(this.ambientManager.getDudeContainerVolume(), 0)
-            !this.turnManager.getIsDudeTurn() && this.ambientManager.updateVolume(this.ambientManager.getBossContainerVolume(), 0)
+            this.turnManager.getIsDudeTurn() &&
+            this.ambientManager.updateVolume(this.ambientManager.getDudeContainerVolume(), 0)
+
+            !this.turnManager.getIsDudeTurn() &&
+            this.ambientManager.updateVolume(this.ambientManager.getBossContainerVolume(), 0)
 
             // this.isDudeTurn = !this.isDudeTurn
             // this.turnManager.setIsDudeTurn(!this.dude)
