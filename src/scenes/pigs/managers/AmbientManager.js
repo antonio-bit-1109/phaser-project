@@ -127,10 +127,7 @@ export class AmbientManager {
         this.addNumerationDent(this.canvasW / 11, this.canvasH / 18 + 280, "-0")
 
         this.createNotificationWhoIsTurn()
-        // this.updateVolume(this.dudeContainerVolume, 200)
-        // this.updateVolume(this.dudeContainerVolume, 50)
-        // this.updateVolume(this.bossContainerVolume, 150)
-        // this.updateVolume(this.dudeContainerVolume, 150)
+
     }
 
 
@@ -141,11 +138,21 @@ export class AmbientManager {
     //METHODS
 
     createNotificationWhoIsTurn() {
-        this.notificationRef = this.scene.add.text(this.canvasW / 7.5, this.canvasH / 10, "È il tuo turno")
+        this.notificationRef = this.scene.add.text(this.canvasW / 7.5, this.canvasH / 10, "È il tuo turno...", {
+            fontSize: '15px',
+            fill: '#ffffff', // <-- Colore bianco, il più importante!
+            stroke: '#000000', // Aggiunge un bordo nero per maggiore leggibilità
+            strokeThickness: 4
+        })
             .setDepth(2)
             .setScale(2.2)
     }
-    
+
+    updateNotificationPosition(x, y) {
+        this.notificationRef
+            .setPosition(x, y)
+    }
+
 
     addNumerationDent(x, y, val) {
         this.scene.add.text(x, y, val)
