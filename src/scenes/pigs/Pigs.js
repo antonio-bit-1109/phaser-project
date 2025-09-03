@@ -156,8 +156,7 @@ export class Pigs extends Phaser.Scene {
             this.dicesmanager.setCurrentCountBoss(this.dicesmanager.updateValue(this.dicesmanager.getCurrentCountBoss(), sumDices))
             this.dicesmanager.getCurrentCountBossRef().setText(this.dicesmanager.getCurrentCountBoss().toString())
         }
-
-
+        
     }
 
     proportionateValues(sumDices) {
