@@ -4,6 +4,10 @@ export class DicesManager {
     canvasH = null
     d1 = 0
     d2 = 0
+    currentCountDude = 0;
+    currentCountBoss = 0;
+    currentCountDudeRef = null
+    currentCountBossRef = null;
 
     d1Ref = null
     d2Ref = null
@@ -14,6 +18,34 @@ export class DicesManager {
     }
 
     //getter
+    getCurrentCountDude() {
+        return this.currentCountDude
+    }
+
+    getCurrentCountBoss() {
+        return this.currentCountBoss
+    }
+
+    updateValue(v1, v2) {
+        return v1 + v2;
+    }
+
+    setCurrentCountDude(intVal) {
+        this.currentCountDude = intVal;
+    }
+
+    setCurrentCountBoss(intVal) {
+        this.currentCountBoss = intVal;
+    }
+
+    getCurrentCountDudeRef() {
+        return this.currentCountDudeRef
+    }
+
+    getCurrentCountBossRef() {
+        return this.currentCountBossRef
+    }
+
     getD1Value() {
         return this.d1
     }
@@ -29,6 +61,23 @@ export class DicesManager {
         this.d2Ref = this.createDiceRef(this.canvasW / 4, this.canvasH / 2, this.d2)
         this.createIconLaunchDices()
         this.setIconLaunchDicesInteractive()
+        this.currentCountDudeRef = this.scene.add.text(this.canvasW / 3.5, this.canvasH / 1.25, "0", {
+            fontSize: '12px',
+            fill: '#ff0000', // <-- Colore bianco, il più importante!
+            stroke: '#000000', // Aggiunge un bordo nero per maggiore leggibilità
+            strokeThickness: 2
+        })
+            .setDepth(3)
+            .setScale(6)
+
+        this.currentCountBossRef = this.scene.add.text(this.canvasW / 1.5, this.canvasH / 1.25, "0", {
+            fontSize: '12px',
+            fill: '#ff0000', // <-- Colore bianco, il più importante!
+            stroke: '#000000', // Aggiunge un bordo nero per maggiore leggibilità
+            strokeThickness: 2
+        })
+            .setDepth(3)
+            .setScale(6)
     }
 
     createDiceRef(x, y, text) {
