@@ -2,7 +2,8 @@ export class AmbientManager {
 
     COLOR_RIEMPIMENTO = 0x008000
     COLOR_OUTERCONTAINER = 0xd2d2d2
-    POINTSGOAL = 60
+    POINTSGOAL = 100
+    DOUBLEONETHROW = 25
     TOTAL_OUTERCONTAINERHEIGTH = 300
 
     canvasW = null
@@ -25,6 +26,10 @@ export class AmbientManager {
     }
 
     // getter
+
+    getDoubleOneThrow() {
+        return this.DOUBLEONETHROW
+    }
 
     getTotalContainerHeight() {
         return this.TOTAL_OUTERCONTAINERHEIGTH
@@ -115,15 +120,15 @@ export class AmbientManager {
 
         // numeration dents for bossContainer
         this.addNumerationDent(this.canvasW / 1.15, this.canvasH / 18 + 280, "0-")
-        this.addNumerationDent(this.canvasW / 1.175, this.canvasH / 18 + 130, "30-")
-        this.addNumerationDent(this.canvasW / 1.175, this.canvasH / 18 - 20, "60-")
+        this.addNumerationDent(this.canvasW / 1.175, this.canvasH / 18 + 130, "50-")
+        this.addNumerationDent(this.canvasW / 1.175, this.canvasH / 18 - 20, "100-")
 
         // numeration dents for dudeContainer
 
         // this.addNumerationDent(this.canvasW / 1, this.canvasH / 18 + 280, "0-")
         // this.addNumerationDent(this.canvasW / 1.175, this.canvasH / 18 + 130, "30-")
-        this.addNumerationDent(this.canvasW / 11, this.canvasH / 18 - 20, "-60")
-        this.addNumerationDent(this.canvasW / 11, this.canvasH / 18 + 130, "-30")
+        this.addNumerationDent(this.canvasW / 11, this.canvasH / 18 - 20, "-100")
+        this.addNumerationDent(this.canvasW / 11, this.canvasH / 18 + 130, "-50")
         this.addNumerationDent(this.canvasW / 11, this.canvasH / 18 + 280, "-0")
 
         this.createNotificationWhoIsTurn()
