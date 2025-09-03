@@ -79,7 +79,7 @@ export class Pigs extends Phaser.Scene {
 
         // se il valore dei dadi nella classe principale è uguale al valore dei dati in diceManager,
         // non c'è stato alcun nuovo lancio.
-        // tutto fermo
+        // tutto fermo.
         if (this.d1_currVal === this.dicesmanager.getD1Value() && this.d2_currVal === this.dicesmanager.getD2Value()) return
 
         // vicevera se i dadi sono stati lanciati
@@ -89,36 +89,86 @@ export class Pigs extends Phaser.Scene {
 
         console.log("registrato variazione del valore dei dadi")
 
+        // se entrambi i dadi sono lo stesso numero ill numero uscito viene raddoppiato
+
+
         // se uno dei valori lanciati dal dado è 1 il turno del player attuale finisce e resetta a zero la propria barra del punteggio
         if (this.IsAnyDiceValueOne(this.d1_currVal, this.d2_currVal)) {
 
-            this.turnManager.getIsDudeTurn() &&
-            this.ambientManager.updateVolume(this.ambientManager.getDudeContainerVolume(), 0)
+            if (this.turnManager.getIsDudeTurn()) {
+                this.ambientManager.updateVolume(this.ambientManager.getDudeContainerVolume(), 0)
+                this.dicesmanager.setCurrentCountDude(0)
+                this.dicesmanager.getCurrentCountDudeRef().setText("0")
+            }
 
-            !this.turnManager.getIsDudeTurn() &&
-            this.ambientManager.updateVolume(this.ambientManager.getBossContainerVolume(), 0)
+            if (!this.turnManager.getIsDudeTurn()) {
+                this.ambientManager.updateVolume(this.ambientManager.getBossContainerVolume(), 0)
+                this.dicesmanager.setCurrentCountBoss(0)
+                this.dicesmanager.getCurrentCountBossRef().setText("0")
+            }
+
 
             // this.isDudeTurn = !this.isDudeTurn
             // this.turnManager.setIsDudeTurn(!this.dude)
             this.turnManager.invertTurn()
             return
+
+            // se i dadi sono lo stesso valore raddoppio il loro valore sommato
+        } else if (this.d1_currVal === this.d2_currVal) {
+
+            let doubled = (this.d1_currVal + this.d2_currVal) * 2
+
+            // se i due dati sono 1 e 1 allora il valore applicato al lancio è 25
+            if (this.d1_currVal === 1 && this.d2_currVal === 1) {
+                doubled = this.ambientManager.getDoubleOneThrow();
+            }
+
+            if (this.turnManager.getIsDudeTurn()) {
+                this.ambientManager.updateVolume(
+                    this.ambientManager.getDudeContainerVolume(),
+                    this.proportionateValues(doubled)
+                )
+                this.dicesmanager.setCurrentCountDude(this.dicesmanager.updateValue(this.dicesmanager.getCurrentCountDude(), doubled))
+                this.dicesmanager.getCurrentCountDudeRef().setText(this.dicesmanager.getCurrentCountDude().toString())
+            }
+
+            if (!this.turnManager.getIsDudeTurn()) {
+                this.ambientManager.updateVolume(
+                    this.ambientManager.getBossContainerVolume(),
+                    this.proportionateValues(doubled)
+                )
+                this.dicesmanager.setCurrentCountBoss(this.dicesmanager.updateValue(this.dicesmanager.getCurrentCountBoss(), doubled))
+                this.dicesmanager.getCurrentCountBossRef().setText(this.dicesmanager.getCurrentCountBoss().toString())
+            }
+            return
         }
 
         let sumDices = this.d1_currVal + this.d2_currVal
 
-        this.turnManager.getIsDudeTurn() && this.ambientManager.updateVolume(this.ambientManager.getDudeContainerVolume(), this.proportionateValues(sumDices))
-        !this.turnManager.getIsDudeTurn() && this.ambientManager.updateVolume(this.ambientManager.getBossContainerVolume(), this.proportionateValues(sumDices))
+        if (this.turnManager.getIsDudeTurn()) {
+            this.ambientManager.updateVolume(this.ambientManager.getDudeContainerVolume(), this.proportionateValues(sumDices))
+            this.dicesmanager.setCurrentCountDude(this.dicesmanager.updateValue(this.dicesmanager.getCurrentCountDude(), sumDices))
+            this.dicesmanager.getCurrentCountDudeRef().setText(this.dicesmanager.getCurrentCountDude().toString())
+        }
+
+        if (!this.turnManager.getIsDudeTurn()) {
+            this.ambientManager.updateVolume(this.ambientManager.getBossContainerVolume(), this.proportionateValues(sumDices))
+            this.dicesmanager.setCurrentCountBoss(this.dicesmanager.updateValue(this.dicesmanager.getCurrentCountBoss(), sumDices))
+            this.dicesmanager.getCurrentCountBossRef().setText(this.dicesmanager.getCurrentCountBoss().toString())
+        }
+
 
     }
 
     proportionateValues(sumDices) {
-        // sumDices : 60 = x : 300 proporzione per trovare a quanto corrisponde, su una scala di 300px, che è l'altezza del container
+        console.log(sumDices, "somma dei dati al lancio, prima di essere proporzionati ai 300px della barra. ")
+        // sumDices : 100 = x : 300 proporzione per trovare a quanto corrisponde, su una scala di 300px, che è l'altezza del container
         // il valore dei dati:
         // DETTO SEMPLICE: SE LA MIA SCALA GRADUATA VOGLIO CHE SIA DA 0 A 60 MA IN REALTÀ IN PIXEL QUELLA SCALA CORRISPONDE A 300PX,
         // TIRANDO I DATI E AVENDO COME RISULTATO AD ESEMPIO 9 COME FACCIO A PROPORZIONARE QUESTO 9 SU UNA SCALA CHE IN REALTÀ HA LUNGHEZZA 300PX ??
         // APPUNTO CON UNA PROPORZIONE!
 
-        // sumDices : 60 = x : 300
+        // sumDices : 100 = x : 300
 
         // noinspection UnnecessaryLocalVariableJS
         let proportionatedValue = sumDices * this.ambientManager.getTotalContainerHeight() / this.ambientManager.getPointsGoal()
