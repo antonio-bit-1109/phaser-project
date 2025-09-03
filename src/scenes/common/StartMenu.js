@@ -23,7 +23,7 @@ export class StartMenu extends Phaser.Scene {
     bombBurnerGameName = "Bomb Burner"
     pingPongGameName = "Ping pong dude"
     circleOfDeathName = "Circle of Death"
-    pigsName = "Pigs"
+    pigsName = "Maiale (pig)"
 
     convertToRadiant(gradi) {
         return Phaser.Math.DegToRad(gradi)
