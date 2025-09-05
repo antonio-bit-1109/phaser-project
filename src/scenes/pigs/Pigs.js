@@ -26,6 +26,9 @@ export class Pigs extends Phaser.Scene {
         this.canvasWidth = data.canvasWidth
         this.canvasHeight = data.canvasHeight
         this.gameName = data.gameName
+        this.ambientManager.resetClass()
+        this.dicesmanager.resetClass()
+        this.turnManager.resetClass()
     }
 
     preload() {
@@ -156,7 +159,8 @@ export class Pigs extends Phaser.Scene {
             this.dicesmanager.setCurrentCountBoss(this.dicesmanager.updateValue(this.dicesmanager.getCurrentCountBoss(), sumDices))
             this.dicesmanager.getCurrentCountBossRef().setText(this.dicesmanager.getCurrentCountBoss().toString())
         }
-        
+
+        this.isGameOver()
     }
 
     proportionateValues(sumDices) {
@@ -176,5 +180,35 @@ export class Pigs extends Phaser.Scene {
 
     IsAnyDiceValueOne(d1Val, d2Val) {
         return d1Val === 1 || d2Val === 1
+    }
+
+    isGameOver() {
+        if (this.dicesmanager.getCurrentCountDude() >= 100 || this.dicesmanager.getCurrentCountBoss() >= 100) {
+            this.soundsManager.stopAllSounds()
+        }
+
+        if (this.dicesmanager.getCurrentCountDude() >= 100) {
+            this.scene.stop("pigs")
+            this.scene.start("gameover", {
+                canvasWidth: this.canvasWidth,
+                canvasHeight: this.canvasHeight,
+                gameName: this.gameName,
+                sceneName: this.scene.key,
+                punteggioFinale: this.dicesmanager.returnFinalScore(),
+                isGameVictory: true
+            })
+        }
+
+        if (this.dicesmanager.getCurrentCountBoss() >= 100) {
+            this.scene.stop("pigs")
+            this.scene.start("gameover", {
+                canvasWidth: this.canvasWidth,
+                canvasHeight: this.canvasHeight,
+                gameName: this.gameName,
+                sceneName: this.scene.key,
+                punteggioFinale: this.dicesmanager.returnFinalScore(),
+                isGameVictory: false
+            })
+        }
     }
 }

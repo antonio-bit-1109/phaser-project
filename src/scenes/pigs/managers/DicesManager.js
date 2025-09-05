@@ -17,6 +17,19 @@ export class DicesManager {
         this.scene = scene
     }
 
+    resetClass() {
+        this.d1 = 0
+        this.d2 = 0
+        this.currentCountDude = 0;
+        this.currentCountBoss = 0;
+        this.currentCountDudeRef = null
+        this.currentCountBossRef = null;
+
+        this.d1Ref = null
+        this.d2Ref = null
+        this.iconDiceLaunch = null
+    }
+
     //getter
     getCurrentCountDude() {
         return this.currentCountDude
@@ -52,6 +65,10 @@ export class DicesManager {
 
     getD2Value() {
         return this.d2
+    }
+
+    returnFinalScore() {
+        return `${this.currentCountDude} / ${this.currentCountBoss}`
     }
 
     create(w, h) {

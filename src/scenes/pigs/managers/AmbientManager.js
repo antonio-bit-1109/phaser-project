@@ -47,6 +47,19 @@ export class AmbientManager {
         return this.bossContainerVolume
     }
 
+    resetClass() {
+        this.dudeOuterContainer = null
+        this.dudeContainerVolume = null
+        this.dudeVolumeValue = 0
+
+        this.bossOuterContainer = null
+        this.bossContainerVolume = null
+        this.bossVolumeValue = 0
+
+
+        this.notificationRef = null
+    }
+
     create(canvasW, canvasH) {
 
         this.canvasW = canvasW

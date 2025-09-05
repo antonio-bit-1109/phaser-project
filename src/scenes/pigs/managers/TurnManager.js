@@ -1,16 +1,21 @@
 export class TurnManager {
 
-    turnSwitcher_ref = null
     canvasW = null
     canvasH = null
 
     isDudeTurn = true
+    turnSwitcher_ref = null
 
     constructor(scene) {
         this.scene = scene
     }
 
     // getter
+
+    resetClass() {
+        this.isDudeTurn = true
+        this.turnSwitcher_ref = null
+    }
 
     getIsDudeTurn() {
         return this.isDudeTurn
