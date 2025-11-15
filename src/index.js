@@ -9,6 +9,7 @@ import {ChoosePongDifficulty} from "./scenes/pingpong/ChoosePongDifficulty";
 import {CircleOfDeath} from "./scenes/circleofdeath/CircleOfDeath";
 import {GameOver} from "./scenes/common/gameover/GameOver";
 import {Pigs} from "./scenes/pigs/Pigs";
+import {GeneralGameRules} from "./scenes/pigs/GeneralGameRules";
 
 const config = {
     type: Phaser.AUTO,
@@ -18,7 +19,7 @@ const config = {
         default: 'arcade',
         arcade: {
             gravity: {y: 0},
-            debug: true
+            debug: false
         }
     },
     scene: [
@@ -30,7 +31,8 @@ const config = {
         PingPong,
         ChoosePongDifficulty,
         CircleOfDeath,
-        Pigs
+        Pigs,
+        GeneralGameRules
     ],
     plugins: {
         scene: [{
