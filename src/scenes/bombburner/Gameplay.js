@@ -1,5 +1,3 @@
-import {updateGameTimer} from "../circleofdeath/constants/costanti";
-
 export class Gameplay extends Phaser.Scene {
 
 // CONSTS
