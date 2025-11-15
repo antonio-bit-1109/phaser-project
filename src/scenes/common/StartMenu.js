@@ -25,6 +25,33 @@ export class StartMenu extends Phaser.Scene {
     circleOfDeathName = "Circle of Death"
     pigsName = "Maiale (pig)"
 
+    // rules for pigs game
+    r0 = "In this game your aim is to reach 100pts rolling 2 dices at a time. \n " +
+        "You can roll dices as many times as you want. \n" +
+        " You keep store points for each throw you make as long as you DONT roll a 1," +
+        "if so you are going to lose all the points \n you have accumulated and is it now turn for your opponent to play. \n " +
+        "During your turn you can decide to roll dices or pass the hand to your opponent. \n " +
+        "first one reach 100pts wins the game. \n" +
+        " use the mouse to click around. \n" +
+        "\n" +
+        "\n" +
+        " 'Grazie al Fabione per lo spunto su questo giochino!' ;) \n "
+
+
+    // rules for bombburner game
+    r1 = "In this game you have to survive to all bombs. \n" +
+        "You can avoid them or destroy them, but be sure to reach the final boss. \n" +
+        "Than you have to defeat him of course. \n " +
+        "Will you be strong enough to survive? \n" +
+        "be careful, you can only fire one bullet at a time. \n " +
+        "Arrows LEFT and RIGHT to move, UP to shoot.";
+
+    r2 = "You can only move in circle, you can't fire, \n just survive until the timer runs out. \n" +
+        "Arrows LEFT and RIGHT to move your dude \n SPACE to accelerate (keep an eye on your tank on the left while sprinting) ."
+
+    r3 = "Just like pong. \n " +
+        "Move using UP and DOWN arrow keys.";
+
     convertToRadiant(gradi) {
         return Phaser.Math.DegToRad(gradi)
     }
@@ -73,10 +100,12 @@ export class StartMenu extends Phaser.Scene {
             .on("pointerdown", () => {
                 this.sound.stopAll()
                 this.scene.stop("startmenu");
-                this.scene.start("gameplay", {
+                this.scene.start("generalgamerules", {
                     canvasWidth: this.canvasWidth,
                     canvasHeight: this.canvasHeight,
-                    gameName: this.bombBurnerGameName
+                    gameName: this.bombBurnerGameName,
+                    r0: this.r1,
+                    gameToStart: "gameplay"
                 })
             })
 
@@ -87,10 +116,12 @@ export class StartMenu extends Phaser.Scene {
             .on("pointerdown", () => {
                 this.sound.stopAll()
                 this.scene.stop("startmenu");
-                this.scene.start("choosepongdifficulty", {
+                this.scene.start("generalgamerules", {
                     canvasWidth: this.canvasWidth,
                     canvasHeight: this.canvasHeight,
-                    gameName: this.pingPongGameName
+                    gameName: this.pingPongGameName,
+                    r0: this.r3,
+                    gameToStart: "choosepongdifficulty"
                 })
             })
 
@@ -101,10 +132,12 @@ export class StartMenu extends Phaser.Scene {
             .on("pointerdown", () => {
                 this.sound.stopAll()
                 this.scene.stop("startmenu");
-                this.scene.start("circleofdeath", {
+                this.scene.start("generalgamerules", {
                     canvasWidth: this.canvasWidth,
                     canvasHeight: this.canvasHeight,
-                    gameName: this.circleOfDeathName
+                    gameName: this.circleOfDeathName,
+                    r0: this.r2,
+                    gameToStart: "circleofdeath"
                 })
             })
 
@@ -115,10 +148,12 @@ export class StartMenu extends Phaser.Scene {
             .on("pointerdown", () => {
                 this.sound.stopAll()
                 this.scene.stop("startmenu");
-                this.scene.start("pigs", {
+                this.scene.start("generalgamerules", {
                     canvasWidth: this.canvasWidth,
                     canvasHeight: this.canvasHeight,
-                    gameName: this.pigsName
+                    gameName: this.pigsName,
+                    r0: this.r0,
+                    gameToStart: "pigs"
                 })
             })
 
