@@ -46,6 +46,7 @@ export class StartMenu extends Phaser.Scene {
         "be careful, you can only fire one bullet at a time. \n " +
         "Arrows LEFT and RIGHT to move, UP to shoot.";
 
+    // circle of death game
     r2 = "You can only move in circle, you can't fire, \n just survive until the timer runs out. \n" +
         "Arrows LEFT and RIGHT to move your dude \n SPACE to accelerate (keep an eye on your tank on the left while sprinting) ."
 
