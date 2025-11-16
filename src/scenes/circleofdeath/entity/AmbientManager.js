@@ -1,4 +1,5 @@
 import {calculatePointCircumference_X, calculatePointCircumference_Y, costanti} from "../constants/costanti";
+import {MovingControlMobileManager} from "./MovingControlMobileManager";
 
 export class AmbientManager {
 
@@ -14,6 +15,7 @@ export class AmbientManager {
     timer = `${this.m}:${this.d}${this.u}`
     timerRef = null
     deltaSum = 0
+    movingControlMobileManager = null;
 
 
     resetDefault() {
@@ -59,9 +61,12 @@ export class AmbientManager {
     create(w, h) {
         this.canvasH = h
         this.canvasW = w
+        this.movingControlMobileManager = new MovingControlMobileManager(this.scene, w);
         this.cursor = this.scene.input.keyboard.createCursorKeys();
         this.keySpace = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-        this.createTimer()
+        this.createTimer();
+        // control check on input mobile
+        this.movingControlMobileManager.checkPointerClick();
     }
 
     update(delta) {
@@ -127,14 +132,14 @@ export class AmbientManager {
         let x;
         let y;
 
-        if (this.cursor.right.isDown) {
+        if (this.cursor.right.isDown || this.movingControlMobileManager.getMovingRight()) {
             this.angolo += costanti.velAngolare * (this.dudeShipManager.getTurbo() ? 3 : 1) * (delta / 1000);
             x = calculatePointCircumference_X(this.canvasW, this.angolo)
             y = calculatePointCircumference_Y(this.canvasH, this.angolo)
             this.dudeShipManager.getDudeShip().setPosition(x, y);
         }
 
-        if (this.cursor.left.isDown) {
+        if (this.cursor.left.isDown || this.movingControlMobileManager.getMovingLeft()) {
             this.angolo -= costanti.velAngolare * (this.dudeShipManager.getTurbo() ? 3 : 1) * (delta / 1000);
             x = calculatePointCircumference_X(this.canvasW, this.angolo)
             y = calculatePointCircumference_Y(this.canvasH, this.angolo)
