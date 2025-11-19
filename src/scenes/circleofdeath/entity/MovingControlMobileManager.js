@@ -4,6 +4,8 @@ export class MovingControlMobileManager {
     canvasW = null;
     movingRight = false;
     movingLeft = false;
+    turbo = false;
+    clickingTurbo = false;
 
     constructor(scene, canvasW) {
         this.scene = scene;
@@ -11,11 +13,29 @@ export class MovingControlMobileManager {
     }
 
     // add event to check if clicked on the right side of the screen
-    checkPointerClick() {
+    checkPointerClick(turboBtn) {
+
+        turboBtn.setInteractive({cursor: "pointer"})
+            .on('pointerdown', () => {
+                this.clickingTurbo = true;
+                this.turbo = true;
+                console.log("TURBO ACTIVATED")
+            })
+            .on('pointerup', () => {
+                this.clickingTurbo = false;
+                this.turbo = false;
+                console.log("TURBO DEACTIVATED")
+            })
+
         this.scene.input.on('pointerdown', (pointer) => {
+
+
             console.log(pointer.x, "VALOR POINTER X")
 
             if (pointer.x > this.canvasW / 2) {
+
+                if (this.clickingTurbo) return;
+
                 this.movingRight = true
                 this.movingLeft = false
                 console.log("il click sta nella parte destra dello schermo ??", pointer.x > this.canvasW / 2)
@@ -47,5 +67,9 @@ export class MovingControlMobileManager {
 
     getMovingLeft() {
         return this.movingLeft;
+    }
+
+    getClickingTurbo() {
+        return this.clickingTurbo;
     }
 }
