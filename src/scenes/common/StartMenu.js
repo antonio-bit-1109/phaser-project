@@ -141,6 +141,14 @@ export class StartMenu extends Phaser.Scene {
                     gameToStart: "circleofdeath"
                 })
             })
+        this.add.text(this.canvasWidth / 1.6, this.canvasHeight / 2.2, "Mobile", {
+                color: '#cd0505',
+                fontSize: '30px',
+                fontStyle: 'bold'
+            }
+        )
+            .setDepth(6)
+
 
         this.add.text(this.canvasWidth / 2, this.canvasHeight / 1.8, this.pigsName, styleDefault)
             .setDepth(6)
