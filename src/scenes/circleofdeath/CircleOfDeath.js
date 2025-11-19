@@ -41,6 +41,7 @@ export class CircleOfDeath extends Phaser.Scene {
         this.load.image("circular_boss", "assets/circleofdeath/images/circular_boss.png")
         this.load.image("circular_boss_funky_pose", "assets/circleofdeath/images/boss_funky_pose.png")
         this.load.image("redBean", "assets/circleofdeath/images/redBean.png")
+        this.load.image("turboBtn", "assets/circleofdeath/images/turboBtn.png")
 
         this.load.image("dudeShip", "assets/pingpong/images/dude_ping_pong.png")
         this.load.image("rifleAim", "assets/circleofdeath/images/rifleAim_0.png")
