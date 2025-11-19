@@ -16,6 +16,7 @@ export class AmbientManager {
     timerRef = null
     deltaSum = 0
     movingControlMobileManager = null;
+    turboButton_ref = null;
 
 
     resetDefault() {
@@ -66,7 +67,14 @@ export class AmbientManager {
         this.keySpace = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
         this.createTimer();
         // control check on input mobile
-        this.movingControlMobileManager.checkPointerClick();
+        this.createTurboButton();
+        this.movingControlMobileManager.checkPointerClick(this.turboButton_ref);
+    }
+
+    createTurboButton() {
+        this.turboButton_ref = this.scene.add.image(this.canvasW / 1.2, this.canvasH / 1.15, "turboBtn")
+            .setScale(0.3)
+
     }
 
     update(delta) {
@@ -146,7 +154,11 @@ export class AmbientManager {
             this.dudeShipManager.getDudeShip().setPosition(x, y);
         }
 
-        if (this.keySpace.isDown && this.dudeShipManager.getTurboUpperBar().width >= 1) {
+        if (
+            this.dudeShipManager.getTurboUpperBar().width >= 1 && (
+                this.keySpace.isDown || this.movingControlMobileManager.getClickingTurbo()
+            )
+        ) {
 
             this.dudeShipManager.setTurbo(true)
             this.dudeShipManager.getTurboUpperBar().width -= 0.58
