@@ -262,6 +262,7 @@ export class BossManager {
                 config.texture,
                 true
             ).setScale(0.5)
+            aim.setTint(0x0048FF);
 
 
             this.rifleAims_Group.add(aim)
