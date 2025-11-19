@@ -74,6 +74,7 @@ export class AmbientManager {
     createTurboButton() {
         this.turboButton_ref = this.scene.add.image(this.canvasW / 1.2, this.canvasH / 1.15, "turboBtn")
             .setScale(0.3)
+            .setVisible(false)
 
     }
 
@@ -141,14 +142,14 @@ export class AmbientManager {
         let y;
 
         if (this.cursor.right.isDown || this.movingControlMobileManager.getMovingRight()) {
-            this.angolo += costanti.velAngolare * (this.dudeShipManager.getTurbo() ? 3 : 1) * (delta / 1000);
+            this.angolo += costanti.velAngolare * (this.dudeShipManager.getTurbo() ? 3 : 2) * (delta / 1000);
             x = calculatePointCircumference_X(this.canvasW, this.angolo)
             y = calculatePointCircumference_Y(this.canvasH, this.angolo)
             this.dudeShipManager.getDudeShip().setPosition(x, y);
         }
 
         if (this.cursor.left.isDown || this.movingControlMobileManager.getMovingLeft()) {
-            this.angolo -= costanti.velAngolare * (this.dudeShipManager.getTurbo() ? 3 : 1) * (delta / 1000);
+            this.angolo -= costanti.velAngolare * (this.dudeShipManager.getTurbo() ? 3 : 2) * (delta / 1000);
             x = calculatePointCircumference_X(this.canvasW, this.angolo)
             y = calculatePointCircumference_Y(this.canvasH, this.angolo)
             this.dudeShipManager.getDudeShip().setPosition(x, y);
