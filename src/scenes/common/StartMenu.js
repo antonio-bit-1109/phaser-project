@@ -126,6 +126,14 @@ export class StartMenu extends Phaser.Scene {
                 })
             })
 
+        this.add.text(this.canvasWidth / 1.6, this.canvasHeight / 2.65, "Mobile", {
+                color: '#cd0505',
+                fontSize: '30px',
+                fontStyle: 'bold'
+            }
+        )
+            .setDepth(6)
+
         this.add.text(this.canvasWidth / 2, this.canvasHeight / 2.1, this.circleOfDeathName, styleDefault)
             .setDepth(6)
             .setOrigin(0.5, 0.5)
