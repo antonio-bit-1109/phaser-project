@@ -1,3 +1,5 @@
+import {MobileControlsPingPong} from "./MobileControlsPingPong"
+
 export class PingPong extends Phaser.Scene {
 
     BALLVELOCITY = 300
@@ -33,6 +35,8 @@ export class PingPong extends Phaser.Scene {
     isBallTouchingScoreline = false;
     fogMode = false
     countFog = 0
+    mobileManagerControl = null;
+
 
     constructor() {
         super("pingpong");
@@ -81,6 +85,9 @@ export class PingPong extends Phaser.Scene {
     create() {
         console.log(this.GAMEDIFFICULTY)
         console.log(this.fogMode)
+
+        this.mobileManagerControl = new MobileControlsPingPong(this, this.canvasHeight)
+        this.mobileManagerControl.addEventClick();
 
         this.soundsMap.set("bg_music_pingPong", this.sound.add("bg_music_pingPong"))
         this.soundsMap.set("crowd_gol", this.sound.add("crowd_gol"))
@@ -164,6 +171,9 @@ export class PingPong extends Phaser.Scene {
 
 
     update(delta, time) {
+
+        // ottengo in tempo reale la posizione del dudeShip
+        this.mobileManagerControl.getDudePosition(this.dudeShip);
 
         if (this.isFirstStart || this.ballSpin <= 0.5) {
             this.ballRotateRight()
@@ -448,14 +458,20 @@ export class PingPong extends Phaser.Scene {
             this.dudeShip.setVelocityY(0)
         }
 
-        if (this.cursor.up.isDown && !this.isBorderUpReached) {
+        if (
+            (this.cursor.up.isDown && !this.isBorderUpReached) ||
+            (this.mobileManagerControl.getMovingUp() && !this.isBorderUpReached)
+        ) {
             this.isBorderDownReached = false
             this.isBorderUpReached = false
             this.dudeShip.setVelocityY(-250)
 
         }
 
-        if (this.cursor.down.isDown && !this.isBorderDownReached) {
+        if (
+            (this.cursor.down.isDown && !this.isBorderDownReached) ||
+            (this.mobileManagerControl.getMovingDown() && !this.isBorderDownReached)
+        ) {
             this.isBorderDownReached = false
             this.isBorderUpReached = false
             this.dudeShip.setVelocityY(250)
